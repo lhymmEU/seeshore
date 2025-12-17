@@ -193,75 +193,47 @@ function mapDbEventToStoreEvent(dbEvent: DbEvent, attendees: string[] = [], host
 }
 
 // ============================================
-// 1. SEND LOGIN OTP - Request OTP for existing user
+// 1. LOGIN WITH EMAIL - Sign in existing user with email/password
 // ============================================
 
-export async function sendLoginOtp(phone: string) {
-    // Format phone number (ensure it has country code)
-    const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
-
-    const { data, error } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
+export async function loginWithEmail(email: string, password: string) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
     });
 
     if (error) {
         throw new Error(error.message);
     }
 
-    return data;
-}
-
-// ============================================
-// 2. VERIFY LOGIN OTP - Verify OTP and complete login
-// ============================================
-
-export async function verifyLoginOtp(phone: string, otp: string) {
-    const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
-
-    const { data, error } = await supabase.auth.verifyOtp({
-        phone: formattedPhone,
-        token: otp,
-        type: 'sms',
-    });
-
-    if (error) {
-        throw new Error(error.message);
+    // Fetch or return the user profile
+    if (data.user) {
+        try {
+            const userProfile = await fetchUser(data.user.id);
+            return { auth: data, user: userProfile };
+        } catch {
+            // User profile doesn't exist yet, return auth data only
+            return { auth: data, user: null };
+        }
     }
 
-    return data;
+    return { auth: data, user: null };
 }
 
 // ============================================
-// 3. SEND REGISTER OTP - Request OTP for new user
+// 2. REGISTER WITH EMAIL - Create new user with email/password
 // ============================================
 
-export async function sendRegisterOtp(phone: string) {
-    const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
-
-    // This will create a new user if one doesn't exist
-    const { data, error } = await supabase.auth.signInWithOtp({
-        phone: formattedPhone,
-    });
-
-    if (error) {
-        throw new Error(error.message);
-    }
-
-    return data;
-}
-
-// ============================================
-// 4. VERIFY REGISTER OTP - Verify OTP and create user profile
-// ============================================
-
-export async function verifyRegisterOtp(phone: string, otp: string, name: string) {
-    const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
-
-    // Verify the OTP
-    const { data: authData, error: authError } = await supabase.auth.verifyOtp({
-        phone: formattedPhone,
-        token: otp,
-        type: 'sms',
+export async function registerWithEmail(email: string, password: string, name: string) {
+    // Sign up the user
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+            data: {
+                name,
+            },
+        },
     });
 
     if (authError) {
@@ -272,7 +244,7 @@ export async function verifyRegisterOtp(phone: string, otp: string, name: string
         throw new Error('Failed to create user');
     }
 
-    // Check if user profile already exists
+    // Check if user profile already exists (in case of re-registration)
     const { data: existingUser } = await supabase
         .from('users')
         .select('id')
@@ -304,15 +276,28 @@ export async function verifyRegisterOtp(phone: string, otp: string, name: string
 }
 
 // ============================================
-// 5. RESEND OTP - Resend OTP to phone number
+// 3. RESET PASSWORD - Send password reset email
 // ============================================
 
-export async function resendOtp(phone: string) {
-    const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
+export async function resetPassword(email: string) {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+    });
 
-    const { data, error } = await supabase.auth.resend({
-        type: 'sms',
-        phone: formattedPhone,
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data;
+}
+
+// ============================================
+// 4. UPDATE PASSWORD - Update user's password
+// ============================================
+
+export async function updatePassword(newPassword: string) {
+    const { data, error } = await supabase.auth.updateUser({
+        password: newPassword,
     });
 
     if (error) {

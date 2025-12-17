@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { X, Store, Headphones, LogIn, CheckCircle, XCircle, Loader2, MapPin, BookOpen, ArrowRight } from "lucide-react";
+import { X, Store, Headphones, LogIn, UserPlus, CheckCircle, XCircle, Loader2, MapPin, BookOpen, ArrowRight, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -10,32 +10,18 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { RoleType } from "./RoleCard";
+import { loginWithEmail, registerWithEmail, fetchStores } from "@/data/supabase";
+import type { Store as StoreType } from "@/types/type";
 
 type VerificationStatus = "idle" | "loading" | "success" | "error";
 type ViewState = "login" | "verifying" | "storeSelection";
-
-interface StoreInfo {
-  id: string;
-  name: string;
-  description: string;
-  address: string;
-}
-
-// Mock store data - in real app, this would come from API
-const mockStores: StoreInfo[] = [
-  {
-    id: "1",
-    name: "Seashore Downtown",
-    description: "Our flagship store in the heart of the city",
-    address: "123 Main Street",
-  },
-];
+type AuthMode = "login" | "register";
 
 interface RoleSlideUpProps {
   role: RoleType | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onContinue?: (role: RoleType, credentials: { username: string; password: string }) => void;
+  onContinue?: (role: RoleType, credentials: { email: string; password: string }) => void;
 }
 
 const roleDetails: Record<
@@ -81,17 +67,27 @@ export function RoleSlideUp({
   onContinue,
 }: RoleSlideUpProps) {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [viewState, setViewState] = useState<ViewState>("login");
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
+  const [stores, setStores] = useState<StoreType[]>([]);
 
   // Transition from success to store selection after 1 second
   useEffect(() => {
     if (verificationStatus === "success" && viewState === "verifying") {
-      const timer = setTimeout(() => {
+      const timer = setTimeout(async () => {
+        // Fetch stores from database
+        try {
+          const fetchedStores = await fetchStores();
+          setStores(fetchedStores);
+        } catch (error) {
+          console.error("Failed to fetch stores:", error);
+        }
         setViewState("storeSelection");
       }, 1000);
       return () => clearTimeout(timer);
@@ -106,33 +102,23 @@ export function RoleSlideUp({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username || !password) return;
+    if (!email || !password) return;
+    if (authMode === "register" && !name) return;
 
     setVerificationStatus("loading");
     setViewState("verifying");
     setErrorMessage("");
 
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password, role }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setVerificationStatus("success");
-        // Don't call onContinue here - wait for store selection
+      if (authMode === "login") {
+        await loginWithEmail(email, password);
       } else {
-        setVerificationStatus("error");
-        setErrorMessage(data.message || "Login failed");
+        await registerWithEmail(email, password, name);
       }
-    } catch {
+      setVerificationStatus("success");
+    } catch (error) {
       setVerificationStatus("error");
-      setErrorMessage("Network error. Please try again.");
+      setErrorMessage(error instanceof Error ? error.message : "Authentication failed");
     }
   };
 
@@ -142,9 +128,12 @@ export function RoleSlideUp({
       setVerificationStatus("idle");
       setViewState("login");
       setErrorMessage("");
-      setUsername("");
+      setEmail("");
       setPassword("");
+      setName("");
       setSelectedStore(null);
+      setAuthMode("login");
+      setStores([]);
     }
     onOpenChange(newOpen);
   };
@@ -167,7 +156,7 @@ export function RoleSlideUp({
       
       // Call onContinue if provided
       if (onContinue) {
-        onContinue(role, { username, password });
+        onContinue(role, { email, password });
       }
       
       // Navigate to the management page
@@ -175,7 +164,12 @@ export function RoleSlideUp({
     }
   };
 
-  const isFormValid = username.trim() !== "" && password.trim() !== "";
+  const toggleAuthMode = () => {
+    setAuthMode(authMode === "login" ? "register" : "login");
+    setErrorMessage("");
+  };
+
+  const isFormValid = email.trim() !== "" && password.trim() !== "" && (authMode === "login" || name.trim() !== "");
 
   // Verification Result View
   const renderVerificationResult = () => (
@@ -187,7 +181,7 @@ export function RoleSlideUp({
           </div>
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-zinc-900">
-              Verifying...
+              {authMode === "login" ? "Signing in..." : "Creating account..."}
             </h2>
             <p className="text-sm text-zinc-500">
               Please wait while we verify your credentials
@@ -203,10 +197,10 @@ export function RoleSlideUp({
           </div>
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-zinc-900">
-              Verification Successful
+              {authMode === "login" ? "Welcome Back!" : "Account Created!"}
             </h2>
             <p className="text-sm text-zinc-500">
-              Welcome back! Loading your stores...
+              Loading your stores...
             </p>
           </div>
         </>
@@ -219,7 +213,7 @@ export function RoleSlideUp({
           </div>
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-zinc-900">
-              Verification Failed
+              {authMode === "login" ? "Login Failed" : "Registration Failed"}
             </h2>
             <p className="text-sm text-zinc-500">
               {errorMessage || "Unable to verify your credentials"}
@@ -258,7 +252,7 @@ export function RoleSlideUp({
       {/* Horizontally scrollable store cards */}
       <div className="-mx-6 px-6">
         <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-          {mockStores.map((store) => (
+          {stores.length > 0 ? stores.map((store) => (
             <button
               key={store.id}
               onClick={() => handleStoreSelect(store.id)}
@@ -270,7 +264,7 @@ export function RoleSlideUp({
             >
               {/* Store image placeholder */}
               <div
-                className={`w-full h-24 rounded-xl mb-3 flex items-center justify-center ${
+                className={`w-full h-24 rounded-xl mb-3 flex items-center justify-center overflow-hidden ${
                   selectedStore === store.id ? "bg-zinc-800" : "bg-zinc-200"
                 }`}
               >
@@ -285,7 +279,7 @@ export function RoleSlideUp({
                   selectedStore === store.id ? "text-zinc-300" : "text-zinc-500"
                 }`}
               >
-                {store.description}
+                {store.description || "No description"}
               </p>
               <div className="flex items-center gap-1">
                 <MapPin
@@ -297,11 +291,16 @@ export function RoleSlideUp({
                     selectedStore === store.id ? "text-zinc-400" : "text-zinc-400"
                   }`}
                 >
-                  {store.address}
+                  {store.rules || "See store rules"}
                 </span>
               </div>
             </button>
-          ))}
+          )) : (
+            <div className="flex-1 text-center py-8 text-zinc-500">
+              <p>No stores available</p>
+              <p className="text-sm mt-1">Contact admin to create a store</p>
+            </div>
+          )}
         </div>
       </div>
 
@@ -348,22 +347,43 @@ export function RoleSlideUp({
         ))}
       </div>
 
-      {/* Login form */}
+      {/* Login/Register form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-3">
+          {/* Name field for registration */}
+          {authMode === "register" && (
+            <div className="space-y-1.5">
+              <label htmlFor="name" className="text-sm font-medium text-zinc-700">
+                Full Name
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your full name"
+                className="w-full h-12 px-4 rounded-xl border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-shadow"
+                autoComplete="name"
+              />
+            </div>
+          )}
+          
           <div className="space-y-1.5">
-            <label htmlFor="username" className="text-sm font-medium text-zinc-700">
-              Username
+            <label htmlFor="email" className="text-sm font-medium text-zinc-700">
+              Email
             </label>
-            <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-              className="w-full h-12 px-4 rounded-xl border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-shadow"
-              autoComplete="username"
-            />
+            <div className="relative">
+              <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full h-12 pl-11 pr-4 rounded-xl border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-shadow"
+                autoComplete="email"
+              />
+            </div>
           </div>
           <div className="space-y-1.5">
             <label htmlFor="password" className="text-sm font-medium text-zinc-700">
@@ -374,22 +394,51 @@ export function RoleSlideUp({
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder={authMode === "register" ? "Create a password" : "Enter your password"}
               className="w-full h-12 px-4 rounded-xl border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-shadow"
-              autoComplete="current-password"
+              autoComplete={authMode === "register" ? "new-password" : "current-password"}
             />
           </div>
         </div>
+
+        {errorMessage && viewState === "login" && (
+          <p className="text-sm text-red-600 text-center">{errorMessage}</p>
+        )}
+
         <Button
           type="submit"
           size="lg"
           disabled={!isFormValid}
           className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <LogIn size={18} className="mr-2" />
-          Sign In
+          {authMode === "login" ? (
+            <>
+              <LogIn size={18} className="mr-2" />
+              Sign In
+            </>
+          ) : (
+            <>
+              <UserPlus size={18} className="mr-2" />
+              Create Account
+            </>
+          )}
         </Button>
       </form>
+
+      {/* Toggle auth mode */}
+      <div className="text-center">
+        <button
+          type="button"
+          onClick={toggleAuthMode}
+          className="text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
+        >
+          {authMode === "login" ? (
+            <>Don&apos;t have an account? <span className="font-medium">Sign up</span></>
+          ) : (
+            <>Already have an account? <span className="font-medium">Sign in</span></>
+          )}
+        </button>
+      </div>
 
       {/* Footer note */}
       <p className="text-xs text-center text-zinc-400">
@@ -418,4 +467,3 @@ export function RoleSlideUp({
     </Drawer>
   );
 }
-
