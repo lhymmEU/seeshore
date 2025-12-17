@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { X, Store, Headphones, LogIn, CheckCircle, XCircle, Loader2, MapPin, BookOpen, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,12 +29,6 @@ const mockStores: StoreInfo[] = [
     description: "Our flagship store in the heart of the city",
     address: "123 Main Street",
   },
-  {
-    id: "2",
-    name: "Seashore Westside",
-    description: "Cozy neighborhood bookstore with cafe",
-    address: "456 Oak Avenue",
-  }
 ];
 
 interface RoleSlideUpProps {
@@ -85,6 +80,7 @@ export function RoleSlideUp({
   onOpenChange,
   onContinue,
 }: RoleSlideUpProps) {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>("idle");
@@ -164,9 +160,18 @@ export function RoleSlideUp({
   };
 
   const handleEnterStore = () => {
-    if (selectedStore && onContinue) {
-      // Call onContinue with the selected credentials
-      onContinue(role, { username, password });
+    if (selectedStore) {
+      // Store the role in sessionStorage for the management page
+      sessionStorage.setItem("userRole", role);
+      sessionStorage.setItem("selectedStore", selectedStore);
+      
+      // Call onContinue if provided
+      if (onContinue) {
+        onContinue(role, { username, password });
+      }
+      
+      // Navigate to the management page
+      router.push("/manage");
     }
   };
 
