@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { 
   Store, 
   Users, 
@@ -24,7 +25,7 @@ interface DashboardCard {
 }
 
 const ownerCards: DashboardCard[] = [
-  { id: "edit-bookstore", title: "Create / Edit Bookstore", icon: Edit3, href: "/manage/bookstore", size: "large" },
+  { id: "edit-bookstore", title: "Edit Bookstore", icon: Edit3, href: "/manage/bookstore", size: "large" },
   { id: "manage-roles", title: "Manage Roles", icon: Users, href: "/manage/roles", size: "medium" },
   { id: "manage-events", title: "Manage Events", icon: CalendarDays, href: "/manage/events", size: "medium" },
   { id: "internal-tasks", title: "Manage Internal Tasks", icon: ClipboardList, href: "/manage/tasks", size: "medium" },
@@ -50,7 +51,8 @@ function DashboardCardComponent({ card }: { card: DashboardCard }) {
   };
 
   return (
-    <button
+    <Link
+      href={card.href}
       className={cn(
         "bg-zinc-200/80 rounded-2xl p-4 flex items-center transition-all active:scale-[0.98] hover:bg-zinc-300/80",
         sizeClasses[card.size || "medium"],
@@ -66,25 +68,28 @@ function DashboardCardComponent({ card }: { card: DashboardCard }) {
       )}>
         {card.title}
       </span>
-    </button>
+    </Link>
   );
 }
 
 export default function ManagePage() {
-  const [role, setRole] = useState<UserRole | null>(null);
   const router = useRouter();
+  
+  // Initialize role synchronously from sessionStorage
+  const [role] = useState<UserRole | null>(() => {
+    if (typeof window === "undefined") return null;
+    const storedRole = sessionStorage.getItem("userRole") as UserRole | null;
+    return storedRole === "owner" || storedRole === "assistant" ? storedRole : null;
+  });
 
   useEffect(() => {
-    // Get role from sessionStorage (set during login)
-    const storedRole = sessionStorage.getItem("userRole") as UserRole | null;
-    
-    if (!storedRole || (storedRole !== "owner" && storedRole !== "assistant")) {
-      // Redirect to home if not logged in as owner or assistant
-      router.push("/");
-      return;
+    // Handle redirect for invalid roles (client-side only)
+    if (typeof window !== "undefined") {
+      const storedRole = sessionStorage.getItem("userRole") as UserRole | null;
+      if (!storedRole || (storedRole !== "owner" && storedRole !== "assistant")) {
+        router.push("/");
+      }
     }
-    
-    setRole(storedRole);
   }, [router]);
 
   if (!role) {

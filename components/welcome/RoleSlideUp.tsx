@@ -76,6 +76,7 @@ export function RoleSlideUp({
   const [viewState, setViewState] = useState<ViewState>("login");
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
   const [stores, setStores] = useState<StoreType[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
 
   // Transition from success to store selection after 1 second
   useEffect(() => {
@@ -110,10 +111,15 @@ export function RoleSlideUp({
     setErrorMessage("");
 
     try {
+      let result;
       if (authMode === "login") {
-        await loginWithEmail(email, password);
+        result = await loginWithEmail(email, password);
       } else {
-        await registerWithEmail(email, password, name);
+        result = await registerWithEmail(email, password, name);
+      }
+      // Store the user ID for later use
+      if (result.auth?.user?.id) {
+        setUserId(result.auth.user.id);
       }
       setVerificationStatus("success");
     } catch (error) {
@@ -134,6 +140,7 @@ export function RoleSlideUp({
       setSelectedStore(null);
       setAuthMode("login");
       setStores([]);
+      setUserId(null);
     }
     onOpenChange(newOpen);
   };
@@ -150,9 +157,12 @@ export function RoleSlideUp({
 
   const handleEnterStore = () => {
     if (selectedStore) {
-      // Store the role in sessionStorage for the management page
+      // Store the role and user info in sessionStorage for the management page
       sessionStorage.setItem("userRole", role);
       sessionStorage.setItem("selectedStore", selectedStore);
+      if (userId) {
+        sessionStorage.setItem("userId", userId);
+      }
       
       // Call onContinue if provided
       if (onContinue) {

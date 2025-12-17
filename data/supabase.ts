@@ -1523,3 +1523,59 @@ export async function promoteToAssistant(storeId: string, userId: string): Promi
         .update({ type: 'Assistant' })
         .eq('id', userId);
 }
+
+// Update a store
+export async function updateStore(
+    storeId: string,
+    updates: {
+        name?: string;
+        banner?: string;
+        description?: string;
+        rules?: string;
+    }
+): Promise<Store> {
+    const updateData: Record<string, unknown> = {};
+
+    if (updates.name !== undefined) updateData.name = updates.name;
+    if (updates.banner !== undefined) updateData.banner = updates.banner;
+    if (updates.description !== undefined) updateData.description = updates.description;
+    if (updates.rules !== undefined) updateData.rules = updates.rules;
+
+    const { error } = await supabase
+        .from('stores')
+        .update(updateData)
+        .eq('id', storeId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return fetchStoreInfo(storeId);
+}
+
+// Fetch store by user ID (owner or assistant)
+export async function fetchStoreByUserId(userId: string): Promise<Store | null> {
+    // First check if user is an owner
+    const { data: ownerRelation } = await supabase
+        .from('store_owners')
+        .select('store_id')
+        .eq('user_id', userId)
+        .single();
+
+    if (ownerRelation) {
+        return fetchStoreInfo(ownerRelation.store_id);
+    }
+
+    // Then check if user is an assistant
+    const { data: assistantRelation } = await supabase
+        .from('store_assistants')
+        .select('store_id')
+        .eq('user_id', userId)
+        .single();
+
+    if (assistantRelation) {
+        return fetchStoreInfo(assistantRelation.store_id);
+    }
+
+    return null;
+}
