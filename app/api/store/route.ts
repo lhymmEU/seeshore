@@ -85,6 +85,12 @@ export async function PUT(request: NextRequest) {
             );
         }
 
+        // Extract access token from Authorization header
+        const authHeader = request.headers.get("Authorization");
+        const accessToken = authHeader?.startsWith("Bearer ") 
+            ? authHeader.slice(7) 
+            : undefined;
+
         const updates: {
             name?: string;
             banner?: string;
@@ -97,7 +103,7 @@ export async function PUT(request: NextRequest) {
         if (description !== undefined) updates.description = description;
         if (rules !== undefined) updates.rules = rules;
 
-        const store = await updateStore(id, updates);
+        const store = await updateStore(id, updates, accessToken);
         return NextResponse.json(store);
     } catch (error) {
         console.error("Failed to update store:", error);

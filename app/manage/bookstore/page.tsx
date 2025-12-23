@@ -101,10 +101,16 @@ export default function BookstoreEditorPage() {
     setIsSaving(true);
     try {
       const userId = sessionStorage.getItem("userId");
-      
+      const accessToken = sessionStorage.getItem("accessToken");
+
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+
       const response = await fetch("/api/store", {
         method: storeId ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           ...(storeId && { id: storeId }),
           ...formData,

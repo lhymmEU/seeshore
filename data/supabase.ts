@@ -10,6 +10,18 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+// Create an authenticated Supabase client using an access token
+// This is used for server-side operations that need to respect RLS
+export function createAuthenticatedClient(accessToken: string) {
+    return createClient(supabaseUrl, supabaseAnonKey, {
+        global: {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        },
+    });
+}
+
 // ============================================
 // DATABASE TYPES (matching Supabase schema)
 // ============================================
@@ -1532,22 +1544,35 @@ export async function updateStore(
         banner?: string;
         description?: string;
         rules?: string;
-    }
+    },
+    accessToken?: string
 ): Promise<Store> {
     const updateData: Record<string, unknown> = {};
 
+    
     if (updates.name !== undefined) updateData.name = updates.name;
     if (updates.banner !== undefined) updateData.banner = updates.banner;
     if (updates.description !== undefined) updateData.description = updates.description;
     if (updates.rules !== undefined) updateData.rules = updates.rules;
-
-    const { error } = await supabase
+ 
+    console.log("Update data while updating store:", updateData);
+    console.log("Using access token:", accessToken ? "yes" : "no");
+    
+    // Use authenticated client if access token is provided (for RLS compliance)
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+    
+    const { data, error } = await client
         .from('stores')
         .update(updateData)
-        .eq('id', storeId);
-
+        .eq('id', storeId)
+        .select();
+    
     if (error) {
         throw new Error(error.message);
+    }
+    
+    if (!data || data.length === 0) {
+        throw new Error("Store update failed - no rows affected. User may not have permission to update this store.");
     }
 
     return fetchStoreInfo(storeId);

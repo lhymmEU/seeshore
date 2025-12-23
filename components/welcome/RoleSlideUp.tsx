@@ -77,6 +77,7 @@ export function RoleSlideUp({
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
   const [stores, setStores] = useState<StoreType[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   // Transition from success to store selection after 1 second
   useEffect(() => {
@@ -117,9 +118,12 @@ export function RoleSlideUp({
       } else {
         result = await registerWithEmail(email, password, name);
       }
-      // Store the user ID for later use
+      // Store the user ID and access token for later use
       if (result.auth?.user?.id) {
         setUserId(result.auth.user.id);
+      }
+      if (result.auth?.session?.access_token) {
+        setAccessToken(result.auth.session.access_token);
       }
       setVerificationStatus("success");
     } catch (error) {
@@ -141,6 +145,7 @@ export function RoleSlideUp({
       setAuthMode("login");
       setStores([]);
       setUserId(null);
+      setAccessToken(null);
     }
     onOpenChange(newOpen);
   };
@@ -162,6 +167,9 @@ export function RoleSlideUp({
       sessionStorage.setItem("selectedStore", selectedStore);
       if (userId) {
         sessionStorage.setItem("userId", userId);
+      }
+      if (accessToken) {
+        sessionStorage.setItem("accessToken", accessToken);
       }
       
       // Call onContinue if provided
