@@ -39,14 +39,14 @@ export default function BookstoreEditorPage() {
         return;
       }
 
-      // Try to fetch existing store data by user ID
-      const userId = sessionStorage.getItem("userId");
-      if (userId) {
+      // Use storeId from sessionStorage (set during login store selection)
+      const savedStoreId = sessionStorage.getItem("storeId");
+      if (savedStoreId) {
+        setStoreId(savedStoreId);
         try {
-          const response = await fetch(`/api/store?userId=${userId}`);
+          const response = await fetch(`/api/store?id=${savedStoreId}`);
           if (response.ok) {
             const store = await response.json();
-            setStoreId(store.id);
             setFormData({
               banner: store.banner || "",
               name: store.name || "",
@@ -56,8 +56,6 @@ export default function BookstoreEditorPage() {
             if (store.banner) {
               setBannerPreview(store.banner);
             }
-            // Store the storeId for future use
-            sessionStorage.setItem("storeId", store.id);
           }
         } catch (error) {
           console.error("Failed to fetch store:", error);

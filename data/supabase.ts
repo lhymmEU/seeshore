@@ -584,9 +584,13 @@ export async function createEvent(
         description?: string;
         location?: string;
         hostIds?: string[];
-    }
+    },
+    accessToken?: string
 ): Promise<StoreEvent> {
-    const { data: event, error } = await supabase
+    // Use authenticated client if access token is provided (for RLS compliance)
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const { data: event, error } = await client
         .from('events')
         .insert({
             store_id: storeId,
@@ -605,14 +609,14 @@ export async function createEvent(
         throw new Error(error.message);
     }
 
-    // Add hosts if provided
+    // Add hosts if provided (also use authenticated client)
     if (eventData.hostIds && eventData.hostIds.length > 0) {
         const hostInserts = eventData.hostIds.map(hostId => ({
             event_id: (event as DbEvent).id,
             user_id: hostId,
         }));
 
-        await supabase.from('event_hosts').insert(hostInserts);
+        await client.from('event_hosts').insert(hostInserts);
     }
 
     return mapDbEventToStoreEvent(event as DbEvent, [], eventData.hostIds || []);
@@ -632,9 +636,13 @@ export async function proposeEvent(
         description?: string;
         location?: string;
         hostIds?: string[];
-    }
+    },
+    accessToken?: string
 ): Promise<StoreEvent> {
-    const { data: event, error } = await supabase
+    // Use authenticated client if access token is provided (for RLS compliance)
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const { data: event, error } = await client
         .from('events')
         .insert({
             store_id: storeId,
@@ -653,14 +661,14 @@ export async function proposeEvent(
         throw new Error(error.message);
     }
 
-    // Add hosts if provided
+    // Add hosts if provided (also use authenticated client)
     if (eventData.hostIds && eventData.hostIds.length > 0) {
         const hostInserts = eventData.hostIds.map(hostId => ({
             event_id: (event as DbEvent).id,
             user_id: hostId,
         }));
 
-        await supabase.from('event_hosts').insert(hostInserts);
+        await client.from('event_hosts').insert(hostInserts);
     }
 
     return mapDbEventToStoreEvent(event as DbEvent, [], eventData.hostIds || []);

@@ -209,8 +209,7 @@ export default function EventsManagePage() {
   };
 
   const handleCreateEvent = () => {
-    // TODO: Implement create event functionality
-    console.log("Create event");
+    router.push("/manage/events/create");
   };
 
   if (isLoading) {
