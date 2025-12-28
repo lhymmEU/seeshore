@@ -1080,7 +1080,22 @@ export async function registerBook(
 }
 
 // ============================================
-// 22. FETCH ALL SPENDINGS
+// 22. DEREGISTER BOOK
+// ============================================
+
+export async function deregisterBook(bookId: string): Promise<void> {
+    const { error } = await supabase
+        .from('books')
+        .delete()
+        .eq('id', bookId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+}
+
+// ============================================
+// 23. FETCH ALL SPENDINGS
 // ============================================
 
 export async function fetchSpendings(storeId?: string): Promise<Spending[]> {
@@ -1100,7 +1115,7 @@ export async function fetchSpendings(storeId?: string): Promise<Spending[]> {
 }
 
 // ============================================
-// 23. ADD SPENDING
+// 24. ADD SPENDING
 // ============================================
 
 export async function addSpending(
@@ -1134,7 +1149,7 @@ export async function addSpending(
 }
 
 // ============================================
-// 24. FETCH BOOKS - Fetch all books in the db
+// 25. FETCH BOOKS - Fetch all books in the db
 // ============================================
 
 export async function fetchBooks(storeId?: string): Promise<Book[]> {
@@ -1154,7 +1169,7 @@ export async function fetchBooks(storeId?: string): Promise<Book[]> {
 }
 
 // ============================================
-// 25. FETCH BOOK - Fetch one specific book
+// 26. FETCH BOOK - Fetch one specific book
 // ============================================
 
 export async function fetchBook(bookId: string): Promise<Book> {
@@ -1172,7 +1187,7 @@ export async function fetchBook(bookId: string): Promise<Book> {
 }
 
 // ============================================
-// 26. FETCH USERS - Fetch based on array of user ids
+// 27. FETCH USERS - Fetch based on array of user ids
 // ============================================
 
 export async function fetchUsers(userIds: string[]): Promise<User[]> {
@@ -1227,7 +1242,7 @@ export async function fetchUsers(userIds: string[]): Promise<User[]> {
 }
 
 // ============================================
-// 27. FETCH USER - Fetch one specific user
+// 28. FETCH USER - Fetch one specific user
 // ============================================
 
 export async function fetchUser(userId: string): Promise<User> {
@@ -1276,7 +1291,7 @@ export async function fetchUser(userId: string): Promise<User> {
 }
 
 // ============================================
-// 28. EDIT PROFILE - Edit a user's profile
+// 29. EDIT PROFILE - Edit a user's profile
 // ============================================
 
 export async function editProfile(
