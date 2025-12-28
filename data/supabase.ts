@@ -71,6 +71,7 @@ interface DbTask {
 
 interface DbBook {
     id: string;
+    isbn: string | null;
     store_id: string;
     cover: string | null;
     background: string | null;
@@ -80,7 +81,10 @@ interface DbBook {
     description: string | null;
     categories: string[];
     likes: number;
-    is_borrowed: boolean;
+    status: "available" | "borrowed";
+    borrowed_date: string | null;
+    link: string | null;
+    location: string;
     borrower_id: string | null;
     created_at: string;
     updated_at: string;
@@ -166,6 +170,7 @@ function mapDbTaskToTask(dbTask: DbTask): Task {
 function mapDbBookToBook(dbBook: DbBook): Book {
     return {
         id: dbBook.id,
+        isbn: dbBook.isbn || undefined,
         cover: dbBook.cover || '',
         background: dbBook.background || '',
         title: dbBook.title,
@@ -174,7 +179,11 @@ function mapDbBookToBook(dbBook: DbBook): Book {
         description: dbBook.description || '',
         categories: dbBook.categories || [],
         likes: dbBook.likes,
-        isBorrowed: dbBook.is_borrowed,
+        status: dbBook.status,
+        borrowedDate: dbBook.borrowed_date || undefined,
+        link: dbBook.link || undefined,
+        location: dbBook.location,
+        borrower: dbBook.borrower_id || undefined,
     };
 }
 
@@ -1025,6 +1034,7 @@ export async function deleteTask(taskId: string): Promise<void> {
 export async function registerBook(
     storeId: string,
     bookData: {
+        isbn?: string; // ISBN - optional identifier
         title: string;
         author?: string;
         cover?: string;
@@ -1032,20 +1042,33 @@ export async function registerBook(
         publicationDate?: string;
         description?: string;
         categories?: string[];
-    }
+        location?: string;
+        link?: string;
+    },
+    accessToken?: string
 ): Promise<Book> {
-    const { data, error } = await supabase
+    // Use authenticated client if access token is provided (for RLS compliance)
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const insertData: Record<string, unknown> = {
+        store_id: storeId,
+        isbn: bookData.isbn || null,
+        title: bookData.title,
+        author: bookData.author,
+        cover: bookData.cover,
+        background: bookData.background,
+        publication_date: bookData.publicationDate,
+        description: bookData.description,
+        categories: bookData.categories || [],
+        location: bookData.location || '',
+        link: bookData.link,
+        status: 'available',
+        likes: 0,
+    };
+
+    const { data, error } = await client
         .from('books')
-        .insert({
-            store_id: storeId,
-            title: bookData.title,
-            author: bookData.author,
-            cover: bookData.cover,
-            background: bookData.background,
-            publication_date: bookData.publicationDate,
-            description: bookData.description,
-            categories: bookData.categories || [],
-        })
+        .insert(insertData)
         .select()
         .single();
 
@@ -1345,8 +1368,9 @@ export async function borrowBook(bookId: string, userId: string): Promise<Book> 
     const { data, error } = await supabase
         .from('books')
         .update({
-            is_borrowed: true,
+            status: 'borrowed',
             borrower_id: userId,
+            borrowed_date: new Date().toISOString(),
         })
         .eq('id', bookId)
         .select()
@@ -1364,8 +1388,9 @@ export async function returnBook(bookId: string): Promise<Book> {
     const { data, error } = await supabase
         .from('books')
         .update({
-            is_borrowed: false,
+            status: 'available',
             borrower_id: null,
+            borrowed_date: null,
         })
         .eq('id', bookId)
         .select()

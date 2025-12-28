@@ -28,7 +28,8 @@ export interface User {
 }
 
 export interface Book {
-    id: string, // Unique identifier for a book (ISBN)
+    id: string, // Unique identifier for a book (UUID)
+    isbn?: string, // ISBN of the book (optional)
     cover: string, // The url to the cover picture
     background: string, // The url to the background picture
     title: string,

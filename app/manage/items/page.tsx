@@ -23,7 +23,7 @@ import { uploadImage } from "@/data/supabase";
 type RegistrationTab = "manual" | "scan";
 
 interface BookFormData {
-  id: string; // ISBN
+  isbn: string; // ISBN
   title: string;
   author: string;
   publicationDate: string;
@@ -42,7 +42,7 @@ export default function ItemRegistrationPage() {
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<BookFormData>({
-    id: "",
+    isbn: "",
     title: "",
     author: "",
     publicationDate: "",
@@ -85,10 +85,6 @@ export default function ItemRegistrationPage() {
   };
 
   const handleSubmit = async () => {
-    if (!formData.id.trim()) {
-      alert("Please enter the ISBN");
-      return;
-    }
     if (!formData.title.trim()) {
       alert("Please enter the book title");
       return;
@@ -130,7 +126,7 @@ export default function ItemRegistrationPage() {
         headers,
         body: JSON.stringify({
           storeId,
-          id: formData.id.trim(),
+          isbn: formData.isbn.trim() || undefined,
           title: formData.title.trim(),
           author: formData.author.trim() || undefined,
           cover: coverUrl,
@@ -139,8 +135,6 @@ export default function ItemRegistrationPage() {
           categories: categoriesArray.length > 0 ? categoriesArray : undefined,
           location: formData.location.trim() || undefined,
           link: formData.link.trim() || undefined,
-          status: "available",
-          likes: 0,
         }),
       });
 
@@ -151,7 +145,7 @@ export default function ItemRegistrationPage() {
 
       // Reset form and show success
       setFormData({
-        id: "",
+        isbn: "",
         title: "",
         author: "",
         publicationDate: "",
@@ -173,7 +167,7 @@ export default function ItemRegistrationPage() {
     }
   };
 
-  const isFormValid = formData.id.trim().length > 0 && formData.title.trim().length > 0;
+  const isFormValid = formData.title.trim().length > 0;
 
   return (
     <div className="min-h-screen bg-white pb-24">
@@ -261,13 +255,13 @@ export default function ItemRegistrationPage() {
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
                 <BookOpen size={14} className="text-zinc-400" />
-                ISBN <span className="text-rose-500">*</span>
+                ISBN
               </label>
               <div className="bg-zinc-100 rounded-2xl overflow-hidden">
                 <input
                   type="text"
-                  name="id"
-                  value={formData.id}
+                  name="isbn"
+                  value={formData.isbn}
                   onChange={handleInputChange}
                   placeholder="Enter ISBN (e.g., 978-0-13-468599-1)"
                   className="w-full px-4 py-4 bg-transparent text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-base"
