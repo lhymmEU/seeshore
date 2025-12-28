@@ -13,9 +13,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
+import { uploadImage } from "@/data/supabase";
 
 interface EventFormData {
-  cover: string;
   title: string;
   startDate: string;
   startTime: string;
@@ -31,8 +31,8 @@ export default function CreateEventPage() {
   
   const [isSaving, setIsSaving] = useState(false);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<EventFormData>({
-    cover: "",
     title: "",
     startDate: "",
     startTime: "",
@@ -49,9 +49,11 @@ export default function CreateEventPage() {
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Store the file for later upload
+      setCoverFile(file);
+      // Create blob URL only for preview (not for storage)
       const previewUrl = URL.createObjectURL(file);
       setCoverPreview(previewUrl);
-      setFormData(prev => ({ ...prev, cover: previewUrl }));
     }
   };
 
@@ -88,6 +90,17 @@ export default function CreateEventPage() {
         throw new Error("No store found");
       }
 
+      // Upload cover image if present
+      let coverUrl: string | undefined;
+      if (coverFile) {
+        try {
+          coverUrl = await uploadImage(coverFile, 'images', 'events');
+        } catch (uploadError) {
+          console.error("Failed to upload cover image:", uploadError);
+          // Continue without cover if upload fails
+        }
+      }
+
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (accessToken) {
         headers["Authorization"] = `Bearer ${accessToken}`;
@@ -99,7 +112,7 @@ export default function CreateEventPage() {
         body: JSON.stringify({
           storeId,
           title: formData.title.trim(),
-          cover: formData.cover || undefined,
+          cover: coverUrl,
           startDate: combineDateTime(formData.startDate, formData.startTime),
           endDate: combineDateTime(formData.endDate, formData.endTime),
           description: formData.description.trim() || undefined,

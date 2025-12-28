@@ -1319,6 +1319,38 @@ export async function logout(): Promise<void> {
     }
 }
 
+// ============================================
+// UPLOAD IMAGE - Upload image to Supabase Storage
+// ============================================
+
+export async function uploadImage(
+    file: File,
+    bucket: string = 'images',
+    folder: string = 'events'
+): Promise<string> {
+    // Generate unique filename
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${folder}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+
+    const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false,
+        });
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    // Get the public URL
+    const { data: urlData } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(data.path);
+
+    return urlData.publicUrl;
+}
+
 // Borrow a book
 export async function borrowBook(bookId: string, userId: string): Promise<Book> {
     const { data, error } = await supabase
