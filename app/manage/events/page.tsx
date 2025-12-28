@@ -224,8 +224,7 @@ export default function EventsManagePage() {
   });
 
   const handleEdit = (eventId: string) => {
-    // TODO: Implement edit functionality
-    console.log("Edit event:", eventId);
+    router.push(`/manage/events/${eventId}/edit`);
   };
 
   const handleDelete = (eventId: string) => {

@@ -756,7 +756,8 @@ export async function editEvent(
         description?: string;
         location?: string;
         status?: StoreEvent['status'];
-    }
+    },
+    accessToken?: string
 ): Promise<StoreEvent> {
     const updateData: Record<string, unknown> = {};
 
@@ -768,33 +769,21 @@ export async function editEvent(
     if (updates.location !== undefined) updateData.location = updates.location;
     if (updates.status !== undefined) updateData.status = updates.status;
 
-    const { data: event, error } = await supabase
+    // Use authenticated client if access token is provided (for RLS compliance)
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    // Perform the update
+    const { error: updateError } = await client
         .from('events')
         .update(updateData)
-        .eq('id', eventId)
-        .select()
-        .single();
+        .eq('id', eventId);
 
-    if (error) {
-        throw new Error(error.message);
+    if (updateError) {
+        throw new Error(updateError.message);
     }
 
-    // Fetch attendees and hosts
-    const { data: attendeeRelations } = await supabase
-        .from('event_attendees')
-        .select('user_id')
-        .eq('event_id', eventId);
-
-    const { data: hostRelations } = await supabase
-        .from('event_hosts')
-        .select('user_id')
-        .eq('event_id', eventId);
-
-    return mapDbEventToStoreEvent(
-        event as DbEvent,
-        (attendeeRelations as RelationRow[] | null)?.map((r: RelationRow) => r.user_id) || [],
-        (hostRelations as RelationRow[] | null)?.map((r: RelationRow) => r.user_id) || []
-    );
+    // Fetch the updated event separately
+    return fetchEvent(eventId);
 }
 
 // ============================================

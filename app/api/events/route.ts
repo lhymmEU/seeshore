@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createEvent, fetchEvents, fetchEvent } from "@/data/supabase";
+import { createEvent, fetchEvents, fetchEvent, editEvent } from "@/data/supabase";
 
 // GET /api/events?storeId=xxx or /api/events?id=xxx - Fetch events
 export async function GET(request: NextRequest) {
@@ -80,6 +80,52 @@ export async function POST(request: NextRequest) {
         console.error("Failed to create event:", error);
         return NextResponse.json(
             { error: "Failed to create event" },
+            { status: 500 }
+        );
+    }
+}
+
+// PUT /api/events - Update an existing event
+export async function PUT(request: NextRequest) {
+    try {
+        const body = await request.json();
+        const { eventId, title, cover, startDate, endDate, description, location, status } = body;
+
+        if (!eventId) {
+            return NextResponse.json(
+                { error: "Event ID is required" },
+                { status: 400 }
+            );
+        }
+
+        if (!title || !title.trim()) {
+            return NextResponse.json(
+                { error: "Event title is required" },
+                { status: 400 }
+            );
+        }
+
+        // Extract access token from Authorization header
+        const authHeader = request.headers.get("Authorization");
+        const accessToken = authHeader?.startsWith("Bearer ") 
+            ? authHeader.slice(7) 
+            : undefined;
+
+        const event = await editEvent(eventId, {
+            title: title.trim(),
+            cover: cover,
+            startDate: startDate || undefined,
+            endDate: endDate || undefined,
+            description: description?.trim() || undefined,
+            location: location?.trim() || undefined,
+            status: status || undefined,
+        }, accessToken);
+
+        return NextResponse.json(event);
+    } catch (error) {
+        console.error("Failed to update event:", error);
+        return NextResponse.json(
+            { error: "Failed to update event" },
             { status: 500 }
         );
     }
