@@ -1411,9 +1411,12 @@ export async function removeBookFromFavorites(userId: string, bookId: string): P
     await supabase.rpc('decrement_book_likes', { book_id: bookId });
 }
 
-// Attend an event
-export async function attendEvent(eventId: string, userId: string): Promise<void> {
-    const { error: attendError } = await supabase
+// Attend an event (requires authentication)
+export async function attendEvent(eventId: string, userId: string, accessToken?: string): Promise<void> {
+    // Use authenticated client if access token is provided (for RLS compliance)
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const { error: attendError } = await client
         .from('event_attendees')
         .insert({
             event_id: eventId,
@@ -1425,12 +1428,16 @@ export async function attendEvent(eventId: string, userId: string): Promise<void
     }
 
     // Also add to user's attended events
-    await supabase
+    const { error: userEventError } = await client
         .from('user_attended_events')
         .insert({
             user_id: userId,
             event_id: eventId,
         });
+
+    if (userEventError) {
+        throw new Error(userEventError.message);
+    }
 }
 
 // Leave an event

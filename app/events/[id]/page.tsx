@@ -1,0 +1,585 @@
+"use client";
+
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { ArrowLeft, ChevronRight, Check, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+  DrawerFooter,
+} from "@/components/ui/drawer";
+import { Button } from "@/components/ui/button";
+import type { StoreEvent, User } from "@/types/type";
+
+function formatDate(dateString: string): string {
+  if (!dateString) return "TBD";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatTime(dateString: string): string {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).toLowerCase();
+}
+
+function formatDateRange(startDate: string, endDate: string): string {
+  const start = formatDate(startDate);
+  const startTime = formatTime(startDate);
+  const endTime = formatTime(endDate);
+
+  if (!startDate) return "Date TBD";
+
+  let result = start;
+  if (startTime) {
+    result += ` ${startTime}`;
+  }
+  if (endTime && endTime !== startTime) {
+    result += ` – ${endTime}`;
+  }
+  return result;
+}
+
+// Generate dicebear avatar URL based on user ID or name
+function getDicebearAvatar(seed: string): string {
+  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
+}
+
+// Slide to Attend Button Component
+function SlideToAttendButton({ 
+  onComplete, 
+  isLoading 
+}: { 
+  onComplete: () => void;
+  isLoading: boolean;
+}) {
+  const [progress, setProgress] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [trackWidth, setTrackWidth] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const thumbRef = useRef<HTMLDivElement>(null);
+
+  // Update track width on mount and resize
+  useEffect(() => {
+    const updateWidth = () => {
+      if (trackRef.current) {
+        setTrackWidth(trackRef.current.offsetWidth);
+      }
+    };
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  const handleMove = useCallback((clientX: number) => {
+    if (!trackRef.current || !thumbRef.current || isLoading) return;
+    
+    const trackRect = trackRef.current.getBoundingClientRect();
+    const thumbWidth = thumbRef.current.offsetWidth;
+    const maxDrag = trackRect.width - thumbWidth;
+    const currentX = clientX - trackRect.left - thumbWidth / 2;
+    const clampedX = Math.max(0, Math.min(currentX, maxDrag));
+    const newProgress = clampedX / maxDrag;
+    
+    setProgress(newProgress);
+    
+    // Complete when reaching the end
+    if (newProgress >= 0.95 && !isCompleted) {
+      setIsCompleted(true);
+      setProgress(1);
+      onComplete();
+    }
+  }, [isLoading, isCompleted, onComplete]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (isLoading || isCompleted) return;
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleTouchStart = () => {
+    if (isLoading || isCompleted) return;
+    setIsDragging(true);
+  };
+
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      handleMove(e.clientX);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        handleMove(e.touches[0].clientX);
+      }
+    };
+
+    const handleEnd = () => {
+      setIsDragging(false);
+      if (!isCompleted && progress < 0.95) {
+        // Animate back to start
+        setProgress(0);
+      }
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleEnd);
+    document.addEventListener("touchmove", handleTouchMove, { passive: true });
+    document.addEventListener("touchend", handleEnd);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleEnd);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleEnd);
+    };
+  }, [isDragging, isCompleted, progress, handleMove]);
+
+  // Calculate thumb translateX value
+  const thumbTranslateX = progress * Math.max(0, trackWidth - 56);
+
+  return (
+    <div className="relative">
+      {/* Track */}
+      <div
+        ref={trackRef}
+        className={cn(
+          "relative h-14 rounded-full overflow-hidden transition-colors",
+          isCompleted ? "bg-emerald-100" : "bg-zinc-100"
+        )}
+      >
+        {/* Progress fill */}
+        <div
+          className={cn(
+            "absolute inset-y-0 left-0 transition-all duration-75",
+            isCompleted ? "bg-emerald-200" : "bg-zinc-200"
+          )}
+          style={{ width: `${progress * 100}%` }}
+        />
+
+        {/* Text label */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <span
+            className={cn(
+              "text-sm font-medium transition-opacity",
+              isCompleted ? "text-emerald-700" : "text-zinc-500"
+            )}
+            style={{ opacity: 1 - progress * 0.5 }}
+          >
+            {isCompleted ? "Event Joined!" : "Attend Event – ¥xx/Free"}
+          </span>
+        </div>
+
+        {/* Draggable thumb */}
+        <div
+          ref={thumbRef}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          className={cn(
+            "absolute top-1 bottom-1 left-1 w-12 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing transition-all",
+            isCompleted 
+              ? "bg-emerald-500 text-white" 
+              : "bg-white shadow-md border border-zinc-200 text-zinc-600",
+            isLoading && "opacity-50 cursor-not-allowed"
+          )}
+          style={{
+            transform: `translateX(${thumbTranslateX}px)`,
+            transition: isDragging ? "none" : "transform 0.3s ease-out",
+          }}
+        >
+          {isCompleted ? (
+            <Check size={20} />
+          ) : (
+            <ChevronRight size={20} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Avatar component with dicebear fallback
+function UserAvatar({ 
+  user, 
+  size = "md" 
+}: { 
+  user: User; 
+  size?: "sm" | "md" | "lg";
+}) {
+  const sizeClasses = {
+    sm: "w-7 h-7",
+    md: "w-9 h-9",
+    lg: "w-12 h-12",
+  };
+
+  const avatarUrl = user.avatar || getDicebearAvatar(user.id || user.name);
+
+  return (
+    <img
+      src={avatarUrl}
+      alt={user.name}
+      className={cn(
+        sizeClasses[size],
+        "rounded-full border-2 border-white object-cover bg-zinc-100"
+      )}
+    />
+  );
+}
+
+// Avatar stack for participants
+function ParticipantAvatars({ 
+  attendees,
+}: { 
+  attendees: User[];
+}) {
+  const displayCount = Math.min(5, attendees.length);
+  const displayedAttendees = attendees.slice(0, displayCount);
+  
+  return (
+    <div className="flex items-center gap-3">
+      <div className="flex -space-x-2">
+        {displayedAttendees.map((attendee) => (
+          <UserAvatar key={attendee.id} user={attendee} />
+        ))}
+        {attendees.length > 5 && (
+          <div className="w-9 h-9 rounded-full bg-zinc-300 border-2 border-white flex items-center justify-center">
+            <span className="text-xs font-medium text-zinc-600">
+              +{attendees.length - 5}
+            </span>
+          </div>
+        )}
+      </div>
+      <span className="text-sm text-zinc-500">Participants</span>
+    </div>
+  );
+}
+
+export default function EventDetailsPage() {
+  const router = useRouter();
+  const params = useParams();
+  const eventId = params.id as string;
+
+  const [event, setEvent] = useState<StoreEvent | null>(null);
+  const [hostUsers, setHostUsers] = useState<User[]>([]);
+  const [attendeeUsers, setAttendeeUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAttending, setIsAttending] = useState(false);
+  const [showSuccessDrawer, setShowSuccessDrawer] = useState(false);
+  const [showFailureDrawer, setShowFailureDrawer] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const fetchAttendees = useCallback(async (attendeeIds: string[]) => {
+    if (attendeeIds.length === 0) {
+      setAttendeeUsers([]);
+      return;
+    }
+    try {
+      const response = await fetch(`/api/users?ids=${attendeeIds.join(",")}`);
+      if (response.ok) {
+        const users = await response.json();
+        setAttendeeUsers(users);
+      }
+    } catch (error) {
+      console.error("Failed to fetch attendees:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+      try {
+        const response = await fetch(`/api/events?id=${eventId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch event");
+        }
+        const eventData = await response.json();
+        setEvent(eventData);
+
+        // Fetch host user details if there are hosts
+        if (eventData.hosts && eventData.hosts.length > 0) {
+          const usersResponse = await fetch(`/api/users?ids=${eventData.hosts.join(",")}`);
+          if (usersResponse.ok) {
+            const users = await usersResponse.json();
+            setHostUsers(users);
+          }
+        }
+
+        // Fetch attendee user details
+        if (eventData.attendees && eventData.attendees.length > 0) {
+          await fetchAttendees(eventData.attendees);
+        }
+      } catch (error) {
+        console.error("Failed to fetch event:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (eventId) {
+      fetchEventDetails();
+    }
+  }, [eventId, fetchAttendees]);
+
+  const handleAttend = async () => {
+    if (!event || isAttending) return;
+    
+    setIsAttending(true);
+    try {
+      const userId = sessionStorage.getItem("userId");
+      const accessToken = sessionStorage.getItem("accessToken");
+      
+      if (!userId || !accessToken) {
+        setErrorMessage("Please log in to attend events.");
+        setShowFailureDrawer(true);
+        return;
+      }
+
+      const response = await fetch("/api/events/attend", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          eventId: event.id,
+          userId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to attend event");
+      }
+
+      // Refetch event to get updated attendees list
+      const eventResponse = await fetch(`/api/events?id=${eventId}`);
+      if (eventResponse.ok) {
+        const updatedEvent = await eventResponse.json();
+        setEvent(updatedEvent);
+        // Fetch updated attendee users
+        if (updatedEvent.attendees && updatedEvent.attendees.length > 0) {
+          await fetchAttendees(updatedEvent.attendees);
+        }
+      }
+
+      setShowSuccessDrawer(true);
+    } catch (error) {
+      console.error("Failed to attend event:", error);
+      const message = error instanceof Error ? error.message : "Failed to attend event";
+      setErrorMessage(message);
+      setShowFailureDrawer(true);
+    } finally {
+      setIsAttending(false);
+    }
+  };
+
+  const handleCloseSuccess = () => {
+    setShowSuccessDrawer(false);
+    router.back();
+  };
+
+  const handleCloseFailure = () => {
+    setShowFailureDrawer(false);
+    setErrorMessage("");
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-8 h-8 border-2 border-zinc-300 border-t-zinc-900 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
+        <p className="text-zinc-600 mb-4">Event not found</p>
+        <Button onClick={() => router.back()} variant="outline">
+          Go Back
+        </Button>
+      </div>
+    );
+  }
+
+  const hostNames = hostUsers.length > 0 
+    ? hostUsers.map(h => h.name).join(", ")
+    : event.hosts.length > 0 
+      ? `${event.hosts.length} host${event.hosts.length > 1 ? "s" : ""}`
+      : "No hosts";
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Cover Image Area */}
+      <div className="relative w-full aspect-[4/5] bg-zinc-100 flex-shrink-0">
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm border border-zinc-200/50"
+        >
+          <ArrowLeft size={20} className="text-zinc-800" />
+        </button>
+
+        {/* Cover Image or Placeholder */}
+        {event.cover ? (
+          <img
+            src={event.cover}
+            alt={event.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <p className="text-zinc-500 text-center px-8">
+              This area is designed to display the event poster
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Content Sheet */}
+      <div className="relative -mt-6 bg-white rounded-t-3xl flex-1 flex flex-col">
+        {/* Drag Handle */}
+        <div className="flex justify-center pt-3 pb-4">
+          <div className="w-12 h-1.5 rounded-full bg-zinc-200" />
+        </div>
+
+        {/* Event Info */}
+        <div className="px-5 pb-6 flex-1 flex flex-col">
+          {/* Title and Date Row */}
+          <div className="mb-4">
+            <h1 className="text-xl font-bold text-zinc-900 mb-2">
+              {event.title}
+            </h1>
+            <div className="flex items-center justify-between text-sm text-zinc-500">
+              <span>{formatDateRange(event.startDate, event.endDate)}</span>
+              <span>Hosts: {hostNames}</span>
+            </div>
+          </div>
+
+          {/* Participants and Map Button Row */}
+          <div className="flex items-center justify-between mb-6">
+            <ParticipantAvatars attendees={attendeeUsers} />
+            
+            {/* Map Button Placeholder */}
+            <button
+              disabled
+              className="px-4 py-2.5 bg-zinc-100 rounded-xl text-sm font-medium text-zinc-400 cursor-not-allowed"
+            >
+              Map Button
+            </button>
+          </div>
+
+          {/* About Event */}
+          <div className="flex-1 mb-6">
+            <h2 className="text-base font-semibold text-zinc-900 mb-2">
+              About Event
+            </h2>
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              {event.description || "Lorem ipsum dolor sit amet consectetur. Duis habitant lectus congue ut. Nisi pellentesque diam metus dictum feugiat duis sit ipsum pulvinar. Magna lectus amet sodales cursus"}
+            </p>
+          </div>
+
+          {/* Slide to Attend Button */}
+          <div className="mt-auto pb-safe">
+            <SlideToAttendButton 
+              onComplete={handleAttend}
+              isLoading={isAttending}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Success Drawer */}
+      <Drawer open={showSuccessDrawer} onOpenChange={setShowSuccessDrawer}>
+        <DrawerContent className="bg-white">
+          <DrawerHeader className="text-center pb-0">
+            <DrawerTitle className="text-xl text-zinc-900">
+              {event.title}
+            </DrawerTitle>
+            <DrawerDescription className="text-zinc-500 mt-1">
+              {formatDateRange(event.startDate, event.endDate)}
+            </DrawerDescription>
+          </DrawerHeader>
+
+          {/* Success Art Placeholder */}
+          <div className="px-6 py-8">
+            <div className="aspect-[4/3] bg-zinc-100 rounded-2xl flex items-center justify-center border border-zinc-200">
+              <div className="text-center px-6">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <Check size={32} className="text-emerald-600" />
+                </div>
+                <p className="text-zinc-500 font-medium">
+                  Display Event Joined Vector Art
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <DrawerFooter className="pt-0">
+            <Button
+              onClick={handleCloseSuccess}
+              className="w-full h-14 rounded-2xl bg-zinc-100 text-zinc-700 font-medium hover:bg-zinc-200 text-base"
+              variant="secondary"
+            >
+              Close
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Failure Drawer */}
+      <Drawer open={showFailureDrawer} onOpenChange={setShowFailureDrawer}>
+        <DrawerContent className="bg-white">
+          <DrawerHeader className="text-center pb-0">
+            <DrawerTitle className="text-xl text-zinc-900">
+              Unable to Attend
+            </DrawerTitle>
+            <DrawerDescription className="text-zinc-500 mt-1">
+              {event.title}
+            </DrawerDescription>
+          </DrawerHeader>
+
+          {/* Failure Art */}
+          <div className="px-6 py-8">
+            <div className="aspect-[4/3] bg-rose-50 rounded-2xl flex items-center justify-center border border-rose-100">
+              <div className="text-center px-6">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-rose-100 flex items-center justify-center">
+                  <X size={32} className="text-rose-600" />
+                </div>
+                <p className="text-rose-600 font-medium mb-2">
+                  Attendance Failed
+                </p>
+                <p className="text-zinc-500 text-sm">
+                  {errorMessage}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <DrawerFooter className="pt-0">
+            <Button
+              onClick={handleCloseFailure}
+              className="w-full h-14 rounded-2xl bg-zinc-100 text-zinc-700 font-medium hover:bg-zinc-200 text-base"
+              variant="secondary"
+            >
+              Close
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+    </div>
+  );
+}
