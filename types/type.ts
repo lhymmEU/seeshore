@@ -28,7 +28,7 @@ export interface User {
 }
 
 export interface Book {
-    id: string, // Unique identifier for a book
+    id: string, // Unique identifier for a book (ISBN)
     cover: string, // The url to the cover picture
     background: string, // The url to the background picture
     title: string,
@@ -36,8 +36,12 @@ export interface Book {
     publicationDate: string,
     description: string,
     categories: string[],
-    likes: number // How many people have favorited this book
-    isBorrowed: boolean // Whether the book is currently borrowed by a user
+    likes: number, // How many people have favorited this book
+    borrowedDate?: string, // When the book was borrowed (optional)
+    status: "available" | "borrowed", // Current status of the book
+    link?: string, // Optional external link (e.g., to purchase or more info)
+    location: string, // Physical location of the book in the store
+    borrower?: string, // The id of the user who borrowed the book (optional)
 }
 
 export interface Spending {
