@@ -1319,6 +1319,24 @@ export async function editProfile(
 }
 
 // ============================================
+// 30. PAY - Pay membership or event fee
+// ============================================
+
+export async function pay(): Promise<boolean> {
+    // TODO: Implement WeChat and AliPay payment integration
+    return Promise.resolve(true);
+}
+
+// =====================================================
+// 31. REFUND - Refund event fee or book rental fee
+// =====================================================
+
+export async function refund(): Promise<boolean> {
+    // TODO: Implement WeChat and AliPay refund integration
+    return Promise.resolve(true);
+}
+
+// ============================================
 // ADDITIONAL UTILITY FUNCTIONS
 // ============================================
 
