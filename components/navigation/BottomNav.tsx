@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Settings, Users } from "lucide-react";
+import { Blocks, BookCheck, Handshake, Home, PartyPopper, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 interface NavItem {
   href: string;
@@ -11,14 +12,29 @@ interface NavItem {
   label: string;
 }
 
-const navItems: NavItem[] = [
-  { href: "/home", icon: Home, label: "Home" },
-  { href: "/manage", icon: Settings, label: "Manage" },
-  { href: "/collaborate", icon: Users, label: "Collaborate" },
+const baseNavItems: NavItem[] = [
+  { href: "/collaborate", icon: Blocks, label: "Collaborate" },
+  { href: "/items", icon: BookCheck, label: "Items" },
+  { href: "/home", icon: PartyPopper, label: "Events" },
+  { href: "/friends", icon: Handshake, label: "Friends" },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  
+  // Initialize role synchronously from sessionStorage
+  const [isStaff] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    const userRole = sessionStorage.getItem("userRole");
+    return userRole === "owner" || userRole === "assistant";
+  });
+
+  const navItems: NavItem[] = [
+    ...baseNavItems,
+    isStaff
+      ? { href: "/manage", icon: Settings, label: "Manage" }
+      : { href: "/profile", icon: User, label: "Profile" },
+  ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 pb-safe z-50">
