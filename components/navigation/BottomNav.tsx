@@ -15,7 +15,7 @@ interface NavItem {
 const baseNavItems: NavItem[] = [
   { href: "/collaborate", icon: Blocks, label: "Collaborate" },
   { href: "/items", icon: BookCheck, label: "Items" },
-  { href: "/home", icon: PartyPopper, label: "Events" },
+  { href: "/events", icon: PartyPopper, label: "Events" },
   { href: "/friends", icon: Handshake, label: "Friends" },
 ];
 

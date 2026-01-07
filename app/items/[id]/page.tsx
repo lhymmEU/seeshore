@@ -230,31 +230,6 @@ export default function ItemDetailsPage() {
           </button>
         </div>
 
-        {/* Borrow Button */}
-        <div className="mt-8">
-          <button
-            onClick={handleBorrow}
-            disabled={book.status === "borrowed"}
-            className={cn(
-              "w-full flex items-center justify-between py-4 px-5 rounded-2xl font-medium transition-all",
-              book.status === "available"
-                ? "bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]"
-                : "bg-zinc-100 text-zinc-400 cursor-not-allowed"
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-1.5 bg-white/20 rounded-full">
-                <ChevronRight size={18} />
-              </div>
-              <span>
-                {book.status === "available"
-                  ? `Borrow Book – ${book.location || "Location TBD"}`
-                  : "Currently Borrowed"}
-              </span>
-            </div>
-          </button>
-        </div>
-
         {/* Status indicator */}
         {book.status === "borrowed" && book.borrowedDate && (
           <p className="text-center text-sm text-zinc-400 mt-3">
