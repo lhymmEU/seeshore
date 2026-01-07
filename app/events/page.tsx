@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { Search, Calendar, MapPin, Users, Sparkles } from "lucide-react";
 import { BottomNav } from "@/components/navigation";
 import type { StoreEvent } from "@/types/type";
@@ -51,11 +50,10 @@ function EventScrollCard({
       {/* Event Cover */}
       {event.cover ? (
         <div className="h-28 w-full relative">
-          <Image
+          <img
             src={event.cover}
             alt={event.title}
-            fill
-            className="object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
       ) : (
@@ -78,7 +76,7 @@ function EventScrollCard({
           {/* Attendee avatars */}
           <div className="flex items-center">
             <div className="flex -space-x-1.5">
-              {[...Array(Math.min(3, attendeeCount || 3))].map((_, i) => (
+              {[...Array(Math.min(1, attendeeCount))].map((_, i) => (
                 <div
                   key={i}
                   className="w-5 h-5 rounded-full bg-zinc-300 border border-white"
@@ -114,11 +112,10 @@ function FeaturedEventCard({
       {/* Cover Image */}
       <div className="relative h-48 w-full">
         {event.cover ? (
-          <Image
+          <img
             src={event.cover}
             alt={event.title}
-            fill
-            className="object-cover"
+            className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-orange-100 to-amber-50 flex items-center justify-center">
@@ -171,7 +168,7 @@ function FeaturedEventCard({
         {/* CTA */}
         <div className="flex items-center justify-between pt-2">
           <div className="flex -space-x-2">
-            {[...Array(Math.min(5, attendeeCount || 5))].map((_, i) => (
+            {[...Array(Math.min(1, attendeeCount))].map((_, i) => (
               <div
                 key={i}
                 className="w-7 h-7 rounded-full bg-gradient-to-br from-orange-200 to-amber-100 border-2 border-white"
