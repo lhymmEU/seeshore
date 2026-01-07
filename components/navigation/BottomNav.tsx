@@ -16,7 +16,6 @@ const baseNavItems: NavItem[] = [
   { href: "/collaborate", icon: Blocks, label: "Collaborate" },
   { href: "/items", icon: BookCheck, label: "Items" },
   { href: "/events", icon: PartyPopper, label: "Events" },
-  { href: "/friends", icon: Handshake, label: "Friends" },
 ];
 
 export function BottomNav() {
