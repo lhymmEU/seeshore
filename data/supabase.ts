@@ -265,8 +265,18 @@ export async function registerWithEmail(email: string, password: string, name: s
         throw new Error('Failed to create user');
     }
 
+    // Get the session access token to make authenticated requests
+    const accessToken = authData.session?.access_token;
+    
+    if (!accessToken) {
+        throw new Error('No session created. Please check your email to confirm your account.');
+    }
+
+    // Create an authenticated client using the new session
+    const authClient = createAuthenticatedClient(accessToken);
+
     // Check if user profile already exists (in case of re-registration)
-    const { data: existingUser } = await supabase
+    const { data: existingUser } = await authClient
         .from('users')
         .select('id')
         .eq('id', authData.user.id)
@@ -278,8 +288,9 @@ export async function registerWithEmail(email: string, password: string, name: s
         return { auth: authData, user };
     }
 
-    // Create user profile in users table
-    const { data: userData, error: userError } = await supabase
+    // Create user profile in users table using authenticated client
+    // This satisfies the RLS policy: auth.uid() = id
+    const { data: userData, error: userError } = await authClient
         .from('users')
         .insert({
             id: authData.user.id,
@@ -329,7 +340,189 @@ export async function updatePassword(newPassword: string) {
 }
 
 // ============================================
-// 3. FETCH STORES - Fetch all stores in the db
+// 5. VALIDATE INVITE CODE - Check if invite code is valid
+// ============================================
+
+export async function validateInviteCode(inviteCode: string): Promise<boolean> {
+    const { data, error } = await supabase.rpc('validate_invite_code', {
+        invite_code: inviteCode,
+    });
+
+    if (error) {
+        console.error('Error validating invite code:', error);
+        return false;
+    }
+
+    return data === true;
+}
+
+// ============================================
+// 5b. GET INVITE CODE DETAILS - Get store_id and other info from invite code
+// ============================================
+
+export async function getInviteCodeDetails(inviteCode: string): Promise<{ storeId: string } | null> {
+    const { data, error } = await supabase
+        .from('invite_codes')
+        .select('store_id')
+        .eq('code', inviteCode)
+        .eq('is_used', false)
+        .single();
+
+    if (error || !data) {
+        console.error('Error getting invite code details:', error);
+        return null;
+    }
+
+    return { storeId: data.store_id };
+}
+
+// ============================================
+// 6. CONSUME INVITE CODE - Mark invite code as used
+// ============================================
+
+export async function consumeInviteCode(inviteCode: string, userId: string): Promise<boolean> {
+    const { data, error } = await supabase.rpc('use_invite_code', {
+        invite_code: inviteCode,
+        user_uuid: userId,
+    });
+
+    if (error) {
+        console.error('Error consuming invite code:', error);
+        return false;
+    }
+
+    return data === true;
+}
+
+// ============================================
+// 7. REGISTER WITH INVITE CODE - Create new member with invite code validation
+// ============================================
+
+export async function registerWithInviteCode(
+    email: string, 
+    password: string, 
+    name: string, 
+    inviteCode: string
+) {
+    // First validate the invite code
+    const isValidCode = await validateInviteCode(inviteCode);
+    
+    if (!isValidCode) {
+        throw new Error('Invalid or expired invite code');
+    }
+
+    // Get the store_id from the invite code BEFORE consuming it
+    const inviteDetails = await getInviteCodeDetails(inviteCode);
+    
+    if (!inviteDetails) {
+        throw new Error('Could not retrieve invite code details');
+    }
+
+    const { storeId } = inviteDetails;
+
+    // Sign up the user
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+            data: {
+                name,
+            },
+        },
+    });
+
+    if (authError) {
+        throw new Error(authError.message);
+    }
+
+    if (!authData.user) {
+        throw new Error('Failed to create user');
+    }
+
+    // Get the session access token to make authenticated requests
+    const accessToken = authData.session?.access_token;
+    
+    if (!accessToken) {
+        throw new Error('No session created. Please check your email to confirm your account.');
+    }
+
+    // Create an authenticated client using the new session
+    const authClient = createAuthenticatedClient(accessToken);
+
+    // Mark the invite code as used (using authenticated client)
+    const { data: codeUsed, error: codeError } = await authClient.rpc('use_invite_code', {
+        invite_code: inviteCode,
+        user_uuid: authData.user.id,
+    });
+    
+    if (codeError || !codeUsed) {
+        console.error('Warning: Could not mark invite code as used:', codeError);
+    }
+
+    // Check if user profile already exists (could be created by trigger or re-registration)
+    const { data: existingUser } = await authClient
+        .from('users')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single();
+
+    let finalUser: DbUser;
+
+    if (existingUser) {
+        // User already exists - update their type to Member and name if needed
+        const { data: updatedUser, error: updateError } = await authClient
+            .from('users')
+            .update({ 
+                type: 'Member',
+                name: name || existingUser.name 
+            })
+            .eq('id', authData.user.id)
+            .select()
+            .single();
+
+        if (updateError) {
+            console.error('Error updating user type:', updateError);
+        }
+
+        finalUser = (updatedUser || existingUser) as DbUser;
+    } else {
+        // Create user profile in users table as Member (since they have valid invite)
+        // Use the authenticated client so RLS policy auth.uid() = id is satisfied
+        const { data: userData, error: userError } = await authClient
+            .from('users')
+            .insert({
+                id: authData.user.id,
+                name,
+                type: 'Member', // Set as Member since they have a valid invite code
+            })
+            .select()
+            .single();
+
+        if (userError) {
+            throw new Error(userError.message);
+        }
+
+        finalUser = userData as DbUser;
+    }
+
+    // Add the user to the store_members table
+    const { error: memberError } = await authClient
+        .from('store_members')
+        .insert({
+            store_id: storeId,
+            user_id: authData.user.id,
+        });
+
+    if (memberError) {
+        // Log but don't fail - user is created, membership can be added later
+        console.error('Warning: Could not add user to store_members:', memberError);
+    }
+
+    return { auth: authData, user: mapDbUserToUser(finalUser) };
+}
+
+// ============================================
+// FETCH STORES - Fetch all stores in the db
 // ============================================
 
 export async function fetchStores(): Promise<Store[]> {

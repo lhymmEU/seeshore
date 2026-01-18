@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { X, Store, Headphones, LogIn, UserPlus, CheckCircle, XCircle, Loader2, MapPin, BookOpen, ArrowRight, Mail } from "lucide-react";
+import { X, Store, Headphones, User, LogIn, UserPlus, CheckCircle, XCircle, Loader2, MapPin, BookOpen, ArrowRight, Mail, Heart, Calendar, Library, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -10,11 +10,11 @@ import {
   DrawerClose,
 } from "@/components/ui/drawer";
 import { RoleType } from "./RoleCard";
-import { loginWithEmail, registerWithEmail, fetchStores } from "@/data/supabase";
+import { loginWithEmail, registerWithInviteCode, fetchStores, validateInviteCode } from "@/data/supabase";
 import type { Store as StoreType } from "@/types/type";
 
 type VerificationStatus = "idle" | "loading" | "success" | "error";
-type ViewState = "login" | "verifying" | "storeSelection";
+type ViewState = "login" | "verifying" | "storeSelection" | "memberWelcome";
 type AuthMode = "login" | "register";
 
 interface RoleSlideUpProps {
@@ -25,7 +25,7 @@ interface RoleSlideUpProps {
 }
 
 const roleDetails: Record<
-  Exclude<RoleType, "user">,
+  RoleType,
   {
     icon: typeof Store;
     title: string;
@@ -34,6 +34,18 @@ const roleDetails: Record<
     ctaText: string;
   }
 > = {
+  user: {
+    icon: User,
+    title: "Member",
+    subtitle: "Your personal reading journey starts here",
+    features: [
+      "Browse & discover curated books",
+      "Save favorites to your reading list",
+      "Borrow books from the library",
+      "Join community events & discussions",
+    ],
+    ctaText: "Start Reading",
+  },
   owner: {
     icon: Store,
     title: "Store Owner",
@@ -71,6 +83,8 @@ export function RoleSlideUp({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
+  const [inviteCodeError, setInviteCodeError] = useState("");
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [viewState, setViewState] = useState<ViewState>("login");
@@ -79,25 +93,30 @@ export function RoleSlideUp({
   const [userId, setUserId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  // Transition from success to store selection after 1 second
+  // Transition from success to appropriate view after 1 second
   useEffect(() => {
     if (verificationStatus === "success" && viewState === "verifying") {
       const timer = setTimeout(async () => {
-        // Fetch stores from database
-        try {
-          const fetchedStores = await fetchStores();
-          setStores(fetchedStores);
-        } catch (error) {
-          console.error("Failed to fetch stores:", error);
+        if (role === "user") {
+          // For members, show welcome view then redirect to items page
+          setViewState("memberWelcome");
+        } else {
+          // For owner/assistant, fetch stores for selection
+          try {
+            const fetchedStores = await fetchStores();
+            setStores(fetchedStores);
+          } catch (error) {
+            console.error("Failed to fetch stores:", error);
+          }
+          setViewState("storeSelection");
         }
-        setViewState("storeSelection");
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, [verificationStatus, viewState]);
+  }, [verificationStatus, viewState, role]);
 
-  // Only show for owner and assistant roles
-  if (!role || role === "user") return null;
+  // Don't render if no role selected
+  if (!role) return null;
 
   const details = roleDetails[role];
   const Icon = details.icon;
@@ -106,17 +125,38 @@ export function RoleSlideUp({
     e.preventDefault();
     if (!email || !password) return;
     if (authMode === "register" && !name) return;
+    
+    // For member registration, require invite code
+    if (authMode === "register" && role === "user" && !inviteCode) {
+      setInviteCodeError("Invite code is required");
+      return;
+    }
 
     setVerificationStatus("loading");
     setViewState("verifying");
     setErrorMessage("");
+    setInviteCodeError("");
 
     try {
       let result;
       if (authMode === "login") {
         result = await loginWithEmail(email, password);
       } else {
-        result = await registerWithEmail(email, password, name);
+        // For member registration with invite code
+        if (role === "user") {
+          // First validate the invite code
+          const isValid = await validateInviteCode(inviteCode);
+          if (!isValid) {
+            setVerificationStatus("error");
+            setErrorMessage("Invalid or expired invite code");
+            return;
+          }
+          result = await registerWithInviteCode(email, password, name, inviteCode);
+        } else {
+          // For owner/assistant registration (no invite code needed)
+          const { registerWithEmail } = await import("@/data/supabase");
+          result = await registerWithEmail(email, password, name);
+        }
       }
       // Store the user ID and access token for later use
       if (result.auth?.user?.id) {
@@ -141,6 +181,8 @@ export function RoleSlideUp({
       setEmail("");
       setPassword("");
       setName("");
+      setInviteCode("");
+      setInviteCodeError("");
       setSelectedStore(null);
       setAuthMode("login");
       setStores([]);
@@ -161,7 +203,7 @@ export function RoleSlideUp({
   };
 
   const handleEnterStore = () => {
-    if (selectedStore) {
+    if (selectedStore && role) {
       // Store the role and user info in sessionStorage for the management page
       sessionStorage.setItem("userRole", role);
       sessionStorage.setItem("selectedStore", selectedStore);
@@ -182,12 +224,40 @@ export function RoleSlideUp({
     }
   };
 
+  const handleMemberContinue = () => {
+    if (role) {
+      // Store the member info in sessionStorage
+      sessionStorage.setItem("userRole", "member");
+      if (userId) {
+        sessionStorage.setItem("userId", userId);
+      }
+      if (accessToken) {
+        sessionStorage.setItem("accessToken", accessToken);
+      }
+      
+      // Call onContinue if provided
+      if (onContinue) {
+        onContinue(role, { email, password });
+      }
+      
+      // Navigate to the items/books page for members
+      router.push("/items");
+    }
+  };
+
   const toggleAuthMode = () => {
     setAuthMode(authMode === "login" ? "register" : "login");
     setErrorMessage("");
   };
 
-  const isFormValid = email.trim() !== "" && password.trim() !== "" && (authMode === "login" || name.trim() !== "");
+  // Form validation - require invite code for member registration
+  const isFormValid = 
+    email.trim() !== "" && 
+    password.trim() !== "" && 
+    (authMode === "login" || (
+      name.trim() !== "" && 
+      (role !== "user" || inviteCode.trim() !== "")
+    ));
 
   // Verification Result View
   const renderVerificationResult = () => (
@@ -335,6 +405,70 @@ export function RoleSlideUp({
     </div>
   );
 
+  // Member Welcome View
+  const renderMemberWelcome = () => (
+    <div className="px-6 pt-8 pb-8 flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex flex-col items-center text-center gap-3">
+        <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center">
+          <CheckCircle size={40} className="text-emerald-600" />
+        </div>
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-zinc-900">
+            Welcome to Seashore Books!
+          </h2>
+          <p className="text-sm text-zinc-500">
+            You&apos;re all set to start your reading journey
+          </p>
+        </div>
+      </div>
+
+      {/* Quick access features */}
+      <div className="bg-zinc-50 rounded-2xl p-5 space-y-4">
+        <h3 className="text-sm font-medium text-zinc-700">What you can do now:</h3>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <Library size={20} className="text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-zinc-900">Browse Books</p>
+              <p className="text-xs text-zinc-500">Discover our curated collection</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center flex-shrink-0">
+              <Heart size={20} className="text-rose-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-zinc-900">Save Favorites</p>
+              <p className="text-xs text-zinc-500">Build your personal reading list</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+              <Calendar size={20} className="text-amber-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-zinc-900">Join Events</p>
+              <p className="text-xs text-zinc-500">Connect with fellow readers</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Continue button */}
+      <Button
+        onClick={handleMemberContinue}
+        size="lg"
+        className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white"
+      >
+        Start Exploring
+        <ArrowRight size={18} className="ml-2" />
+      </Button>
+    </div>
+  );
+
   // Login Form View
   const renderLoginForm = () => (
     <div className="px-6 pt-8 pb-8 flex flex-col gap-6">
@@ -417,6 +551,38 @@ export function RoleSlideUp({
               autoComplete={authMode === "register" ? "new-password" : "current-password"}
             />
           </div>
+          
+          {/* Invite code field for member registration */}
+          {authMode === "register" && role === "user" && (
+            <div className="space-y-1.5">
+              <label htmlFor="inviteCode" className="text-sm font-medium text-zinc-700">
+                Invite Code
+              </label>
+              <div className="relative">
+                <Ticket size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                <input
+                  id="inviteCode"
+                  type="text"
+                  value={inviteCode}
+                  onChange={(e) => {
+                    setInviteCode(e.target.value.toUpperCase());
+                    setInviteCodeError("");
+                  }}
+                  placeholder="Enter your invite code"
+                  className={`w-full h-12 pl-11 pr-4 rounded-xl border bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-shadow ${
+                    inviteCodeError ? "border-red-300" : "border-zinc-200"
+                  }`}
+                  autoComplete="off"
+                />
+              </div>
+              {inviteCodeError && (
+                <p className="text-xs text-red-600">{inviteCodeError}</p>
+              )}
+              <p className="text-xs text-zinc-400">
+                Ask a store owner or assistant for an invite code
+              </p>
+            </div>
+          )}
         </div>
 
         {errorMessage && viewState === "login" && (
@@ -481,6 +647,7 @@ export function RoleSlideUp({
         {viewState === "login" && renderLoginForm()}
         {viewState === "verifying" && renderVerificationResult()}
         {viewState === "storeSelection" && renderStoreSelection()}
+        {viewState === "memberWelcome" && renderMemberWelcome()}
       </DrawerContent>
     </Drawer>
   );

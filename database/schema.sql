@@ -169,6 +169,19 @@ CREATE TABLE user_hosted_events (
     PRIMARY KEY (user_id, event_id)
 );
 
+-- Invite codes table for member registration
+CREATE TABLE invite_codes (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    code TEXT UNIQUE NOT NULL,
+    store_id UUID REFERENCES stores(id) ON DELETE CASCADE NOT NULL,
+    created_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    used_by UUID REFERENCES users(id) ON DELETE SET NULL,
+    used_at TIMESTAMPTZ,
+    expires_at TIMESTAMPTZ,
+    is_used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ============================================
 -- INDEXES
 -- ============================================
@@ -226,6 +239,12 @@ CREATE INDEX idx_event_hosts_user ON event_hosts(user_id);
 -- User book favorites indexes
 CREATE INDEX idx_user_favorite_books_user ON user_favorite_books(user_id);
 CREATE INDEX idx_user_favorite_books_book ON user_favorite_books(book_id);
+
+-- Invite codes indexes
+CREATE INDEX idx_invite_codes_code ON invite_codes(code);
+CREATE INDEX idx_invite_codes_is_used ON invite_codes(is_used);
+CREATE INDEX idx_invite_codes_created_by ON invite_codes(created_by);
+CREATE INDEX idx_invite_codes_store ON invite_codes(store_id);
 
 -- ============================================
 -- FUNCTIONS
@@ -325,6 +344,7 @@ ALTER TABLE books ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_favorite_books ENABLE ROW LEVEL SECURITY;
 ALTER TABLE spendings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE invite_codes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE event_attendees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE event_hosts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_attended_events ENABLE ROW LEVEL SECURITY;
@@ -618,6 +638,37 @@ CREATE POLICY "Users can manage own hosted events"
     USING (auth.uid() = user_id);
 
 -- ============================================
+-- INVITE CODES POLICIES
+-- ============================================
+
+-- Anyone can check if an invite code exists (for validation during registration)
+CREATE POLICY "Anyone can validate invite codes"
+    ON invite_codes FOR SELECT
+    USING (true);
+
+-- Only owners/assistants can create invite codes
+CREATE POLICY "Staff can create invite codes"
+    ON invite_codes FOR INSERT
+    WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE id = auth.uid() 
+            AND type IN ('Owner', 'Assistant')
+        )
+    );
+
+-- Service role can update invite codes (for marking as used)
+-- Note: This is handled via service role key in API routes
+
+-- Only creators or owners can delete unused invite codes
+CREATE POLICY "Creators can delete unused invite codes"
+    ON invite_codes FOR DELETE
+    USING (
+        created_by = auth.uid() 
+        AND is_used = false
+    );
+
+-- ============================================
 -- GRANT PERMISSIONS
 -- ============================================
 
@@ -651,6 +702,44 @@ BEGIN
 END;
 $$ language 'plpgsql' SECURITY DEFINER;
 
+-- Function to validate an invite code (check if it exists, is unused, and not expired)
+CREATE OR REPLACE FUNCTION validate_invite_code(invite_code TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM invite_codes 
+        WHERE code = invite_code 
+        AND is_used = false
+        AND (expires_at IS NULL OR expires_at > NOW())
+    );
+END;
+$$ language 'plpgsql' SECURITY DEFINER;
+
+-- Function to use an invite code (mark as used and record who used it)
+CREATE OR REPLACE FUNCTION use_invite_code(invite_code TEXT, user_uuid UUID)
+RETURNS BOOLEAN AS $$
+DECLARE
+    code_valid BOOLEAN;
+BEGIN
+    -- Check if code is valid
+    SELECT validate_invite_code(invite_code) INTO code_valid;
+    
+    IF NOT code_valid THEN
+        RETURN false;
+    END IF;
+    
+    -- Mark the code as used
+    UPDATE invite_codes 
+    SET is_used = true, 
+        used_by = user_uuid, 
+        used_at = NOW()
+    WHERE code = invite_code 
+    AND is_used = false;
+    
+    RETURN true;
+END;
+$$ language 'plpgsql' SECURITY DEFINER;
+
 -- Grant execute permissions on functions
 GRANT EXECUTE ON FUNCTION increment_book_likes(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION decrement_book_likes(UUID) TO authenticated;
@@ -658,4 +747,5 @@ GRANT EXECUTE ON FUNCTION is_store_owner(UUID, UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION is_store_assistant(UUID, UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION is_store_member(UUID, UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION has_store_access(UUID, UUID) TO authenticated;
-
+GRANT EXECUTE ON FUNCTION validate_invite_code(TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION use_invite_code(TEXT, UUID) TO authenticated;

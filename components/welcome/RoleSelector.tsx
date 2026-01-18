@@ -1,13 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight } from "lucide-react";
 import { RoleCard, RoleType } from "./RoleCard";
 import { RoleSlideUp } from "./RoleSlideUp";
-import { Button } from "@/components/ui/button";
 
 interface RoleSelectorProps {
-  onContinue?: (role: RoleType, credentials?: { username: string; password: string }) => void;
+  onContinue?: (role: RoleType, credentials?: { email: string; password: string }) => void;
 }
 
 const roles: RoleType[] = ["user", "assistant", "owner"];
@@ -20,20 +18,12 @@ export function RoleSelector({ onContinue }: RoleSelectorProps) {
   const handleRoleClick = (role: RoleType) => {
     setSelectedRole(role);
     
-    // Open slide-up for owner and assistant roles
-    if (role === "owner" || role === "assistant") {
-      setSlideUpRole(role);
-      setIsSlideUpOpen(true);
-    }
+    // Open slide-up for all roles that require login
+    setSlideUpRole(role);
+    setIsSlideUpOpen(true);
   };
 
-  const handleContinue = () => {
-    if (selectedRole && onContinue) {
-      onContinue(selectedRole);
-    }
-  };
-
-  const handleSlideUpContinue = (role: RoleType, credentials: { username: string; password: string }) => {
+  const handleSlideUpContinue = (role: RoleType, credentials: { email: string; password: string }) => {
     if (onContinue) {
       onContinue(role, credentials);
     }
@@ -65,18 +55,10 @@ export function RoleSelector({ onContinue }: RoleSelectorProps) {
           </div>
         </div>
 
-        {/* Continue button */}
-        <div className="px-4 pb-2">
-          <Button
-            onClick={handleContinue}
-            disabled={!selectedRole}
-            size="lg"
-            className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Continue
-            <ArrowRight size={18} className="ml-1" />
-          </Button>
-        </div>
+        {/* Hint text */}
+        <p className="text-xs text-center text-zinc-400 px-4">
+          Tap a role to sign in or create an account
+        </p>
       </div>
 
       {/* Role-specific slide-up */}
