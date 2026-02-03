@@ -43,6 +43,7 @@ interface DbStore {
     description: string | null;
     rules: string | null;
     balance: number;
+    featured_books: string[] | null;
     created_at: string;
     updated_at: string;
 }
@@ -1091,6 +1092,7 @@ export async function fetchStoreInfo(storeId: string): Promise<Store> {
         events: (events as IdRow[] | null)?.map((e: IdRow) => e.id) || [],
         balance: dbStore.balance,
         spendings: (spendings as IdRow[] | null)?.map((s: IdRow) => s.id) || [],
+        featuredBooks: dbStore.featured_books || [],
     };
 }
 
@@ -1884,6 +1886,7 @@ export async function updateStore(
         banner?: string;
         description?: string;
         rules?: string;
+        featuredBooks?: string[];
     },
     accessToken?: string
 ): Promise<Store> {
@@ -1894,6 +1897,7 @@ export async function updateStore(
     if (updates.banner !== undefined) updateData.banner = updates.banner;
     if (updates.description !== undefined) updateData.description = updates.description;
     if (updates.rules !== undefined) updateData.rules = updates.rules;
+    if (updates.featuredBooks !== undefined) updateData.featured_books = updates.featuredBooks;
  
     console.log("Update data while updating store:", updateData);
     console.log("Using access token:", accessToken ? "yes" : "no");

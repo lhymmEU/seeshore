@@ -13,6 +13,7 @@ export interface Store {
     events: string[], // The ids of the events
     balance: number, // The remaining balance of the store
     spendings: string[], // The ids of the spendings
+    featuredBooks: string[], // The ids of the featured "This Week's Books"
 }
 
 export interface User {

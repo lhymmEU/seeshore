@@ -15,28 +15,40 @@ import type { Book } from "@/types/type";
 export default function ItemsPage() {
   const router = useRouter();
   const [books, setBooks] = useState<Book[]>([]);
+  const [featuredBookIds, setFeaturedBookIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchBooks = async () => {
+    const fetchData = async () => {
       try {
         const storeId = sessionStorage.getItem("selectedStore");
-        const url = storeId ? `/api/books?storeId=${storeId}` : "/api/books";
-        const response = await fetch(url);
-        if (response.ok) {
-          const data = await response.json();
-          setBooks(data);
+        
+        // Fetch books
+        const booksUrl = storeId ? `/api/books?storeId=${storeId}` : "/api/books";
+        const booksResponse = await fetch(booksUrl);
+        if (booksResponse.ok) {
+          const booksData = await booksResponse.json();
+          setBooks(booksData);
+        }
+
+        // Fetch store info to get featured books
+        if (storeId) {
+          const storeResponse = await fetch(`/api/store?id=${storeId}`);
+          if (storeResponse.ok) {
+            const storeData = await storeResponse.json();
+            setFeaturedBookIds(storeData.featuredBooks || []);
+          }
         }
       } catch (error) {
-        console.error("Failed to fetch books:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchBooks();
+    fetchData();
   }, []);
 
   const allCategories = useMemo(() => {
@@ -63,8 +75,11 @@ export default function ItemsPage() {
   }, [books, searchQuery, selectedCategory]);
 
   const featuredBooks = useMemo(() => {
-    return books.filter((book) => book.cover).slice(0, 10);
-  }, [books]);
+    // Return books that are in the featuredBookIds list, in the order they were selected
+    return featuredBookIds
+      .map((id) => books.find((book) => book.id === id))
+      .filter((book): book is Book => book !== undefined && !!book.cover);
+  }, [books, featuredBookIds]);
 
   const handleViewBook = (bookId: string) => {
     router.push(`/items/${bookId}`);

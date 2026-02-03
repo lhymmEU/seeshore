@@ -9,7 +9,8 @@ import {
   CalendarDays, 
   ClipboardList, 
   Package, 
-  Edit3
+  Edit3,
+  Star
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/loading-spinner";
@@ -27,10 +28,10 @@ interface DashboardCard {
 
 const ownerCards: DashboardCard[] = [
   { id: "edit-bookstore", title: "Edit Bookstore", icon: Edit3, href: "/manage/bookstore", size: "large" },
-  { id: "manage-roles", title: "Manage Roles", icon: Users, href: "/manage/roles", size: "medium", disabled: true },
+  { id: "featured-books", title: "This Week's Books", icon: Star, href: "/manage/featured", size: "medium" },
   { id: "manage-events", title: "Manage Events", icon: CalendarDays, href: "/manage/events", size: "medium" },
   { id: "internal-tasks", title: "Manage Internal Tasks", icon: ClipboardList, href: "/manage/tasks", size: "medium", disabled: true },
-  { id: "register-items", title: "Register Items", icon: Package, href: "/manage/items", size: "medium" },
+  { id: "register-items", title: "Manage Items", icon: Package, href: "/manage/items", size: "medium" },
 ];
 
 const assistantCards: DashboardCard[] = [

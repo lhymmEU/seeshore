@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
     try {
         const body = await request.json();
-        const { id, name, banner, description, rules } = body;
+        const { id, name, banner, description, rules, featuredBooks } = body;
 
         if (!id) {
             return NextResponse.json(
@@ -96,12 +96,14 @@ export async function PUT(request: NextRequest) {
             banner?: string;
             description?: string;
             rules?: string;
+            featuredBooks?: string[];
         } = {};
 
         if (name !== undefined) updates.name = name;
         if (banner !== undefined) updates.banner = banner;
         if (description !== undefined) updates.description = description;
         if (rules !== undefined) updates.rules = rules;
+        if (featuredBooks !== undefined) updates.featuredBooks = featuredBooks;
 
         const store = await updateStore(id, updates, accessToken);
         return NextResponse.json(store);
