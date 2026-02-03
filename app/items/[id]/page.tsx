@@ -7,9 +7,15 @@ import {
   Heart, 
   BookOpen,
   Calendar,
-  Building2
+  Building2,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { 
+  fetchUser, 
+  addBookToFavorites, 
+  removeBookFromFavorites 
+} from "@/data/supabase";
 import type { Book } from "@/types/type";
 
 export default function ItemDetailsPage() {
@@ -21,24 +27,39 @@ export default function ItemDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [isTogglingLike, setIsTogglingLike] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchBook = async () => {
+    const loadData = async () => {
       try {
+        // Get user ID from session
+        const storedUserId = sessionStorage.getItem("userId");
+        setUserId(storedUserId);
+
+        // Fetch book data
         const response = await fetch(`/api/books?id=${bookId}`);
         if (response.ok) {
           const data = await response.json();
           setBook(data);
         }
+
+        // Check if user has favorited this book
+        if (storedUserId) {
+          const userData = await fetchUser(storedUserId);
+          if (userData.favoriteBooks?.includes(bookId)) {
+            setIsLiked(true);
+          }
+        }
       } catch (error) {
-        console.error("Failed to fetch book:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     if (bookId) {
-      fetchBook();
+      loadData();
     }
   }, [bookId]);
 
@@ -50,8 +71,32 @@ export default function ItemDetailsPage() {
 
   const shouldShowMore = book?.description && book.description.length > 150;
 
-  const handleLike = () => {
-    setIsLiked(!isLiked);
+  const handleLike = async () => {
+    if (!userId || isTogglingLike) return;
+
+    setIsTogglingLike(true);
+    try {
+      if (isLiked) {
+        await removeBookFromFavorites(userId, bookId);
+        setIsLiked(false);
+        // Update local book likes count
+        if (book) {
+          setBook({ ...book, likes: Math.max(0, book.likes - 1) });
+        }
+      } else {
+        await addBookToFavorites(userId, bookId);
+        setIsLiked(true);
+        // Update local book likes count
+        if (book) {
+          setBook({ ...book, likes: book.likes + 1 });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+      alert("Failed to update favorite. Please try again.");
+    } finally {
+      setIsTogglingLike(false);
+    }
   };
 
   if (isLoading) {
@@ -200,17 +245,26 @@ export default function ItemDetailsPage() {
           </div>
           <button
             onClick={handleLike}
-            className="p-2.5 rounded-full hover:bg-zinc-100 transition-colors"
+            disabled={!userId || isTogglingLike}
+            className={cn(
+              "p-2.5 rounded-full transition-colors",
+              userId ? "hover:bg-zinc-100" : "opacity-50 cursor-not-allowed"
+            )}
+            title={userId ? (isLiked ? "Remove from favorites" : "Add to favorites") : "Login to favorite"}
           >
-            <Heart
-              size={22}
-              className={cn(
-                "transition-all",
-                isLiked
-                  ? "fill-rose-500 text-rose-500"
-                  : "text-zinc-400"
-              )}
-            />
+            {isTogglingLike ? (
+              <Loader2 size={22} className="text-zinc-400 animate-spin" />
+            ) : (
+              <Heart
+                size={22}
+                className={cn(
+                  "transition-all",
+                  isLiked
+                    ? "fill-rose-500 text-rose-500"
+                    : "text-zinc-400"
+                )}
+              />
+            )}
           </button>
         </div>
 
