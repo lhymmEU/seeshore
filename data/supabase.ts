@@ -1865,6 +1865,87 @@ export async function updateStore(
     return fetchStoreInfo(storeId);
 }
 
+// Fetch books by IDs
+export async function fetchBooksByIds(bookIds: string[]): Promise<Book[]> {
+    if (bookIds.length === 0) {
+        return [];
+    }
+
+    const { data, error } = await supabase
+        .from('books')
+        .select('*')
+        .in('id', bookIds);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return (data as DbBook[]).map(mapDbBookToBook);
+}
+
+// Fetch events by IDs
+export async function fetchEventsByIds(eventIds: string[]): Promise<StoreEvent[]> {
+    if (eventIds.length === 0) {
+        return [];
+    }
+
+    const { data: events, error } = await supabase
+        .from('events')
+        .select('*')
+        .in('id', eventIds);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    // Fetch attendees and hosts for each event
+    const eventsWithRelations = await Promise.all(
+        (events as DbEvent[]).map(async (event: DbEvent) => {
+            const { data: attendeeRelations } = await supabase
+                .from('event_attendees')
+                .select('user_id')
+                .eq('event_id', event.id);
+
+            const { data: hostRelations } = await supabase
+                .from('event_hosts')
+                .select('user_id')
+                .eq('event_id', event.id);
+
+            return mapDbEventToStoreEvent(
+                event,
+                (attendeeRelations as RelationRow[] | null)?.map((r: RelationRow) => r.user_id) || [],
+                (hostRelations as RelationRow[] | null)?.map((r: RelationRow) => r.user_id) || []
+            );
+        })
+    );
+
+    return eventsWithRelations;
+}
+
+// Update user profile with authentication
+export async function updateUserProfile(
+    userId: string,
+    updates: {
+        name?: string;
+        avatar?: string;
+        location?: string;
+    },
+    accessToken?: string
+): Promise<User> {
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const { error } = await client
+        .from('users')
+        .update(updates)
+        .eq('id', userId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return fetchUser(userId);
+}
+
 // Fetch store by user ID (owner or assistant)
 export async function fetchStoreByUserId(userId: string): Promise<Store | null> {
     // First check if user is an owner
