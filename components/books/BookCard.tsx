@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Book } from "@/types/type";
@@ -27,10 +28,12 @@ export function BookCard({ book, onView }: BookCardProps) {
       <div className="relative">
         {book.cover ? (
           <div className="h-40 w-full relative">
-            <img
+            <Image
               src={book.cover}
               alt={book.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           </div>

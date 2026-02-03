@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Calendar, MapPin, Users, Edit2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDate, formatTime } from "@/lib/date-utils";
@@ -47,10 +48,12 @@ export function EventCard({
       {/* Event Cover */}
       {event.cover ? (
         <div className="h-32 w-full relative">
-          <img
+          <Image
             src={event.cover}
             alt={event.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           <span className={cn(

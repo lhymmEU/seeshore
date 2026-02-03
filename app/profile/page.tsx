@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { 
   User as UserIcon, 
   BookOpen, 
@@ -37,9 +38,9 @@ function BorrowedBookCard({ book, onClick }: { book: Book; onClick: () => void }
       onClick={onClick}
       className="flex items-center gap-3 p-3 bg-white rounded-xl border border-zinc-100 hover:border-zinc-200 transition-all text-left w-full"
     >
-      <div className="w-12 h-16 rounded-lg overflow-hidden bg-zinc-100 flex-shrink-0">
+      <div className="w-12 h-16 rounded-lg overflow-hidden bg-zinc-100 flex-shrink-0 relative">
         {book.cover ? (
-          <img src={book.cover} alt={book.title} className="w-full h-full object-cover" />
+          <Image src={book.cover} alt={book.title} fill className="object-cover" unoptimized />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <BookOpen size={16} className="text-zinc-400" />
@@ -67,9 +68,9 @@ function FavoriteBookCard({ book, onClick }: { book: Book; onClick: () => void }
       onClick={onClick}
       className="flex-shrink-0 w-24 text-center"
     >
-      <div className="w-24 h-32 rounded-xl overflow-hidden bg-zinc-100 shadow-sm hover:shadow-md transition-shadow">
+      <div className="w-24 h-32 rounded-xl overflow-hidden bg-zinc-100 shadow-sm hover:shadow-md transition-shadow relative">
         {book.cover ? (
-          <img src={book.cover} alt={book.title} className="w-full h-full object-cover" />
+          <Image src={book.cover} alt={book.title} fill className="object-cover" unoptimized />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <BookOpen size={24} className="text-zinc-400" />
@@ -88,9 +89,9 @@ function AttendedEventCard({ event, onClick }: { event: StoreEvent; onClick: () 
       onClick={onClick}
       className="flex items-center gap-3 p-3 bg-white rounded-xl border border-zinc-100 hover:border-zinc-200 transition-all text-left w-full"
     >
-      <div className="w-12 h-12 rounded-xl overflow-hidden bg-zinc-100 flex-shrink-0">
+      <div className="w-12 h-12 rounded-xl overflow-hidden bg-zinc-100 flex-shrink-0 relative">
         {event.cover ? (
-          <img src={event.cover} alt={event.title} className="w-full h-full object-cover" />
+          <Image src={event.cover} alt={event.title} fill className="object-cover" unoptimized />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Calendar size={16} className="text-zinc-400" />
@@ -272,11 +273,13 @@ export default function ProfilePage() {
           <div className="flex items-start gap-4">
             {/* Avatar */}
             <div className="relative">
-              <div className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-100">
-                <img 
+              <div className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-100 relative">
+                <Image 
                   src={avatarUrl} 
                   alt={user.name}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  unoptimized
                 />
               </div>
               <label className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-zinc-900 flex items-center justify-center cursor-pointer hover:bg-zinc-800 transition-colors">

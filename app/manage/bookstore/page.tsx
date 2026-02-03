@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Loader2, BookOpen, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
@@ -27,12 +28,14 @@ function BookListItem({ book }: { book: Book }) {
   return (
     <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
       {/* Book Cover */}
-      <div className="w-12 h-16 rounded-lg overflow-hidden bg-zinc-200 flex-shrink-0">
+      <div className="w-12 h-16 rounded-lg overflow-hidden bg-zinc-200 flex-shrink-0 relative">
         {book.cover ? (
-          <img
+          <Image
             src={book.cover}
             alt={book.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

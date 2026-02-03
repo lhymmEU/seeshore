@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { Camera } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -45,10 +46,12 @@ export function ImageUpload({
       >
         {preview ? (
           <>
-            <img
+            <Image
               src={preview}
               alt="Preview"
-              className="absolute inset-0 w-full h-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <Camera size={28} className="text-white" />

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 import { 
   ArrowLeft, 
   Heart, 
@@ -155,12 +156,14 @@ export default function ItemDetailsPage() {
 
       {/* Book Cover - Overlapping the header */}
       <div className="relative px-4 -mt-28 z-0">
-        <div className="w-36 h-52 mx-auto rounded-xl overflow-hidden shadow-xl bg-zinc-900">
+        <div className="w-36 h-52 mx-auto rounded-xl overflow-hidden shadow-xl bg-zinc-900 relative">
           {book.cover ? (
-            <img
+            <Image
               src={book.cover}
               alt={book.title}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">

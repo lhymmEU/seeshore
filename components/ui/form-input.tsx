@@ -1,6 +1,6 @@
 "use client";
 
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FormInputProps {
@@ -118,9 +118,6 @@ export function DateTimeInput({
   onTimeChange,
   className,
 }: DateTimeInputProps) {
-  // Import Clock icon dynamically to avoid circular dependencies
-  const ClockIcon = require("lucide-react").Clock;
-
   return (
     <div className={cn("space-y-2", className)}>
       {label && (
@@ -140,7 +137,7 @@ export function DateTimeInput({
           />
         </div>
         <div className="w-32 bg-zinc-100 rounded-2xl overflow-hidden flex items-center">
-          <ClockIcon size={16} className="text-zinc-400 ml-4" />
+          <Clock size={16} className="text-zinc-400 ml-4" />
           <input
             type="time"
             name={timeName}

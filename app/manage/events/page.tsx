@@ -11,7 +11,6 @@ import {
   Loader2,
   Trash2
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
 import { EventCard } from "@/components/events";
 import { PageHeader } from "@/components/ui/page-header";

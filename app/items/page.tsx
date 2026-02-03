@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
@@ -94,12 +95,14 @@ export default function ItemsPage() {
                 <button
                   key={book.id}
                   onClick={() => handleViewBook(book.id)}
-                  className="flex-shrink-0 w-28 h-40 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow active:scale-[0.98]"
+                  className="flex-shrink-0 w-28 h-40 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow active:scale-[0.98] relative"
                 >
-                  <img
-                    src={book.cover}
+                  <Image
+                    src={book.cover!}
                     alt={book.title}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 </button>
               ))}

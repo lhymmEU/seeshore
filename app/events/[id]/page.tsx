@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 import { ArrowLeft, ChevronRight, Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/ui/loading-spinner";
-import { formatDate, formatTime, formatDateRange } from "@/lib/date-utils";
+import { formatDateRange } from "@/lib/date-utils";
 import type { StoreEvent, User } from "@/types/type";
 
 // Generate dicebear avatar URL based on user ID or name
@@ -183,16 +184,25 @@ function UserAvatar({
     lg: "w-12 h-12",
   };
 
+  const sizePx = {
+    sm: 28,
+    md: 36,
+    lg: 48,
+  };
+
   const avatarUrl = user.avatar || getDicebearAvatar(user.id || user.name);
 
   return (
-    <img
+    <Image
       src={avatarUrl}
       alt={user.name}
+      width={sizePx[size]}
+      height={sizePx[size]}
       className={cn(
         sizeClasses[size],
         "rounded-full border-2 border-white object-cover bg-zinc-100"
       )}
+      unoptimized
     />
   );
 }
@@ -382,10 +392,12 @@ export default function EventDetailsPage() {
         </button>
 
         {event.cover ? (
-          <img
+          <Image
             src={event.cover}
             alt={event.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

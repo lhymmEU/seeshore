@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Calendar, MapPin, Users, Sparkles } from "lucide-react";
 import { BottomNav } from "@/components/navigation";
 import { SearchInput } from "@/components/ui/search-input";
@@ -26,10 +27,12 @@ function EventScrollCard({
     >
       {event.cover ? (
         <div className="h-28 w-full relative">
-          <img
+          <Image
             src={event.cover}
             alt={event.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized
           />
         </div>
       ) : (
@@ -84,10 +87,12 @@ function FeaturedEventCard({
     >
       <div className="relative h-48 w-full">
         {event.cover ? (
-          <img
+          <Image
             src={event.cover}
             alt={event.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            unoptimized
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-orange-100 to-amber-50 flex items-center justify-center">
