@@ -1273,11 +1273,64 @@ export async function registerBook(
 }
 
 // ============================================
-// 22. DEREGISTER BOOK
+// 22. UPDATE BOOK
 // ============================================
 
-export async function deregisterBook(bookId: string): Promise<void> {
-    const { error } = await supabase
+export async function updateBook(
+    bookId: string,
+    bookData: {
+        isbn?: string;
+        title?: string;
+        author?: string;
+        cover?: string;
+        background?: string;
+        publicationDate?: string;
+        description?: string;
+        categories?: string[];
+        location?: string;
+        link?: string;
+    },
+    accessToken?: string
+): Promise<Book> {
+    // Use authenticated client if access token is provided (for RLS compliance)
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const updateData: Record<string, unknown> = {};
+    
+    if (bookData.isbn !== undefined) updateData.isbn = bookData.isbn || null;
+    if (bookData.title !== undefined) updateData.title = bookData.title;
+    if (bookData.author !== undefined) updateData.author = bookData.author;
+    if (bookData.cover !== undefined) updateData.cover = bookData.cover;
+    if (bookData.background !== undefined) updateData.background = bookData.background;
+    if (bookData.publicationDate !== undefined) updateData.publication_date = bookData.publicationDate;
+    if (bookData.description !== undefined) updateData.description = bookData.description;
+    if (bookData.categories !== undefined) updateData.categories = bookData.categories;
+    if (bookData.location !== undefined) updateData.location = bookData.location;
+    if (bookData.link !== undefined) updateData.link = bookData.link;
+
+    const { data, error } = await client
+        .from('books')
+        .update(updateData)
+        .eq('id', bookId)
+        .select()
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return mapDbBookToBook(data as DbBook);
+}
+
+// ============================================
+// 23. DEREGISTER BOOK
+// ============================================
+
+export async function deregisterBook(bookId: string, accessToken?: string): Promise<void> {
+    // Use authenticated client if access token is provided (for RLS compliance)
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const { error } = await client
         .from('books')
         .delete()
         .eq('id', bookId);

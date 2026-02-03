@@ -9,7 +9,6 @@ import {
   CalendarDays, 
   ClipboardList, 
   Package, 
-  Wallet,
   Edit3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
