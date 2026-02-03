@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { 
-  ArrowLeft, 
   Calendar, 
   Plus,
   Sparkles,
@@ -15,6 +14,10 @@ import {
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
 import { EventCard } from "@/components/events";
+import { PageHeader } from "@/components/ui/page-header";
+import { PageLoader } from "@/components/ui/loading-spinner";
+import { EmptyState } from "@/components/ui/empty-state";
+import { TabSwitcher } from "@/components/ui/tab-switcher";
 import { fetchEvents, deleteEvent } from "@/data/supabase";
 import {
   Drawer,
@@ -58,7 +61,6 @@ export default function EventsManagePage() {
         return;
       }
 
-      // Check if user is owner (not just assistant)
       setIsOwner(role === "owner");
 
       const storeId = sessionStorage.getItem("selectedStore");
@@ -81,7 +83,6 @@ export default function EventsManagePage() {
     checkAuthAndFetch();
   }, [router]);
 
-  // Filter events based on selected tab
   const filteredEvents = events.filter((event) => {
     if (filter === "live") {
       return event.status === "open" || event.status === "full";
@@ -113,7 +114,6 @@ export default function EventsManagePage() {
       await deleteEvent(eventToDelete.id);
       setDeleteDrawerOpen(false);
       setEventToDelete(null);
-      // Refetch events from database
       await refetchEvents();
     } catch (error) {
       console.error("Failed to delete event:", error);
@@ -133,94 +133,37 @@ export default function EventsManagePage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-8 h-8 border-2 border-zinc-300 border-t-zinc-900 rounded-full animate-spin" />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   const liveCount = events.filter(e => e.status === "open" || e.status === "full").length;
   const proposedCount = events.filter(e => e.status === "proposed").length;
 
+  const tabs = [
+    { id: "live", label: "Live Events", icon: Radio, iconActiveClassName: "text-emerald-400", count: liveCount },
+    { id: "proposed", label: "Proposed", icon: Sparkles, iconActiveClassName: "text-sky-400", count: proposedCount },
+  ];
+
   return (
     <div className="min-h-screen bg-white pb-32">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-zinc-100">
-        <div className="flex items-center h-14 px-4">
-          <button
-            onClick={() => router.back()}
-            className="p-2 -ml-2 rounded-full hover:bg-zinc-100 transition-colors"
-          >
-            <ArrowLeft size={20} className="text-zinc-800" />
-          </button>
-          <h1 className="flex-1 text-center font-semibold text-zinc-900 pr-8">
-            Manage Events
-          </h1>
-        </div>
-      </div>
+      <PageHeader title="Manage Events" />
 
       <div className="px-4 pt-6 space-y-6">
-        {/* Filter Toggle */}
-        <div className="flex bg-zinc-100 rounded-full p-1">
-          <button
-            onClick={() => setFilter("live")}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-sm font-medium transition-all",
-              filter === "live"
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-800"
-            )}
-          >
-            <Radio size={14} className={filter === "live" ? "text-emerald-400" : ""} />
-            Live Events
-            {liveCount > 0 && (
-              <span className={cn(
-                "px-1.5 py-0.5 rounded-full text-xs",
-                filter === "live" ? "bg-white/20" : "bg-zinc-200"
-              )}>
-                {liveCount}
-              </span>
-            )}
-          </button>
-          <button
-            onClick={() => setFilter("proposed")}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-sm font-medium transition-all",
-              filter === "proposed"
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-800"
-            )}
-          >
-            <Sparkles size={14} className={filter === "proposed" ? "text-sky-400" : ""} />
-            Proposed
-            {proposedCount > 0 && (
-              <span className={cn(
-                "px-1.5 py-0.5 rounded-full text-xs",
-                filter === "proposed" ? "bg-white/20" : "bg-zinc-200"
-              )}>
-                {proposedCount}
-              </span>
-            )}
-          </button>
-        </div>
+        <TabSwitcher
+          tabs={tabs}
+          activeTab={filter}
+          onChange={(tab) => setFilter(tab as EventFilter)}
+        />
 
-        {/* Events List */}
         {filteredEvents.length === 0 ? (
-          <div className="bg-zinc-50 rounded-2xl p-12 flex flex-col items-center justify-center gap-4 border border-zinc-100">
-            <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center">
-              <Calendar size={28} className="text-zinc-400" />
-            </div>
-            <div className="text-center">
-              <p className="text-zinc-600 font-medium">
-                No {filter === "live" ? "live" : "proposed"} events
-              </p>
-              <p className="text-zinc-400 text-sm mt-1">
-                {filter === "live" 
-                  ? "Create an event or approve a proposed one"
-                  : "No event proposals pending review"}
-              </p>
-            </div>
+          <div className="bg-zinc-50 rounded-2xl p-12 border border-zinc-100">
+            <EmptyState
+              icon={Calendar}
+              title={`No ${filter === "live" ? "live" : "proposed"} events`}
+              message={filter === "live" 
+                ? "Create an event or approve a proposed one"
+                : "No event proposals pending review"}
+            />
           </div>
         ) : (
           <div className="space-y-4">
@@ -249,7 +192,6 @@ export default function EventsManagePage() {
         </button>
       </div>
 
-      {/* Bottom Navigation */}
       <BottomNav />
 
       {/* Delete Confirmation Drawer */}
@@ -271,7 +213,6 @@ export default function EventsManagePage() {
             </DrawerDescription>
           </DrawerHeader>
 
-          {/* Warning Box */}
           <div className="px-4 pb-4">
             <div className="bg-rose-50 border border-rose-100 rounded-xl p-4 space-y-2">
               <p className="text-sm font-medium text-rose-800">

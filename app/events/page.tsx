@@ -2,35 +2,12 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, Calendar, MapPin, Users, Sparkles } from "lucide-react";
+import { Calendar, MapPin, Users, Sparkles } from "lucide-react";
 import { BottomNav } from "@/components/navigation";
+import { SearchInput } from "@/components/ui/search-input";
+import { EmptyState } from "@/components/ui/empty-state";
+import { formatDate, formatTime, formatDateShort } from "@/lib/date-utils";
 import type { StoreEvent } from "@/types/type";
-
-function formatDate(dateString: string): string {
-  if (!dateString) return "TBD";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function formatTime(dateString: string): string {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  }).toLowerCase();
-}
-
-function formatDateShort(dateString: string): string {
-  if (!dateString) return "TBD";
-  const date = new Date(dateString);
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
-}
 
 // Compact event card for horizontal scroll
 function EventScrollCard({
@@ -47,7 +24,6 @@ function EventScrollCard({
       onClick={onClick}
       className="flex-shrink-0 w-44 bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 hover:border-zinc-200 transition-all active:scale-[0.98] text-left"
     >
-      {/* Event Cover */}
       {event.cover ? (
         <div className="h-28 w-full relative">
           <img
@@ -62,7 +38,6 @@ function EventScrollCard({
         </div>
       )}
 
-      {/* Event Info */}
       <div className="p-3 space-y-1.5">
         <h3 className="font-semibold text-zinc-900 text-sm leading-tight line-clamp-1">
           {event.title}
@@ -71,9 +46,7 @@ function EventScrollCard({
           {formatDateShort(event.startDate)} {formatTime(event.startDate)} – {formatTime(event.endDate)}
         </p>
         
-        {/* Bottom row */}
         <div className="flex items-center justify-between pt-1">
-          {/* Attendee avatars */}
           <div className="flex items-center">
             <div className="flex -space-x-1.5">
               {[...Array(Math.min(1, attendeeCount))].map((_, i) => (
@@ -109,7 +82,6 @@ function FeaturedEventCard({
       onClick={onClick}
       className="w-full bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 rounded-3xl overflow-hidden border border-orange-100 hover:border-orange-200 transition-all active:scale-[0.99] text-left"
     >
-      {/* Cover Image */}
       <div className="relative h-48 w-full">
         {event.cover ? (
           <img
@@ -125,17 +97,14 @@ function FeaturedEventCard({
             </div>
           </div>
         )}
-        {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         
-        {/* Badge */}
         <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1.5">
           <Sparkles size={12} className="text-orange-500" />
           <span className="text-xs font-semibold text-zinc-800">Closest Event</span>
         </div>
       </div>
 
-      {/* Event Info */}
       <div className="p-4 space-y-3">
         <div>
           <h3 className="font-bold text-zinc-900 text-lg leading-tight line-clamp-2">
@@ -165,7 +134,6 @@ function FeaturedEventCard({
           </div>
         </div>
 
-        {/* CTA */}
         <div className="flex items-center justify-between pt-2">
           <div className="flex -space-x-2">
             {[...Array(Math.min(1, attendeeCount))].map((_, i) => (
@@ -190,7 +158,6 @@ export default function EventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch events on mount
   useEffect(() => {
     const fetchEventsData = async () => {
       try {
@@ -216,7 +183,6 @@ export default function EventsPage() {
     fetchEventsData();
   }, []);
 
-  // Filter events based on search
   const filteredEvents = useMemo(() => {
     return events.filter((event) => {
       const matchesSearch =
@@ -229,13 +195,11 @@ export default function EventsPage() {
     });
   }, [events, searchQuery]);
 
-  // Get the closest upcoming event (first event since they're sorted by start date)
   const closestEvent = useMemo(() => {
     const now = new Date();
     return events.find(event => new Date(event.startDate) >= now) || events[0];
   }, [events]);
 
-  // Events for the horizontal scroll (excluding the featured one)
   const scrollEvents = useMemo(() => {
     if (!closestEvent) return filteredEvents;
     return filteredEvents.filter(event => event.id !== closestEvent.id);
@@ -249,23 +213,14 @@ export default function EventsPage() {
     <div className="min-h-screen bg-white pb-24">
       {/* Search Bar Section */}
       <div className="px-4 pt-12 pb-4 space-y-4">
-        <div className="relative">
-          <Search
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
-          />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Event Search Bar"
-            className="w-full pl-11 pr-4 py-3.5 bg-zinc-100 rounded-full text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200 transition-all text-base"
-          />
-        </div>
+        <SearchInput
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Event Search Bar"
+        />
       </div>
 
       <div className="px-4 space-y-6">
-        {/* Events Section Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-zinc-800">Events</h2>
           <button className="text-sm text-zinc-500 hover:text-zinc-700 transition-colors">
@@ -273,7 +228,6 @@ export default function EventsPage() {
           </button>
         </div>
 
-        {/* Horizontally Scrollable Events */}
         <section>
           {isLoading ? (
             <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
@@ -301,7 +255,6 @@ export default function EventsPage() {
           )}
         </section>
 
-        {/* The Closest Event - Featured Section */}
         <section className="pt-2">
           <h2 className="text-base font-semibold text-zinc-800 mb-3">
             The Closest Event
@@ -314,22 +267,18 @@ export default function EventsPage() {
               onClick={() => handleViewEvent(closestEvent.id)}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 bg-zinc-50 rounded-3xl text-center">
-              <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
-                <Calendar size={28} className="text-zinc-400" />
-              </div>
-              <p className="text-zinc-600 font-medium">No events scheduled</p>
-              <p className="text-zinc-400 text-sm mt-1">
-                Check back later for upcoming events
-              </p>
+            <div className="bg-zinc-50 rounded-3xl">
+              <EmptyState
+                icon={Calendar}
+                title="No events scheduled"
+                message="Check back later for upcoming events"
+              />
             </div>
           )}
         </section>
       </div>
 
-      {/* Bottom Navigation */}
       <BottomNav />
     </div>
   );
 }
-

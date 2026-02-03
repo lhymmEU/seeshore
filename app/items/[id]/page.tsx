@@ -5,7 +5,6 @@ import { useRouter, useParams } from "next/navigation";
 import { 
   ArrowLeft, 
   Heart, 
-  ChevronRight,
   BookOpen,
   Calendar,
   Building2
@@ -23,7 +22,6 @@ export default function ItemDetailsPage() {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
-  // Fetch book details
   useEffect(() => {
     const fetchBook = async () => {
       try {
@@ -44,7 +42,6 @@ export default function ItemDetailsPage() {
     }
   }, [bookId]);
 
-  // Truncate description for "More" functionality
   const truncatedDescription = book?.description
     ? book.description.length > 150
       ? book.description.slice(0, 150) + "..."
@@ -54,19 +51,12 @@ export default function ItemDetailsPage() {
   const shouldShowMore = book?.description && book.description.length > 150;
 
   const handleLike = () => {
-    // Unimplemented - just toggle local state for UI feedback
     setIsLiked(!isLiked);
-  };
-
-  const handleBorrow = () => {
-    // Unimplemented - placeholder for future functionality
-    console.log("Borrow functionality not implemented yet");
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
-        {/* Loading skeleton */}
         <div className="h-64 bg-zinc-100 animate-pulse" />
         <div className="px-4 py-6 space-y-4">
           <div className="w-32 h-44 mx-auto bg-zinc-200 rounded-xl animate-pulse -mt-24" />
@@ -96,7 +86,6 @@ export default function ItemDetailsPage() {
     <div className="min-h-screen bg-white">
       {/* Background Header with Vector Pattern */}
       <div className="relative h-56 bg-gradient-to-br from-zinc-100 via-zinc-50 to-zinc-100 overflow-hidden">
-        {/* Decorative background pattern */}
         <div className="absolute inset-0 opacity-30">
           <svg className="w-full h-full" viewBox="0 0 400 250" preserveAspectRatio="xMidYMid slice">
             <defs>
@@ -111,7 +100,6 @@ export default function ItemDetailsPage() {
           </svg>
         </div>
         
-        {/* Back Button */}
         <button
           onClick={() => router.back()}
           className="absolute top-4 left-4 z-20 p-2.5 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-white transition-colors"
@@ -139,7 +127,6 @@ export default function ItemDetailsPage() {
 
       {/* Book Info */}
       <div className="px-4 pt-5 pb-8">
-        {/* Title and Author */}
         <div className="text-center space-y-1.5">
           <h1 className="text-xl font-bold text-zinc-900 leading-tight">
             {book.title}
@@ -149,7 +136,6 @@ export default function ItemDetailsPage() {
           </p>
         </div>
 
-        {/* Publication Info Pills */}
         <div className="flex items-center justify-center gap-3 mt-5">
           {book.publicationDate && (
             <div className="flex items-center gap-2 px-4 py-2.5 bg-zinc-100 rounded-xl">
@@ -172,7 +158,6 @@ export default function ItemDetailsPage() {
           )}
         </div>
 
-        {/* Description */}
         {book.description && (
           <div className="mt-6">
             <p className="text-zinc-600 leading-relaxed text-[15px]">
@@ -197,7 +182,6 @@ export default function ItemDetailsPage() {
           </div>
         )}
 
-        {/* Categories and Like */}
         <div className="flex items-center justify-between mt-6">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-zinc-500 font-medium">Categories:</span>
@@ -230,7 +214,6 @@ export default function ItemDetailsPage() {
           </button>
         </div>
 
-        {/* Status indicator */}
         {book.status === "borrowed" && book.borrowedDate && (
           <p className="text-center text-sm text-zinc-400 mt-3">
             Borrowed on {new Date(book.borrowedDate).toLocaleDateString()}
@@ -240,4 +223,3 @@ export default function ItemDetailsPage() {
     </div>
   );
 }
-

@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Search, BookOpen } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
 import { BookCard } from "@/components/books";
+import { PageHeader } from "@/components/ui/page-header";
+import { SearchInput } from "@/components/ui/search-input";
+import { EmptyState } from "@/components/ui/empty-state";
 import type { Book } from "@/types/type";
 
 export default function ItemsPage() {
@@ -15,7 +18,6 @@ export default function ItemsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // Fetch books on mount
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -36,7 +38,6 @@ export default function ItemsPage() {
     fetchBooks();
   }, []);
 
-  // Extract unique categories from all books
   const allCategories = useMemo(() => {
     const categorySet = new Set<string>();
     books.forEach((book) => {
@@ -45,7 +46,6 @@ export default function ItemsPage() {
     return Array.from(categorySet).sort();
   }, [books]);
 
-  // Filter books based on search and category
   const filteredBooks = useMemo(() => {
     return books.filter((book) => {
       const matchesSearch =
@@ -61,7 +61,6 @@ export default function ItemsPage() {
     });
   }, [books, searchQuery, selectedCategory]);
 
-  // Featured books for the horizontal scroll (first 10 books with covers)
   const featuredBooks = useMemo(() => {
     return books.filter((book) => book.cover).slice(0, 10);
   }, [books]);
@@ -72,14 +71,7 @@ export default function ItemsPage() {
 
   return (
     <div className="min-h-screen bg-white pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-zinc-100">
-        <div className="flex items-center justify-center h-14 px-4">
-          <h1 className="font-semibold text-zinc-900">
-            Browse Books
-          </h1>
-        </div>
-      </div>
+      <PageHeader title="Browse Books" showBack={false} />
 
       <div className="px-4 pt-5 space-y-5">
         {/* This Week's Book - Horizontal Scroll */}
@@ -119,20 +111,11 @@ export default function ItemsPage() {
           )}
         </section>
 
-        {/* Search Bar */}
-        <div className="relative">
-          <Search
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
-          />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search books..."
-            className="w-full pl-11 pr-4 py-3.5 bg-zinc-100 rounded-full text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200 transition-all text-base"
-          />
-        </div>
+        <SearchInput
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search books..."
+        />
 
         {/* Category Tags */}
         {allCategories.length > 0 && (
@@ -194,24 +177,18 @@ export default function ItemsPage() {
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mb-4">
-                <BookOpen size={28} className="text-zinc-400" />
-              </div>
-              <p className="text-zinc-600 font-medium">No books found</p>
-              <p className="text-zinc-400 text-sm mt-1">
-                {searchQuery || selectedCategory
-                  ? "Try adjusting your filters"
-                  : "Check back later for new additions"}
-              </p>
-            </div>
+            <EmptyState
+              icon={BookOpen}
+              title="No books found"
+              message={searchQuery || selectedCategory
+                ? "Try adjusting your filters"
+                : "Check back later for new additions"}
+            />
           )}
         </section>
       </div>
 
-      {/* Bottom Navigation */}
       <BottomNav />
     </div>
   );
 }
-

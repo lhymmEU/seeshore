@@ -2,27 +2,8 @@
 
 import { Calendar, MapPin, Users, Edit2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatDate, formatTime } from "@/lib/date-utils";
 import type { StoreEvent } from "@/types/type";
-
-function formatDate(dateString: string): string {
-  if (!dateString) return "TBD";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function formatTime(dateString: string): string {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-}
 
 function getStatusBadge(status: StoreEvent["status"]) {
   const statusConfig = {

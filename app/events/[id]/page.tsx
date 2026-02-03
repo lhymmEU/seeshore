@@ -13,44 +13,9 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { PageLoader } from "@/components/ui/loading-spinner";
+import { formatDate, formatTime, formatDateRange } from "@/lib/date-utils";
 import type { StoreEvent, User } from "@/types/type";
-
-function formatDate(dateString: string): string {
-  if (!dateString) return "TBD";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatTime(dateString: string): string {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  }).toLowerCase();
-}
-
-function formatDateRange(startDate: string, endDate: string): string {
-  const start = formatDate(startDate);
-  const startTime = formatTime(startDate);
-  const endTime = formatTime(endDate);
-
-  if (!startDate) return "Date TBD";
-
-  let result = start;
-  if (startTime) {
-    result += ` ${startTime}`;
-  }
-  if (endTime && endTime !== startTime) {
-    result += ` – ${endTime}`;
-  }
-  return result;
-}
 
 // Generate dicebear avatar URL based on user ID or name
 function getDicebearAvatar(seed: string): string {
@@ -72,7 +37,6 @@ function SlideToAttendButton({
   const trackRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
 
-  // Update track width on mount and resize
   useEffect(() => {
     const updateWidth = () => {
       if (trackRef.current) {
@@ -96,7 +60,6 @@ function SlideToAttendButton({
     
     setProgress(newProgress);
     
-    // Complete when reaching the end
     if (newProgress >= 0.95 && !isCompleted) {
       setIsCompleted(true);
       setProgress(1);
@@ -131,7 +94,6 @@ function SlideToAttendButton({
     const handleEnd = () => {
       setIsDragging(false);
       if (!isCompleted && progress < 0.95) {
-        // Animate back to start
         setProgress(0);
       }
     };
@@ -149,12 +111,10 @@ function SlideToAttendButton({
     };
   }, [isDragging, isCompleted, progress, handleMove]);
 
-  // Calculate thumb translateX value
   const thumbTranslateX = progress * Math.max(0, trackWidth - 56);
 
   return (
     <div className="relative">
-      {/* Track */}
       <div
         ref={trackRef}
         className={cn(
@@ -162,7 +122,6 @@ function SlideToAttendButton({
           isCompleted ? "bg-emerald-100" : "bg-zinc-100"
         )}
       >
-        {/* Progress fill */}
         <div
           className={cn(
             "absolute inset-y-0 left-0 transition-all duration-75",
@@ -171,7 +130,6 @@ function SlideToAttendButton({
           style={{ width: `${progress * 100}%` }}
         />
 
-        {/* Text label */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <span
             className={cn(
@@ -184,7 +142,6 @@ function SlideToAttendButton({
           </span>
         </div>
 
-        {/* Draggable thumb */}
         <div
           ref={thumbRef}
           onMouseDown={handleMouseDown}
@@ -308,7 +265,6 @@ export default function EventDetailsPage() {
         const eventData = await response.json();
         setEvent(eventData);
 
-        // Fetch host user details if there are hosts
         if (eventData.hosts && eventData.hosts.length > 0) {
           const usersResponse = await fetch(`/api/users?ids=${eventData.hosts.join(",")}`);
           if (usersResponse.ok) {
@@ -317,7 +273,6 @@ export default function EventDetailsPage() {
           }
         }
 
-        // Fetch attendee user details
         if (eventData.attendees && eventData.attendees.length > 0) {
           await fetchAttendees(eventData.attendees);
         }
@@ -364,12 +319,10 @@ export default function EventDetailsPage() {
         throw new Error(errorData.error || "Failed to attend event");
       }
 
-      // Refetch event to get updated attendees list
       const eventResponse = await fetch(`/api/events?id=${eventId}`);
       if (eventResponse.ok) {
         const updatedEvent = await eventResponse.json();
         setEvent(updatedEvent);
-        // Fetch updated attendee users
         if (updatedEvent.attendees && updatedEvent.attendees.length > 0) {
           await fetchAttendees(updatedEvent.attendees);
         }
@@ -397,11 +350,7 @@ export default function EventDetailsPage() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-8 h-8 border-2 border-zinc-300 border-t-zinc-900 rounded-full animate-spin" />
-      </div>
-    );
+    return <PageLoader />;
   }
 
   if (!event) {
@@ -425,7 +374,6 @@ export default function EventDetailsPage() {
     <div className="min-h-screen bg-white flex flex-col">
       {/* Cover Image Area */}
       <div className="relative w-full aspect-[4/5] bg-zinc-100 flex-shrink-0">
-        {/* Back Button */}
         <button
           onClick={() => router.back()}
           className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm border border-zinc-200/50"
@@ -433,7 +381,6 @@ export default function EventDetailsPage() {
           <ArrowLeft size={20} className="text-zinc-800" />
         </button>
 
-        {/* Cover Image or Placeholder */}
         {event.cover ? (
           <img
             src={event.cover}
@@ -451,14 +398,11 @@ export default function EventDetailsPage() {
 
       {/* Content Sheet */}
       <div className="relative -mt-6 bg-white rounded-t-3xl flex-1 flex flex-col">
-        {/* Drag Handle */}
         <div className="flex justify-center pt-3 pb-4">
           <div className="w-12 h-1.5 rounded-full bg-zinc-200" />
         </div>
 
-        {/* Event Info */}
         <div className="px-5 pb-6 flex-1 flex flex-col">
-          {/* Title and Date Row */}
           <div className="mb-4">
             <h1 className="text-xl font-bold text-zinc-900 mb-2">
               {event.title}
@@ -469,11 +413,9 @@ export default function EventDetailsPage() {
             </div>
           </div>
 
-          {/* Participants and Map Button Row */}
           <div className="flex items-center justify-between mb-6">
             <ParticipantAvatars attendees={attendeeUsers} />
             
-            {/* Map Button Placeholder */}
             <button
               disabled
               className="px-4 py-2.5 bg-zinc-100 rounded-xl text-sm font-medium text-zinc-400 cursor-not-allowed"
@@ -482,7 +424,6 @@ export default function EventDetailsPage() {
             </button>
           </div>
 
-          {/* About Event */}
           <div className="flex-1 mb-6">
             <h2 className="text-base font-semibold text-zinc-900 mb-2">
               About Event
@@ -492,7 +433,6 @@ export default function EventDetailsPage() {
             </p>
           </div>
 
-          {/* Slide to Attend Button */}
           <div className="mt-auto pb-safe">
             <SlideToAttendButton 
               onComplete={handleAttend}
@@ -514,7 +454,6 @@ export default function EventDetailsPage() {
             </DrawerDescription>
           </DrawerHeader>
 
-          {/* Success Art Placeholder */}
           <div className="px-6 py-8">
             <div className="aspect-[4/3] bg-zinc-100 rounded-2xl flex items-center justify-center border border-zinc-200">
               <div className="text-center px-6">
@@ -552,7 +491,6 @@ export default function EventDetailsPage() {
             </DrawerDescription>
           </DrawerHeader>
 
-          {/* Failure Art */}
           <div className="px-6 py-8">
             <div className="aspect-[4/3] bg-rose-50 rounded-2xl flex items-center justify-center border border-rose-100">
               <div className="text-center px-6">

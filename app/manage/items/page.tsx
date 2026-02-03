@@ -1,11 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
-  ArrowLeft, 
-  Camera, 
-  Loader2,
   BookOpen,
   User,
   Calendar,
@@ -14,16 +11,21 @@ import {
   Link as LinkIcon,
   Tag,
   Scan,
-  PenLine
+  PenLine,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
+import { PageHeader } from "@/components/ui/page-header";
+import { ImageUpload } from "@/components/ui/image-upload";
+import { TabSwitcher } from "@/components/ui/tab-switcher";
+import { FormInput, FormTextarea } from "@/components/ui/form-input";
 import { uploadImage } from "@/data/supabase";
 
 type RegistrationTab = "manual" | "scan";
 
 interface BookFormData {
-  isbn: string; // ISBN
+  isbn: string;
   title: string;
   author: string;
   publicationDate: string;
@@ -35,7 +37,6 @@ interface BookFormData {
 
 export default function ItemRegistrationPage() {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [activeTab, setActiveTab] = useState<RegistrationTab>("manual");
   const [isSaving, setIsSaving] = useState(false);
@@ -64,17 +65,10 @@ export default function ItemRegistrationPage() {
     checkAuth();
   }, [router]);
 
-  const handleCoverClick = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setCoverFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setCoverPreview(previewUrl);
-    }
+  const handleCoverSelect = (file: File) => {
+    setCoverFile(file);
+    const previewUrl = URL.createObjectURL(file);
+    setCoverPreview(previewUrl);
   };
 
   const handleInputChange = (
@@ -99,14 +93,12 @@ export default function ItemRegistrationPage() {
         throw new Error("No store found");
       }
 
-      // Upload cover image if present
       let coverUrl: string | undefined;
       if (coverFile) {
         try {
           coverUrl = await uploadImage(coverFile, 'images', 'books');
         } catch (uploadError) {
           console.error("Failed to upload cover image:", uploadError);
-          // Continue without cover if upload fails
         }
       }
 
@@ -115,7 +107,6 @@ export default function ItemRegistrationPage() {
         headers["Authorization"] = `Bearer ${accessToken}`;
       }
 
-      // Parse categories from comma-separated string
       const categoriesArray = formData.categories
         .split(",")
         .map(cat => cat.trim())
@@ -143,7 +134,6 @@ export default function ItemRegistrationPage() {
         throw new Error(errorData.error || "Failed to register book");
       }
 
-      // Reset form and show success
       setFormData({
         isbn: "",
         title: "",
@@ -169,143 +159,58 @@ export default function ItemRegistrationPage() {
 
   const isFormValid = formData.title.trim().length > 0;
 
+  const tabs = [
+    { id: "manual", label: "Manual Entry", icon: PenLine },
+    { id: "scan", label: "Scan ISBN", icon: Scan },
+  ];
+
   return (
     <div className="min-h-screen bg-white pb-24">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-zinc-100">
-        <div className="flex items-center h-14 px-4">
-          <button
-            onClick={() => router.back()}
-            className="p-2 -ml-2 rounded-full hover:bg-zinc-100 transition-colors"
-          >
-            <ArrowLeft size={20} className="text-zinc-800" />
-          </button>
-          <h1 className="flex-1 text-center font-semibold text-zinc-900 pr-8">
-            Register Item
-          </h1>
-        </div>
-      </div>
+      <PageHeader title="Register Item" />
 
       <div className="px-4 pt-6 space-y-5">
-        {/* Registration Method Toggle */}
-        <div className="flex bg-zinc-100 rounded-full p-1">
-          <button
-            onClick={() => setActiveTab("manual")}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-sm font-medium transition-all",
-              activeTab === "manual"
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-800"
-            )}
-          >
-            <PenLine size={14} />
-            Manual Entry
-          </button>
-          <button
-            onClick={() => setActiveTab("scan")}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-sm font-medium transition-all",
-              activeTab === "scan"
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-800"
-            )}
-          >
-            <Scan size={14} />
-            Scan ISBN
-          </button>
-        </div>
+        <TabSwitcher
+          tabs={tabs}
+          activeTab={activeTab}
+          onChange={(tab) => setActiveTab(tab as RegistrationTab)}
+        />
 
-        {/* Tab Content */}
         {activeTab === "manual" ? (
           <>
-            {/* Cover Image Upload */}
-            <button
-              onClick={handleCoverClick}
-              className="w-full h-44 bg-zinc-100 rounded-2xl flex flex-col items-center justify-center gap-2 overflow-hidden relative group transition-all hover:bg-zinc-200/80"
-            >
-              {coverPreview ? (
-                <>
-                  <img
-                    src={coverPreview}
-                    alt="Cover preview"
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Camera size={28} className="text-white" />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <Camera size={28} className="text-zinc-400" />
-                  <span className="text-zinc-500 font-medium text-sm">
-                    Upload Book Cover
-                  </span>
-                </>
-              )}
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleCoverChange}
-              className="hidden"
+            <ImageUpload
+              preview={coverPreview}
+              onFileSelect={handleCoverSelect}
+              label="Upload Book Cover"
             />
 
-            {/* ISBN (ID) */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-                <BookOpen size={14} className="text-zinc-400" />
-                ISBN
-              </label>
-              <div className="bg-zinc-100 rounded-2xl overflow-hidden">
-                <input
-                  type="text"
-                  name="isbn"
-                  value={formData.isbn}
-                  onChange={handleInputChange}
-                  placeholder="Enter ISBN (e.g., 978-0-13-468599-1)"
-                  className="w-full px-4 py-4 bg-transparent text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-base"
-                />
-              </div>
-            </div>
+            <FormInput
+              label="ISBN"
+              icon={BookOpen}
+              name="isbn"
+              value={formData.isbn}
+              onChange={handleInputChange}
+              placeholder="Enter ISBN (e.g., 978-0-13-468599-1)"
+            />
 
-            {/* Book Title */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-                <FileText size={14} className="text-zinc-400" />
-                Book Title <span className="text-rose-500">*</span>
-              </label>
-              <div className="bg-zinc-100 rounded-2xl overflow-hidden">
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  placeholder="Enter book title"
-                  className="w-full px-4 py-4 bg-transparent text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-base"
-                />
-              </div>
-            </div>
+            <FormInput
+              label="Book Title"
+              icon={FileText}
+              name="title"
+              value={formData.title}
+              onChange={handleInputChange}
+              placeholder="Enter book title"
+              required
+            />
 
-            {/* Author */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-                <User size={14} className="text-zinc-400" />
-                Author
-              </label>
-              <div className="bg-zinc-100 rounded-2xl overflow-hidden">
-                <input
-                  type="text"
-                  name="author"
-                  value={formData.author}
-                  onChange={handleInputChange}
-                  placeholder="Enter author name"
-                  className="w-full px-4 py-4 bg-transparent text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-base"
-                />
-              </div>
-            </div>
+            <FormInput
+              label="Author"
+              icon={User}
+              name="author"
+              value={formData.author}
+              onChange={handleInputChange}
+              placeholder="Enter author name"
+            />
 
-            {/* Publication Date */}
             <div className="space-y-2">
               <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
                 <Calendar size={14} className="text-zinc-400" />
@@ -322,79 +227,44 @@ export default function ItemRegistrationPage() {
               </div>
             </div>
 
-            {/* Categories */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-                <Tag size={14} className="text-zinc-400" />
-                Categories
-              </label>
-              <div className="bg-zinc-100 rounded-2xl overflow-hidden">
-                <input
-                  type="text"
-                  name="categories"
-                  value={formData.categories}
-                  onChange={handleInputChange}
-                  placeholder="Fiction, Mystery, Thriller (comma-separated)"
-                  className="w-full px-4 py-4 bg-transparent text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-base"
-                />
-              </div>
-            </div>
+            <FormInput
+              label="Categories"
+              icon={Tag}
+              name="categories"
+              value={formData.categories}
+              onChange={handleInputChange}
+              placeholder="Fiction, Mystery, Thriller (comma-separated)"
+            />
 
-            {/* Location */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-                <MapPin size={14} className="text-zinc-400" />
-                Location
-              </label>
-              <div className="bg-zinc-100 rounded-2xl overflow-hidden">
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  placeholder="Shelf A3, Row 2"
-                  className="w-full px-4 py-4 bg-transparent text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-base"
-                />
-              </div>
-            </div>
+            <FormInput
+              label="Location"
+              icon={MapPin}
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              placeholder="Shelf A3, Row 2"
+            />
 
-            {/* External Link */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-                <LinkIcon size={14} className="text-zinc-400" />
-                External Link
-              </label>
-              <div className="bg-zinc-100 rounded-2xl overflow-hidden">
-                <input
-                  type="url"
-                  name="link"
-                  value={formData.link}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com/book"
-                  className="w-full px-4 py-4 bg-transparent text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-base"
-                />
-              </div>
-            </div>
+            <FormInput
+              label="External Link"
+              icon={LinkIcon}
+              name="link"
+              value={formData.link}
+              onChange={handleInputChange}
+              placeholder="https://example.com/book"
+              type="url"
+            />
 
-            {/* Description */}
-            <div className="space-y-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-                <FileText size={14} className="text-zinc-400" />
-                Description
-              </label>
-              <div className="bg-zinc-100 rounded-2xl overflow-hidden">
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  placeholder="Enter book description..."
-                  rows={4}
-                  className="w-full px-4 py-4 bg-transparent text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-base resize-none"
-                />
-              </div>
-            </div>
+            <FormTextarea
+              label="Description"
+              icon={FileText}
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Enter book description..."
+              rows={4}
+            />
 
-            {/* Submit Button */}
             <button
               onClick={handleSubmit}
               disabled={isSaving || !isFormValid}
@@ -416,7 +286,6 @@ export default function ItemRegistrationPage() {
             </button>
           </>
         ) : (
-          /* Scan Tab - Placeholder */
           <div className="bg-zinc-100 rounded-2xl p-12 flex flex-col items-center justify-center gap-4 min-h-[300px]">
             <div className="w-20 h-20 rounded-full bg-zinc-200 flex items-center justify-center">
               <Scan size={36} className="text-zinc-400" />
@@ -433,9 +302,7 @@ export default function ItemRegistrationPage() {
         )}
       </div>
 
-      {/* Bottom Navigation */}
       <BottomNav />
     </div>
   );
 }
-
