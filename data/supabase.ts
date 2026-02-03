@@ -1291,6 +1291,7 @@ export async function updateBook(
         categories?: string[];
         location?: string;
         link?: string;
+        status?: "available" | "borrowed";
     },
     accessToken?: string
 ): Promise<Book> {
@@ -1309,6 +1310,7 @@ export async function updateBook(
     if (bookData.categories !== undefined) updateData.categories = bookData.categories;
     if (bookData.location !== undefined) updateData.location = bookData.location;
     if (bookData.link !== undefined) updateData.link = bookData.link;
+    if (bookData.status !== undefined) updateData.status = bookData.status;
 
     const { data, error } = await client
         .from('books')

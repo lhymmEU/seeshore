@@ -23,12 +23,15 @@ function ItemCard({
   book,
   onEdit,
   onDelete,
+  onStatusChange,
 }: {
   book: Book;
   onEdit: () => void;
   onDelete: () => void;
+  onStatusChange: (newStatus: "available" | "borrowed") => Promise<void>;
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const handleDelete = async () => {
     if (!confirm(`Are you sure you want to delete "${book.title}"?`)) {
@@ -39,17 +42,41 @@ function ItemCard({
     setIsDeleting(false);
   };
 
+  const handleStatusClick = async () => {
+    const newStatus = book.status === "available" ? "borrowed" : "available";
+    setIsUpdatingStatus(true);
+    try {
+      await onStatusChange(newStatus);
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  const isBorrowed = book.status === "borrowed";
+
   return (
-    <div className="bg-white rounded-2xl border border-zinc-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+    <div
+      className={cn(
+        "rounded-2xl border overflow-hidden shadow-sm hover:shadow-md transition-all",
+        isBorrowed
+          ? "bg-zinc-100 border-zinc-200"
+          : "bg-white border-zinc-100"
+      )}
+    >
       <div className="flex gap-4 p-4">
         {/* Book Cover */}
-        <div className="flex-shrink-0 w-20 h-28 rounded-xl overflow-hidden bg-zinc-100 relative">
+        <div
+          className={cn(
+            "flex-shrink-0 w-20 h-28 rounded-xl overflow-hidden bg-zinc-100 relative",
+            isBorrowed && "opacity-60"
+          )}
+        >
           {book.cover ? (
             <Image
               src={book.cover}
               alt={book.title}
               fill
-              className="object-cover"
+              className={cn("object-cover", isBorrowed && "grayscale")}
               unoptimized
             />
           ) : (
@@ -61,29 +88,56 @@ function ItemCard({
 
         {/* Book Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-zinc-900 text-base leading-tight line-clamp-2">
+          <h3
+            className={cn(
+              "font-semibold text-base leading-tight line-clamp-2",
+              isBorrowed ? "text-zinc-500" : "text-zinc-900"
+            )}
+          >
             {book.title}
           </h3>
-          <p className="text-sm text-zinc-500 mt-1 line-clamp-1">
+          <p
+            className={cn(
+              "text-sm mt-1 line-clamp-1",
+              isBorrowed ? "text-zinc-400" : "text-zinc-500"
+            )}
+          >
             {book.author || "Unknown Author"}
           </p>
           {book.location && (
-            <div className="flex items-center gap-1.5 mt-2 text-xs text-zinc-400">
+            <div
+              className={cn(
+                "flex items-center gap-1.5 mt-2 text-xs",
+                isBorrowed ? "text-zinc-400" : "text-zinc-400"
+              )}
+            >
               <MapPin size={12} />
               <span className="line-clamp-1">{book.location}</span>
             </div>
           )}
           <div className="flex items-center gap-2 mt-3">
-            <span
+            <button
+              onClick={handleStatusClick}
+              disabled={isUpdatingStatus}
               className={cn(
-                "px-2.5 py-1 rounded-full text-xs font-medium",
+                "px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50",
                 book.status === "available"
-                  ? "bg-emerald-100 text-emerald-700"
-                  : "bg-amber-100 text-amber-700"
+                  ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
+                  : "bg-zinc-300 text-zinc-600 hover:bg-zinc-400"
               )}
+              title="Click to toggle status"
             >
-              {book.status === "available" ? "Available" : "Borrowed"}
-            </span>
+              {isUpdatingStatus ? (
+                <span className="flex items-center gap-1">
+                  <Loader2 size={12} className="animate-spin" />
+                  Updating...
+                </span>
+              ) : book.status === "available" ? (
+                "Available"
+              ) : (
+                "Borrowed"
+              )}
+            </button>
           </div>
         </div>
 
@@ -196,6 +250,40 @@ export default function ManageItemsPage() {
     }
   };
 
+  const handleStatusChange = async (
+    bookId: string,
+    newStatus: "available" | "borrowed"
+  ) => {
+    try {
+      const accessToken = sessionStorage.getItem("accessToken");
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (accessToken) {
+        headers["Authorization"] = `Bearer ${accessToken}`;
+      }
+
+      const response = await fetch(`/api/books/${bookId}`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update book status");
+      }
+
+      // Update local state
+      setBooks((prev) =>
+        prev.map((b) => (b.id === bookId ? { ...b, status: newStatus } : b))
+      );
+    } catch (error) {
+      console.error("Failed to update book status:", error);
+      alert("Failed to update book status. Please try again.");
+      throw error;
+    }
+  };
+
   const handleDrawerSuccess = () => {
     fetchBooks();
   };
@@ -253,6 +341,9 @@ export default function ManageItemsPage() {
                 book={book}
                 onEdit={() => handleEdit(book)}
                 onDelete={() => handleDelete(book.id)}
+                onStatusChange={(newStatus) =>
+                  handleStatusChange(book.id, newStatus)
+                }
               />
             ))}
           </div>

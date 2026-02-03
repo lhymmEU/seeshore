@@ -517,10 +517,10 @@ export function RoleSlideUp({
         </div>
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-zinc-900">
-            Choose Your Library
+            Choose A Store
           </h2>
           <p className="text-sm text-zinc-500">
-            Select the bookstore you want to join
+            Select the store you want to join
           </p>
         </div>
       </div>

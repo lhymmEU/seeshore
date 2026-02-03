@@ -38,6 +38,7 @@ export async function PUT(
             categories,
             location,
             link,
+            status,
         } = body;
 
         // Extract access token from Authorization header
@@ -59,6 +60,7 @@ export async function PUT(
                 categories: categories || undefined,
                 location: location?.trim() || undefined,
                 link: link?.trim() || undefined,
+                status: status || undefined,
             },
             accessToken
         );
