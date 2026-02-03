@@ -25,20 +25,37 @@ export default function ItemsPage() {
       try {
         const storeId = sessionStorage.getItem("selectedStore");
         
-        // Fetch books
-        const booksUrl = storeId ? `/api/books?storeId=${storeId}` : "/api/books";
-        const booksResponse = await fetch(booksUrl);
-        if (booksResponse.ok) {
-          const booksData = await booksResponse.json();
-          setBooks(booksData);
-        }
+        // Validate storeId is a non-empty, valid-looking value
+        const isValidStoreId = storeId && 
+          storeId.trim() !== "" && 
+          storeId !== "null" && 
+          storeId !== "undefined";
+        
+        if (isValidStoreId) {
+          // Fetch books first
+          const booksResponse = await fetch(`/api/books?storeId=${storeId}`);
+          if (booksResponse.ok) {
+            const booksData = await booksResponse.json();
+            setBooks(booksData);
+          }
 
-        // Fetch store info to get featured books
-        if (storeId) {
-          const storeResponse = await fetch(`/api/store?id=${storeId}`);
-          if (storeResponse.ok) {
-            const storeData = await storeResponse.json();
-            setFeaturedBookIds(storeData.featuredBooks || []);
+          // Fetch store info separately with error handling
+          try {
+            const storeResponse = await fetch(`/api/store?id=${storeId}`);
+            if (storeResponse.ok) {
+              const storeData = await storeResponse.json();
+              setFeaturedBookIds(storeData.featuredBooks || []);
+            }
+          } catch (storeError) {
+            console.error("Failed to fetch store info:", storeError);
+            // Continue without featured books
+          }
+        } else {
+          // No valid store selected, just fetch all books
+          const booksResponse = await fetch("/api/books");
+          if (booksResponse.ok) {
+            const booksData = await booksResponse.json();
+            setBooks(booksData);
           }
         }
       } catch (error) {

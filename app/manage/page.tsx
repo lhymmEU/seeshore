@@ -10,10 +10,13 @@ import {
   ClipboardList, 
   Package, 
   Edit3,
-  Star
+  Star,
+  LogOut,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/loading-spinner";
+import { logout } from "@/data/supabase";
 
 type UserRole = "owner" | "assistant";
 
@@ -122,6 +125,7 @@ export default function ManagePage() {
     const storedRole = sessionStorage.getItem("userRole") as UserRole | null;
     return storedRole === "owner" || storedRole === "assistant" ? storedRole : null;
   });
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -131,6 +135,20 @@ export default function ManagePage() {
       }
     }
   }, [router]);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      sessionStorage.clear();
+      router.push("/");
+    } catch (error) {
+      console.error("Failed to logout:", error);
+      alert("Failed to logout. Please try again.");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   if (!role) {
     return <PageLoader />;
@@ -147,6 +165,20 @@ export default function ManagePage() {
             <DashboardCardComponent key={card.id} card={card} />
           ))}
         </div>
+
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="w-full flex items-center justify-center gap-2 py-4 mt-6 rounded-2xl bg-white border border-zinc-200 text-rose-600 font-medium hover:bg-rose-50 hover:border-rose-200 transition-colors disabled:opacity-50"
+        >
+          {isLoggingOut ? (
+            <Loader2 size={18} className="animate-spin" />
+          ) : (
+            <LogOut size={18} />
+          )}
+          {isLoggingOut ? "Logging out..." : "Log Out"}
+        </button>
       </div>
     </div>
   );

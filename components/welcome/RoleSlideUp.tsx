@@ -14,7 +14,7 @@ import { loginWithEmail, registerWithInviteCode, fetchStores, validateInviteCode
 import type { Store as StoreType } from "@/types/type";
 
 type VerificationStatus = "idle" | "loading" | "success" | "error";
-type ViewState = "login" | "verifying" | "storeSelection" | "memberWelcome";
+type ViewState = "login" | "verifying" | "storeSelection" | "memberWelcome" | "memberStoreSelection";
 type AuthMode = "login" | "register";
 
 interface RoleSlideUpProps {
@@ -90,8 +90,35 @@ export function RoleSlideUp({
   const [viewState, setViewState] = useState<ViewState>("login");
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
   const [stores, setStores] = useState<StoreType[]>([]);
+  const [isLoadingStores, setIsLoadingStores] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  // When role changes or drawer opens, set the correct initial view for members
+  // Only switch to store selection if no store has been selected yet
+  useEffect(() => {
+    if (open && role === "user" && viewState === "login" && !selectedStore) {
+      setViewState("memberStoreSelection");
+      setIsLoadingStores(true);
+    }
+  }, [open, role, viewState, selectedStore]);
+
+  // For members, load stores when drawer opens
+  useEffect(() => {
+    if (open && role === "user" && isLoadingStores && stores.length === 0) {
+      const loadStores = async () => {
+        try {
+          const fetchedStores = await fetchStores();
+          setStores(fetchedStores);
+        } catch (error) {
+          console.error("Failed to fetch stores:", error);
+        } finally {
+          setIsLoadingStores(false);
+        }
+      };
+      loadStores();
+    }
+  }, [open, role, isLoadingStores, stores.length]);
 
   // Transition from success to appropriate view after 1 second
   useEffect(() => {
@@ -177,6 +204,7 @@ export function RoleSlideUp({
       // Reset state when closing
       setVerificationStatus("idle");
       setViewState("login");
+      setIsLoadingStores(false);
       setErrorMessage("");
       setEmail("");
       setPassword("");
@@ -228,6 +256,9 @@ export function RoleSlideUp({
     if (role) {
       // Store the member info in sessionStorage
       sessionStorage.setItem("userRole", "member");
+      if (selectedStore) {
+        sessionStorage.setItem("selectedStore", selectedStore);
+      }
       if (userId) {
         sessionStorage.setItem("userId", userId);
       }
@@ -242,6 +273,13 @@ export function RoleSlideUp({
       
       // Navigate to the items/books page for members
       router.push("/items");
+    }
+  };
+
+  // Handler for member store selection - proceed to login after selecting store
+  const handleMemberStoreConfirm = () => {
+    if (selectedStore) {
+      setViewState("login");
     }
   };
 
@@ -469,6 +507,107 @@ export function RoleSlideUp({
     </div>
   );
 
+  // Member Store Selection View (before login)
+  const renderMemberStoreSelection = () => (
+    <div className="px-6 pt-8 pb-8 flex flex-col gap-6">
+      {/* Header */}
+      <div className="flex flex-col items-center text-center gap-3">
+        <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center">
+          <Store size={32} className="text-zinc-600" />
+        </div>
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-zinc-900">
+            Choose Your Library
+          </h2>
+          <p className="text-sm text-zinc-500">
+            Select the bookstore you want to join
+          </p>
+        </div>
+      </div>
+
+      {/* Horizontally scrollable store cards */}
+      <div className="-mx-6 px-6">
+        <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+          {isLoadingStores ? (
+            // Loading skeleton
+            <>
+              {[1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0 w-44 rounded-2xl p-4 bg-zinc-100 animate-pulse"
+                >
+                  <div className="w-full h-24 rounded-xl mb-3 bg-zinc-200" />
+                  <div className="h-4 bg-zinc-200 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-zinc-200 rounded w-full mb-1" />
+                  <div className="h-3 bg-zinc-200 rounded w-2/3" />
+                </div>
+              ))}
+            </>
+          ) : stores.length > 0 ? stores.map((store) => (
+            <button
+              key={store.id}
+              onClick={() => handleStoreSelect(store.id)}
+              className={`flex-shrink-0 w-44 rounded-2xl p-4 text-left transition-all ${
+                selectedStore === store.id
+                  ? "bg-zinc-900 text-white"
+                  : "bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
+              }`}
+            >
+              {/* Store image placeholder */}
+              <div
+                className={`w-full h-24 rounded-xl mb-3 flex items-center justify-center overflow-hidden ${
+                  selectedStore === store.id ? "bg-zinc-800" : "bg-zinc-200"
+                }`}
+              >
+                <BookOpen
+                  size={32}
+                  className={selectedStore === store.id ? "text-zinc-400" : "text-zinc-400"}
+                />
+              </div>
+              <h3 className="font-semibold text-sm mb-1 truncate">{store.name}</h3>
+              <p
+                className={`text-xs mb-2 line-clamp-2 ${
+                  selectedStore === store.id ? "text-zinc-300" : "text-zinc-500"
+                }`}
+              >
+                {store.description || "No description"}
+              </p>
+              <div className="flex items-center gap-1">
+                <MapPin
+                  size={12}
+                  className={selectedStore === store.id ? "text-zinc-400" : "text-zinc-400"}
+                />
+                <span
+                  className={`text-xs truncate ${
+                    selectedStore === store.id ? "text-zinc-400" : "text-zinc-400"
+                  }`}
+                >
+                  {store.rules || "See store rules"}
+                </span>
+              </div>
+            </button>
+          )) : (
+            <div className="flex-1 text-center py-8 text-zinc-500">
+              <p>No libraries available</p>
+              <p className="text-sm mt-1">Please check back later</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Continue button */}
+      <Button
+        onClick={handleMemberStoreConfirm}
+        size="lg"
+        disabled={!selectedStore}
+        className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Continue
+        <ArrowRight size={18} className="ml-2" />
+      </Button>
+    </div>
+  );
+
   // Login Form View
   const renderLoginForm = () => (
     <div className="px-6 pt-8 pb-8 flex flex-col gap-6">
@@ -656,6 +795,7 @@ export function RoleSlideUp({
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto">
+          {viewState === "memberStoreSelection" && renderMemberStoreSelection()}
           {viewState === "login" && renderLoginForm()}
           {viewState === "verifying" && renderVerificationResult()}
           {viewState === "storeSelection" && renderStoreSelection()}
