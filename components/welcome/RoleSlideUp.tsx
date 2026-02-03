@@ -633,7 +633,7 @@ export function RoleSlideUp({
 
   return (
     <Drawer open={open} onOpenChange={handleClose}>
-      <DrawerContent className="max-h-[85vh]">
+      <DrawerContent className="max-h-[85vh] px-4">
         {/* Close button */}
         <DrawerClose asChild>
           <button

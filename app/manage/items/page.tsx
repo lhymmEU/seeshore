@@ -161,7 +161,7 @@ export default function ItemRegistrationPage() {
 
   const tabs = [
     { id: "manual", label: "Manual Entry", icon: PenLine },
-    { id: "scan", label: "Scan ISBN", icon: Scan },
+    { id: "scan", label: "Scan ISBN", icon: Scan, disabled: true },
   ];
 
   return (

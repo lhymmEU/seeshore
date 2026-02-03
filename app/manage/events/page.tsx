@@ -141,7 +141,7 @@ export default function EventsManagePage() {
 
   const tabs = [
     { id: "live", label: "Live Events", icon: Radio, iconActiveClassName: "text-emerald-400", count: liveCount },
-    { id: "proposed", label: "Proposed", icon: Sparkles, iconActiveClassName: "text-sky-400", count: proposedCount },
+    { id: "proposed", label: "Proposed", icon: Sparkles, iconActiveClassName: "text-sky-400", count: proposedCount, disabled: true },
   ];
 
   return (

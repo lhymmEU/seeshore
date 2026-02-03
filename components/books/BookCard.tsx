@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Eye } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Book } from "@/types/type";
 
@@ -62,9 +62,8 @@ export function BookCard({ book, onView }: BookCardProps) {
         {/* View Button */}
         <button
           onClick={onView}
-          className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-zinc-900 text-white font-medium text-sm hover:bg-zinc-800 transition-colors active:scale-[0.98]"
+          className="w-full flex items-center justify-center py-2.5 px-4 rounded-xl bg-zinc-900 text-white font-medium text-sm hover:bg-zinc-800 transition-colors active:scale-[0.98]"
         >
-          <Eye size={16} />
           View Details
         </button>
       </div>

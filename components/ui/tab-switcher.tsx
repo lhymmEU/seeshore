@@ -9,6 +9,7 @@ interface Tab {
   icon?: LucideIcon;
   iconActiveClassName?: string;
   count?: number;
+  disabled?: boolean;
 }
 
 interface TabSwitcherProps {
@@ -28,27 +29,37 @@ export function TabSwitcher({
     <div className={cn("flex bg-zinc-100 rounded-full p-1", className)}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
+        const isDisabled = tab.disabled;
         const Icon = tab.icon;
 
         return (
           <button
             key={tab.id}
-            onClick={() => onChange(tab.id)}
+            onClick={() => !isDisabled && onChange(tab.id)}
+            disabled={isDisabled}
             className={cn(
               "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-sm font-medium transition-all",
-              isActive
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-800"
+              isDisabled
+                ? "text-zinc-400 cursor-not-allowed"
+                : isActive
+                  ? "bg-zinc-900 text-white shadow-sm"
+                  : "text-zinc-600 hover:text-zinc-800"
             )}
           >
             {Icon && (
               <Icon
                 size={14}
-                className={isActive ? tab.iconActiveClassName : undefined}
+                className={cn(
+                  isDisabled 
+                    ? "text-zinc-400" 
+                    : isActive 
+                      ? tab.iconActiveClassName 
+                      : undefined
+                )}
               />
             )}
             {tab.label}
-            {typeof tab.count === "number" && tab.count > 0 && (
+            {typeof tab.count === "number" && tab.count > 0 && !isDisabled && (
               <span
                 className={cn(
                   "px-1.5 py-0.5 rounded-full text-xs",
@@ -56,6 +67,11 @@ export function TabSwitcher({
                 )}
               >
                 {tab.count}
+              </span>
+            )}
+            {isDisabled && (
+              <span className="text-[10px] text-zinc-400 uppercase tracking-wide">
+                Soon
               </span>
             )}
           </button>

@@ -8,7 +8,7 @@ interface RoleSelectorProps {
   onContinue?: (role: RoleType, credentials?: { email: string; password: string }) => void;
 }
 
-const roles: RoleType[] = ["user", "assistant", "owner"];
+const roles: RoleType[] = ["user", "owner"];
 
 export function RoleSelector({ onContinue }: RoleSelectorProps) {
   const [selectedRole, setSelectedRole] = useState<RoleType | null>(null);
@@ -43,7 +43,7 @@ export function RoleSelector({ onContinue }: RoleSelectorProps) {
 
         {/* Horizontally scrollable role cards */}
         <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-          <div className="flex gap-3 pb-2" style={{ width: "max-content" }}>
+          <div className="flex gap-3 pb-2 px-4" style={{ width: "max-content" }}>
             {roles.map((role) => (
               <RoleCard
                 key={role}
@@ -54,11 +54,6 @@ export function RoleSelector({ onContinue }: RoleSelectorProps) {
             ))}
           </div>
         </div>
-
-        {/* Hint text */}
-        <p className="text-xs text-center text-zinc-400 px-4">
-          Tap a role to sign in or create an account
-        </p>
       </div>
 
       {/* Role-specific slide-up */}

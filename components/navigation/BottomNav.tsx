@@ -2,18 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Blocks, BookCheck, Handshake, Home, PartyPopper, Settings, User } from "lucide-react";
+import { Blocks, BookCheck, PartyPopper, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 interface NavItem {
   href: string;
-  icon: typeof Home;
+  icon: typeof Blocks;
   label: string;
+  disabled?: boolean;
 }
 
 const baseNavItems: NavItem[] = [
-  { href: "/collaborate", icon: Blocks, label: "Collaborate" },
+  { href: "/collaborate", icon: Blocks, label: "Collaborate", disabled: true },
   { href: "/items", icon: BookCheck, label: "Items" },
   { href: "/events", icon: PartyPopper, label: "Events" },
 ];
@@ -39,9 +40,21 @@ export function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-200 pb-safe z-50">
       <div className="flex items-center justify-around h-16 max-w-md mx-auto px-6">
         {navItems.map((item) => {
-          const isActive = pathname === item.href || 
-            (item.href !== "/manage" && pathname.startsWith(item.href));
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          const isDisabled = item.disabled;
           const Icon = item.icon;
+
+          if (isDisabled) {
+            return (
+              <div
+                key={item.href}
+                className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl text-zinc-300 cursor-not-allowed"
+              >
+                <Icon size={24} strokeWidth={1.5} />
+                <span className="text-xs font-medium">{item.label}</span>
+              </div>
+            );
+          }
 
           return (
             <Link
@@ -70,4 +83,3 @@ export function BottomNav() {
     </nav>
   );
 }
-
