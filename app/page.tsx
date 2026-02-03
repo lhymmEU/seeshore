@@ -29,7 +29,7 @@ export default function WelcomePage() {
         {/* Store name and description */}
         <div className="text-center space-y-3 max-w-xs">
           <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">
-            Seashore Books
+            SeeShore Books
           </h1>
           <p className="text-zinc-500 text-sm leading-relaxed">
             Discover your next great read. Curated collections, personalized

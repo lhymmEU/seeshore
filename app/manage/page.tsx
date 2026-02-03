@@ -32,7 +32,6 @@ const ownerCards: DashboardCard[] = [
   { id: "manage-events", title: "Manage Events", icon: CalendarDays, href: "/manage/events", size: "medium" },
   { id: "internal-tasks", title: "Manage Internal Tasks", icon: ClipboardList, href: "/manage/tasks", size: "medium", disabled: true },
   { id: "register-items", title: "Register Items", icon: Package, href: "/manage/items", size: "medium" },
-  { id: "manage-spending", title: "Manage Spending", icon: Wallet, href: "/manage/spending", size: "wide", disabled: true },
 ];
 
 const assistantCards: DashboardCard[] = [

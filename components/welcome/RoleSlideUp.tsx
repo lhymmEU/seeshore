@@ -42,7 +42,7 @@ const roleDetails: Record<
       "Browse & discover curated books",
       "Save favorites to your reading list",
       "Borrow books from the library",
-      "Join community events & discussions",
+      "Join high-quality events",
     ],
     ctaText: "Start Reading",
   },
@@ -344,9 +344,9 @@ export function RoleSlideUp({
             <button
               key={store.id}
               onClick={() => handleStoreSelect(store.id)}
-              className={`flex-shrink-0 w-44 snap-start rounded-2xl p-4 text-left transition-all ${
+              className={`flex-shrink-0 w-44 rounded-2xl p-4 text-left transition-all ${
                 selectedStore === store.id
-                  ? "bg-zinc-900 text-white ring-2 ring-zinc-900 ring-offset-2"
+                  ? "bg-zinc-900 text-white"
                   : "bg-zinc-100 text-zinc-900 hover:bg-zinc-200"
               }`}
             >
@@ -415,7 +415,7 @@ export function RoleSlideUp({
         </div>
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-zinc-900">
-            Welcome to Seashore Books!
+            Welcome to SeeShore Books!
           </h2>
           <p className="text-sm text-zinc-500">
             You&apos;re all set to start your reading journey
@@ -589,40 +589,50 @@ export function RoleSlideUp({
           <p className="text-sm text-red-600 text-center">{errorMessage}</p>
         )}
 
-        <Button
-          type="submit"
-          size="lg"
-          disabled={!isFormValid}
-          className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {authMode === "login" ? (
-            <>
+        {authMode === "login" ? (
+          <div className="flex gap-3">
+            <Button
+              type="button"
+              size="lg"
+              onClick={toggleAuthMode}
+              className="flex-1 rounded-full h-12 text-base font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-900"
+            >
+              <UserPlus size={18} className="mr-2" />
+              Sign Up
+            </Button>
+            <Button
+              type="submit"
+              size="lg"
+              disabled={!isFormValid}
+              className="flex-1 rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <LogIn size={18} className="mr-2" />
               Sign In
-            </>
-          ) : (
-            <>
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={!isFormValid}
+              className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               <UserPlus size={18} className="mr-2" />
               Create Account
-            </>
-          )}
-        </Button>
+            </Button>
+            <Button
+              type="button"
+              size="lg"
+              onClick={toggleAuthMode}
+              variant="ghost"
+              className="w-full rounded-full h-12 text-base font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+            >
+              Already have an account? Sign in
+            </Button>
+          </div>
+        )}
       </form>
-
-      {/* Toggle auth mode */}
-      <div className="text-center">
-        <button
-          type="button"
-          onClick={toggleAuthMode}
-          className="text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
-        >
-          {authMode === "login" ? (
-            <>Don&apos;t have an account? <span className="font-medium">Sign up</span></>
-          ) : (
-            <>Already have an account? <span className="font-medium">Sign in</span></>
-          )}
-        </button>
-      </div>
 
       {/* Footer note */}
       <p className="text-xs text-center text-zinc-400">
@@ -633,7 +643,7 @@ export function RoleSlideUp({
 
   return (
     <Drawer open={open} onOpenChange={handleClose}>
-      <DrawerContent className="max-h-[85vh] px-4">
+      <DrawerContent className="max-h-[85vh] px-4 flex flex-col">
         {/* Close button */}
         <DrawerClose asChild>
           <button
@@ -644,10 +654,13 @@ export function RoleSlideUp({
           </button>
         </DrawerClose>
 
-        {viewState === "login" && renderLoginForm()}
-        {viewState === "verifying" && renderVerificationResult()}
-        {viewState === "storeSelection" && renderStoreSelection()}
-        {viewState === "memberWelcome" && renderMemberWelcome()}
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto">
+          {viewState === "login" && renderLoginForm()}
+          {viewState === "verifying" && renderVerificationResult()}
+          {viewState === "storeSelection" && renderStoreSelection()}
+          {viewState === "memberWelcome" && renderMemberWelcome()}
+        </div>
       </DrawerContent>
     </Drawer>
   );

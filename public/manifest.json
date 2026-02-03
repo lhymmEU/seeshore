@@ -1,7 +1,7 @@
 {
-  "name": "Seashore Books",
-  "short_name": "Seashore",
-  "description": "Discover your next great read with Seashore Books",
+  "name": "SeeShore Books",
+  "short_name": "SeeShore",
+  "description": "Discover your next great read with SeeShore Books",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Seashore Books",
-  description: "Discover your next great read with Seashore Books",
+  title: "SeeShore Books",
+  description: "Discover your next great read with SeeShore Books",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Seashore Books",
+    title: "SeeShore Books",
   },
   formatDetection: {
     telephone: false,

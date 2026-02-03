@@ -37,7 +37,7 @@ export function RoleSelector({ onContinue }: RoleSelectorProps) {
         <div className="text-center px-4">
           <h2 className="text-lg font-semibold text-zinc-900">Choose your role</h2>
           <p className="text-sm text-zinc-500 mt-1">
-            Select how you&apos;ll be using Seashore Books
+            Select how you&apos;ll be using SeeShore Books
           </p>
         </div>
 

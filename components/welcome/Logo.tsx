@@ -33,7 +33,7 @@ export function Logo({ size = "md", showText = false }: LogoProps) {
       </div>
       {showText && (
         <span className="text-sm font-medium text-zinc-500 tracking-wide uppercase">
-          Seashore Books
+          SeeShore Books
         </span>
       )}
     </div>

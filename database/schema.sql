@@ -1,5 +1,5 @@
 -- ============================================
--- SEASHORE DATABASE SCHEMA FOR SUPABASE
+-- SEESHORE DATABASE SCHEMA FOR SUPABASE
 -- ============================================
 -- Run this SQL in your Supabase SQL Editor to create all tables and policies
 

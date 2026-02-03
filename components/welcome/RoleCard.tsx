@@ -20,7 +20,7 @@ const roleConfig: Record<
 > = {
   user: {
     icon: User,
-    title: "Reader",
+    title: "Member",
     description: "Browse and discover books, manage your reading list",
   },
   assistant: {
