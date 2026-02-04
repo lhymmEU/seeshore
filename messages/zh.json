@@ -124,11 +124,32 @@
     "thisWeeksBooks": "本周推荐",
     "manageEvents": "管理活动",
     "manageInternalTasks": "内部任务管理",
+    "invitationCode": "邀请码",
     "manageItems": "物品管理",
     "manageRoles": "角色管理",
     "draftEvents": "活动草稿",
     "taskList": "任务列表",
-    "registerItems": "登记物品"
+    "registerItems": "登记物品",
+    "invitationCodes": {
+      "title": "邀请码",
+      "description": "生成和管理邀请码，供新成员加入你的书店。",
+      "generate": "生成邀请码",
+      "generating": "生成中...",
+      "code": "邀请码",
+      "createdAt": "创建时间",
+      "expiresAt": "过期时间",
+      "status": "状态",
+      "used": "已使用",
+      "unused": "未使用",
+      "revoke": "撤销",
+      "revoking": "撤销中...",
+      "noCodes": "暂无邀请码",
+      "generateFirst": "生成一个邀请码分享给新成员。",
+      "copyCode": "复制邀请码",
+      "copied": "已复制！",
+      "revokeConfirm": "确定要撤销此邀请码？撤销后将无法用于注册。",
+      "onlyOwnerStore": "请先在管理后台选择一家书店。"
+    }
   },
   "books": {
     "browseBooks": "浏览书籍",

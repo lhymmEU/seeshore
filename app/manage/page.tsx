@@ -13,7 +13,8 @@ import {
   Edit3,
   Star,
   LogOut,
-  Loader2
+  Loader2,
+  Ticket
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/loading-spinner";
@@ -35,7 +36,7 @@ const ownerCardConfigs: DashboardCard[] = [
   { id: "edit-bookstore", titleKey: "editBookstore", icon: Edit3, href: "/manage/bookstore", size: "large" },
   { id: "featured-books", titleKey: "thisWeeksBooks", icon: Star, href: "/manage/featured", size: "medium" },
   { id: "manage-events", titleKey: "manageEvents", icon: CalendarDays, href: "/manage/events", size: "medium" },
-  { id: "internal-tasks", titleKey: "manageInternalTasks", icon: ClipboardList, href: "/manage/tasks", size: "medium", disabled: true },
+  { id: "invitation-code", titleKey: "invitationCode", icon: Ticket, href: "/manage/invitation-codes", size: "medium" },
   { id: "register-items", titleKey: "manageItems", icon: Package, href: "/manage/items", size: "medium" },
 ];
 

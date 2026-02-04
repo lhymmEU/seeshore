@@ -124,11 +124,32 @@
     "thisWeeksBooks": "This Week's Books",
     "manageEvents": "Manage Events",
     "manageInternalTasks": "Manage Internal Tasks",
+    "invitationCode": "Invitation Code",
     "manageItems": "Manage Items",
     "manageRoles": "Manage Roles",
     "draftEvents": "Draft Events",
     "taskList": "Task List",
-    "registerItems": "Register Items"
+    "registerItems": "Register Items",
+    "invitationCodes": {
+      "title": "Invitation Codes",
+      "description": "Generate and manage codes for members to join your store.",
+      "generate": "Generate Code",
+      "generating": "Generating...",
+      "code": "Code",
+      "createdAt": "Created",
+      "expiresAt": "Expires",
+      "status": "Status",
+      "used": "Used",
+      "unused": "Unused",
+      "revoke": "Revoke",
+      "revoking": "Revoking...",
+      "noCodes": "No invitation codes yet",
+      "generateFirst": "Generate a code to share with new members.",
+      "copyCode": "Copy code",
+      "copied": "Copied!",
+      "revokeConfirm": "Revoke this code? It will no longer be valid for registration.",
+      "onlyOwnerStore": "Please select a store from the manage dashboard first."
+    }
   },
   "books": {
     "browseBooks": "Browse Books",
