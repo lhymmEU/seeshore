@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Store, User, Book, Spending, Role, Task, StoreEvent } from '@/types/type';
+import type { Store, User, Book, Spending, Role, Task, StoreEvent, CollaboratePost, CollaborateReply } from '@/types/type';
 import { isEventPastDeadline } from '@/lib/date-utils';
 
 // ============================================
@@ -114,6 +114,26 @@ interface DbEvent {
     status: 'proposed' | 'open' | 'full' | 'cancelled' | 'rejected' | 'finished';
     description: string | null;
     location: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+interface DbCollaboratePost {
+    id: string;
+    store_id: string;
+    author_id: string;
+    title: string;
+    description: string;
+    photos: string[];
+    created_at: string;
+    updated_at: string;
+}
+
+interface DbCollaborateReply {
+    id: string;
+    post_id: string;
+    author_id: string;
+    content: string;
     created_at: string;
     updated_at: string;
 }
@@ -2160,4 +2180,306 @@ export async function searchStoreMembers(storeId: string, query?: string): Promi
     }
 
     return (users as DbUser[]).map(mapDbUserToUser);
+}
+
+// ============================================
+// COLLABORATE FEATURE FUNCTIONS
+// ============================================
+
+// Helper function to map DbCollaboratePost to CollaboratePost
+async function mapDbPostToCollaboratePost(
+    dbPost: DbCollaboratePost,
+    replyCount: number = 0
+): Promise<CollaboratePost> {
+    const author = await fetchUser(dbPost.author_id);
+    return {
+        id: dbPost.id,
+        storeId: dbPost.store_id,
+        author,
+        title: dbPost.title,
+        description: dbPost.description,
+        photos: dbPost.photos || [],
+        replyCount,
+        createdAt: dbPost.created_at,
+        updatedAt: dbPost.updated_at,
+    };
+}
+
+// Helper function to map DbCollaborateReply to CollaborateReply
+async function mapDbReplyToCollaborateReply(
+    dbReply: DbCollaborateReply
+): Promise<CollaborateReply> {
+    const author = await fetchUser(dbReply.author_id);
+    return {
+        id: dbReply.id,
+        postId: dbReply.post_id,
+        author,
+        content: dbReply.content,
+        createdAt: dbReply.created_at,
+        updatedAt: dbReply.updated_at,
+    };
+}
+
+// ============================================
+// FETCH COLLABORATE POSTS - Get all posts for a store
+// ============================================
+
+export async function fetchCollaboratePosts(storeId: string): Promise<CollaboratePost[]> {
+    const { data: posts, error } = await supabase
+        .from('collaborate_posts')
+        .select('*')
+        .eq('store_id', storeId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    if (!posts || posts.length === 0) {
+        return [];
+    }
+
+    // Get reply counts for all posts
+    const postIds = posts.map((p: DbCollaboratePost) => p.id);
+    const { data: replyCounts } = await supabase
+        .from('collaborate_replies')
+        .select('post_id')
+        .in('post_id', postIds);
+
+    // Count replies per post
+    const replyCountMap: Record<string, number> = {};
+    if (replyCounts) {
+        for (const reply of replyCounts) {
+            replyCountMap[reply.post_id] = (replyCountMap[reply.post_id] || 0) + 1;
+        }
+    }
+
+    // Map posts with reply counts
+    const mappedPosts = await Promise.all(
+        (posts as DbCollaboratePost[]).map(async (post: DbCollaboratePost) => 
+            mapDbPostToCollaboratePost(post, replyCountMap[post.id] || 0)
+        )
+    );
+
+    return mappedPosts;
+}
+
+// ============================================
+// FETCH SINGLE COLLABORATE POST - Get a post by ID
+// ============================================
+
+export async function fetchCollaboratePost(postId: string): Promise<CollaboratePost> {
+    const { data: post, error } = await supabase
+        .from('collaborate_posts')
+        .select('*')
+        .eq('id', postId)
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    // Get reply count
+    const { count } = await supabase
+        .from('collaborate_replies')
+        .select('*', { count: 'exact', head: true })
+        .eq('post_id', postId);
+
+    return mapDbPostToCollaboratePost(post as DbCollaboratePost, count || 0);
+}
+
+// ============================================
+// CREATE COLLABORATE POST - Create a new post
+// ============================================
+
+export async function createCollaboratePost(
+    storeId: string,
+    authorId: string,
+    data: {
+        title: string;
+        description: string;
+        photos?: string[];
+    },
+    accessToken?: string
+): Promise<CollaboratePost> {
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const { data: post, error } = await client
+        .from('collaborate_posts')
+        .insert({
+            store_id: storeId,
+            author_id: authorId,
+            title: data.title,
+            description: data.description,
+            photos: data.photos || [],
+        })
+        .select()
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return mapDbPostToCollaboratePost(post as DbCollaboratePost, 0);
+}
+
+// ============================================
+// UPDATE COLLABORATE POST - Update an existing post
+// ============================================
+
+export async function updateCollaboratePost(
+    postId: string,
+    data: {
+        title?: string;
+        description?: string;
+        photos?: string[];
+    },
+    accessToken?: string
+): Promise<CollaboratePost> {
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const updateData: Record<string, unknown> = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.photos !== undefined) updateData.photos = data.photos;
+
+    const { data: post, error } = await client
+        .from('collaborate_posts')
+        .update(updateData)
+        .eq('id', postId)
+        .select()
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    // Get reply count
+    const { count } = await supabase
+        .from('collaborate_replies')
+        .select('*', { count: 'exact', head: true })
+        .eq('post_id', postId);
+
+    return mapDbPostToCollaboratePost(post as DbCollaboratePost, count || 0);
+}
+
+// ============================================
+// DELETE COLLABORATE POST - Delete a post and its replies
+// ============================================
+
+export async function deleteCollaboratePost(
+    postId: string,
+    accessToken?: string
+): Promise<void> {
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    // Replies will be cascade deleted due to foreign key constraint
+    const { error } = await client
+        .from('collaborate_posts')
+        .delete()
+        .eq('id', postId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+}
+
+// ============================================
+// FETCH COLLABORATE REPLIES - Get all replies for a post
+// ============================================
+
+export async function fetchCollaborateReplies(postId: string): Promise<CollaborateReply[]> {
+    const { data: replies, error } = await supabase
+        .from('collaborate_replies')
+        .select('*')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: true });
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    if (!replies || replies.length === 0) {
+        return [];
+    }
+
+    const mappedReplies = await Promise.all(
+        (replies as DbCollaborateReply[]).map(mapDbReplyToCollaborateReply)
+    );
+
+    return mappedReplies;
+}
+
+// ============================================
+// CREATE COLLABORATE REPLY - Create a new reply
+// ============================================
+
+export async function createCollaborateReply(
+    postId: string,
+    authorId: string,
+    content: string,
+    accessToken?: string
+): Promise<CollaborateReply> {
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const { data: reply, error } = await client
+        .from('collaborate_replies')
+        .insert({
+            post_id: postId,
+            author_id: authorId,
+            content,
+        })
+        .select()
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return mapDbReplyToCollaborateReply(reply as DbCollaborateReply);
+}
+
+// ============================================
+// UPDATE COLLABORATE REPLY - Update an existing reply
+// ============================================
+
+export async function updateCollaborateReply(
+    replyId: string,
+    content: string,
+    accessToken?: string
+): Promise<CollaborateReply> {
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const { data: reply, error } = await client
+        .from('collaborate_replies')
+        .update({ content })
+        .eq('id', replyId)
+        .select()
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return mapDbReplyToCollaborateReply(reply as DbCollaborateReply);
+}
+
+// ============================================
+// DELETE COLLABORATE REPLY - Delete a reply
+// ============================================
+
+export async function deleteCollaborateReply(
+    replyId: string,
+    accessToken?: string
+): Promise<void> {
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const { error } = await client
+        .from('collaborate_replies')
+        .delete()
+        .eq('id', replyId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
 }

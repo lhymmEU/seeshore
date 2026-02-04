@@ -181,5 +181,30 @@
     "switchTo": "切换到{language}",
     "english": "English",
     "chinese": "中文"
+  },
+  "collaborate": {
+    "title": "协作",
+    "subtitle": "分享创意，共同建设项目",
+    "searchPosts": "搜索帖子...",
+    "createPost": "创建帖子",
+    "publishPost": "发布帖子",
+    "postTitle": "标题",
+    "postDescription": "描述",
+    "enterTitle": "输入帖子标题",
+    "enterDescription": "分享你的想法或项目...",
+    "photos": "图片",
+    "replies": "条回复",
+    "noPosts": "暂无帖子",
+    "noPostsFound": "未找到帖子",
+    "beFirstToPost": "成为第一个分享想法的人！",
+    "tryDifferentSearch": "尝试不同的搜索词",
+    "postNotFound": "帖子未找到",
+    "postMayBeDeleted": "此帖子可能已被删除",
+    "noRepliesYet": "暂无回复，快来发表第一条评论吧！",
+    "writeReply": "写下你的回复...",
+    "justNow": "刚刚",
+    "minutesAgo": "{count}分钟前",
+    "hoursAgo": "{count}小时前",
+    "daysAgo": "{count}天前"
   }
 }

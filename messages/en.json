@@ -181,5 +181,30 @@
     "switchTo": "Switch to {language}",
     "english": "English",
     "chinese": "中文"
+  },
+  "collaborate": {
+    "title": "Collaborate",
+    "subtitle": "Share ideas and co-build projects together",
+    "searchPosts": "Search posts...",
+    "createPost": "Create Post",
+    "publishPost": "Publish Post",
+    "postTitle": "Title",
+    "postDescription": "Description",
+    "enterTitle": "Enter a title for your post",
+    "enterDescription": "Share your idea or project...",
+    "photos": "Photos",
+    "replies": "replies",
+    "noPosts": "No posts yet",
+    "noPostsFound": "No posts found",
+    "beFirstToPost": "Be the first to share your idea!",
+    "tryDifferentSearch": "Try a different search term",
+    "postNotFound": "Post not found",
+    "postMayBeDeleted": "This post may have been deleted",
+    "noRepliesYet": "No replies yet. Be the first to comment!",
+    "writeReply": "Write a reply...",
+    "justNow": "just now",
+    "minutesAgo": "{count}m ago",
+    "hoursAgo": "{count}h ago",
+    "daysAgo": "{count}d ago"
   }
 }

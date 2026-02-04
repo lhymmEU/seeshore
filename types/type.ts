@@ -83,3 +83,24 @@ export interface StoreEvent {
     attendees: string[], // The ids of the users
     hosts: string[], // The ids of the users
 }
+
+export interface CollaboratePost {
+    id: string, // Unique identifier for a post
+    storeId: string, // The store this post belongs to
+    author: User, // The user who created the post
+    title: string,
+    description: string,
+    photos: string[], // Array of photo URLs
+    replyCount: number, // Number of replies
+    createdAt: string, // ISO timestamp
+    updatedAt: string, // ISO timestamp
+}
+
+export interface CollaborateReply {
+    id: string, // Unique identifier for a reply
+    postId: string, // The post this reply belongs to
+    author: User, // The user who created the reply
+    content: string,
+    createdAt: string, // ISO timestamp
+    updatedAt: string, // ISO timestamp
+}
