@@ -14,7 +14,8 @@ import {
   Camera,
   Edit3,
   ChevronRight,
-  Loader2
+  Loader2,
+  Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
@@ -33,8 +34,32 @@ import {
 import { formatDate, isEventPastDeadline } from "@/lib/date-utils";
 import type { User, Book, StoreEvent } from "@/types/type";
 
-// Compact book card for profile
-function BorrowedBookCard({ book, onClick, unknownAuthorText, borrowedText }: { book: Book; onClick: () => void; unknownAuthorText: string; borrowedText: string }) {
+// Calculate days remaining for a borrowed book (30-day lending period)
+function calculateDaysRemaining(borrowedDate: string): number {
+  const borrowed = new Date(borrowedDate);
+  const dueDate = new Date(borrowed);
+  dueDate.setDate(dueDate.getDate() + 30);
+  const now = new Date();
+  const diffTime = dueDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+}
+
+// Format the countdown display
+function formatCountdown(daysRemaining: number): string {
+  if (daysRemaining <= 0) {
+    return "Overdue";
+  } else if (daysRemaining === 1) {
+    return "1 day left";
+  } else {
+    return `${daysRemaining} days`;
+  }
+}
+
+// Compact book card for profile with countdown
+function BorrowedBookCard({ book, onClick, unknownAuthorText }: { book: Book; onClick: () => void; unknownAuthorText: string }) {
+  const daysRemaining = book.borrowedDate ? calculateDaysRemaining(book.borrowedDate) : null;
+  
   return (
     <button
       onClick={onClick}
@@ -52,10 +77,20 @@ function BorrowedBookCard({ book, onClick, unknownAuthorText, borrowedText }: { 
       <div className="flex-1 min-w-0">
         <h4 className="font-medium text-zinc-900 text-sm truncate">{book.title}</h4>
         <p className="text-xs text-zinc-500 truncate">{book.author || unknownAuthorText}</p>
-        {book.borrowedDate && (
-          <p className="text-[10px] text-amber-600 mt-1">
-            {borrowedText}
-          </p>
+        {daysRemaining !== null && (
+          <div
+            className={cn(
+              "flex items-center gap-1 mt-1.5 text-[10px] font-medium",
+              daysRemaining <= 0
+                ? "text-red-600"
+                : daysRemaining <= 7
+                ? "text-amber-600"
+                : "text-blue-600"
+            )}
+          >
+            <Clock size={10} />
+            <span>{formatCountdown(daysRemaining)}</span>
+          </div>
         )}
       </div>
       <ChevronRight size={16} className="text-zinc-400 flex-shrink-0" />
@@ -512,7 +547,6 @@ export default function ProfilePage() {
                       book={book} 
                       onClick={() => handleViewBook(book.id)}
                       unknownAuthorText={t("unknownAuthor")}
-                      borrowedText={book.borrowedDate ? t("borrowedOn", { date: formatDate(book.borrowedDate) }) : ""}
                     />
                   ))}
                 </div>

@@ -10,28 +10,53 @@ import {
   Trash2,
   Loader2,
   MapPin,
+  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
 import { PageHeader } from "@/components/ui/page-header";
 import { SearchInput } from "@/components/ui/search-input";
 import { EmptyState } from "@/components/ui/empty-state";
-import { ItemRegistrationDrawer } from "@/components/manage";
+import { ItemRegistrationDrawer, BorrowDrawer } from "@/components/manage";
 import type { Book } from "@/types/type";
+
+// Calculate days remaining for a borrowed book (30-day lending period)
+function calculateDaysRemaining(borrowedDate: string): number {
+  const borrowed = new Date(borrowedDate);
+  const dueDate = new Date(borrowed);
+  dueDate.setDate(dueDate.getDate() + 30);
+  const now = new Date();
+  const diffTime = dueDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+}
+
+// Format the countdown display
+function formatCountdown(daysRemaining: number): string {
+  if (daysRemaining <= 0) {
+    return "Overdue";
+  } else if (daysRemaining === 1) {
+    return "1 day left";
+  } else {
+    return `${daysRemaining} days`;
+  }
+}
 
 function ItemCard({
   book,
   onEdit,
   onDelete,
-  onStatusChange,
+  onStatusClick,
+  onReturnBook,
 }: {
   book: Book;
   onEdit: () => void;
   onDelete: () => void;
-  onStatusChange: (newStatus: "available" | "borrowed") => Promise<void>;
+  onStatusClick: () => void;
+  onReturnBook: () => Promise<void>;
 }) {
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
+  const [isReturning, setIsReturning] = useState(false);
 
   const handleDelete = async () => {
     if (!confirm(`Are you sure you want to delete "${book.title}"?`)) {
@@ -43,16 +68,29 @@ function ItemCard({
   };
 
   const handleStatusClick = async () => {
-    const newStatus = book.status === "available" ? "borrowed" : "available";
-    setIsUpdatingStatus(true);
-    try {
-      await onStatusChange(newStatus);
-    } finally {
-      setIsUpdatingStatus(false);
+    if (book.status === "available") {
+      // Open borrow drawer for available books
+      onStatusClick();
+    } else {
+      // Return the book for borrowed books
+      if (!confirm(`Return "${book.title}"?`)) {
+        return;
+      }
+      setIsReturning(true);
+      try {
+        await onReturnBook();
+      } finally {
+        setIsReturning(false);
+      }
     }
   };
 
   const isBorrowed = book.status === "borrowed";
+  
+  // Calculate countdown for borrowed books
+  const daysRemaining = isBorrowed && book.borrowedDate 
+    ? calculateDaysRemaining(book.borrowedDate) 
+    : null;
 
   return (
     <div
@@ -118,19 +156,19 @@ function ItemCard({
           <div className="flex items-center gap-2 mt-3">
             <button
               onClick={handleStatusClick}
-              disabled={isUpdatingStatus}
+              disabled={isReturning}
               className={cn(
                 "px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50",
                 book.status === "available"
                   ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
                   : "bg-zinc-300 text-zinc-600 hover:bg-zinc-400"
               )}
-              title="Click to toggle status"
+              title={book.status === "available" ? "Click to lend" : "Click to return"}
             >
-              {isUpdatingStatus ? (
+              {isReturning ? (
                 <span className="flex items-center gap-1">
                   <Loader2 size={12} className="animate-spin" />
-                  Updating...
+                  Returning...
                 </span>
               ) : book.status === "available" ? (
                 "Available"
@@ -138,6 +176,23 @@ function ItemCard({
                 "Borrowed"
               )}
             </button>
+            
+            {/* Countdown for borrowed books */}
+            {isBorrowed && daysRemaining !== null && (
+              <div
+                className={cn(
+                  "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium",
+                  daysRemaining <= 0
+                    ? "bg-red-100 text-red-700"
+                    : daysRemaining <= 7
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-blue-100 text-blue-700"
+                )}
+              >
+                <Clock size={12} />
+                <span>{formatCountdown(daysRemaining)}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -176,6 +231,8 @@ export default function ManageItemsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
+  const [borrowDrawerOpen, setBorrowDrawerOpen] = useState(false);
+  const [selectedBookForBorrow, setSelectedBookForBorrow] = useState<Book | null>(null);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -250,10 +307,14 @@ export default function ManageItemsPage() {
     }
   };
 
-  const handleStatusChange = async (
-    bookId: string,
-    newStatus: "available" | "borrowed"
-  ) => {
+  // Open borrow drawer for a book
+  const handleOpenBorrowDrawer = (book: Book) => {
+    setSelectedBookForBorrow(book);
+    setBorrowDrawerOpen(true);
+  };
+
+  // Return a borrowed book
+  const handleReturnBook = async (bookId: string) => {
     try {
       const accessToken = sessionStorage.getItem("accessToken");
       const headers: Record<string, string> = {
@@ -266,22 +327,31 @@ export default function ManageItemsPage() {
       const response = await fetch(`/api/books/${bookId}`, {
         method: "PUT",
         headers,
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: "available" }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update book status");
+        throw new Error("Failed to return book");
       }
 
       // Update local state
       setBooks((prev) =>
-        prev.map((b) => (b.id === bookId ? { ...b, status: newStatus } : b))
+        prev.map((b) =>
+          b.id === bookId
+            ? { ...b, status: "available", borrower: undefined, borrowedDate: undefined }
+            : b
+        )
       );
     } catch (error) {
-      console.error("Failed to update book status:", error);
-      alert("Failed to update book status. Please try again.");
+      console.error("Failed to return book:", error);
+      alert("Failed to return book. Please try again.");
       throw error;
     }
+  };
+
+  // Handle successful borrow from drawer
+  const handleBorrowSuccess = () => {
+    fetchBooks();
   };
 
   const handleDrawerSuccess = () => {
@@ -341,9 +411,8 @@ export default function ManageItemsPage() {
                 book={book}
                 onEdit={() => handleEdit(book)}
                 onDelete={() => handleDelete(book.id)}
-                onStatusChange={(newStatus) =>
-                  handleStatusChange(book.id, newStatus)
-                }
+                onStatusClick={() => handleOpenBorrowDrawer(book)}
+                onReturnBook={() => handleReturnBook(book.id)}
               />
             ))}
           </div>
@@ -374,6 +443,13 @@ export default function ManageItemsPage() {
         onOpenChange={setDrawerOpen}
         editBook={editingBook}
         onSuccess={handleDrawerSuccess}
+      />
+
+      <BorrowDrawer
+        open={borrowDrawerOpen}
+        onOpenChange={setBorrowDrawerOpen}
+        book={selectedBookForBorrow}
+        onSuccess={handleBorrowSuccess}
       />
 
       <BottomNav />

@@ -1497,7 +1497,7 @@ export async function fetchUsers(userIds: string[]): Promise<User[]> {
                 .from('books')
                 .select('id')
                 .eq('borrower_id', user.id)
-                .eq('is_borrowed', true);
+                .eq('status', 'borrowed');
 
             const { data: favoriteBooks } = await supabase
                 .from('user_favorite_books')
@@ -1547,7 +1547,7 @@ export async function fetchUser(userId: string): Promise<User> {
         .from('books')
         .select('id')
         .eq('borrower_id', userId)
-        .eq('is_borrowed', true);
+        .eq('status', 'borrowed');
 
     // Fetch favorite books
     const { data: favoriteBooks } = await supabase
@@ -1683,8 +1683,11 @@ export async function uploadImage(
 }
 
 // Borrow a book
-export async function borrowBook(bookId: string, userId: string): Promise<Book> {
-    const { data, error } = await supabase
+export async function borrowBook(bookId: string, userId: string, accessToken?: string): Promise<Book> {
+    // Use authenticated client if access token is provided (for RLS compliance)
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+    
+    const { data, error } = await client
         .from('books')
         .update({
             status: 'borrowed',
@@ -1703,8 +1706,11 @@ export async function borrowBook(bookId: string, userId: string): Promise<Book> 
 }
 
 // Return a book
-export async function returnBook(bookId: string): Promise<Book> {
-    const { data, error } = await supabase
+export async function returnBook(bookId: string, accessToken?: string): Promise<Book> {
+    // Use authenticated client if access token is provided (for RLS compliance)
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+    
+    const { data, error } = await client
         .from('books')
         .update({
             status: 'available',
@@ -2080,4 +2086,78 @@ export async function fetchStoreByUserId(userId: string): Promise<Store | null> 
     }
 
     return null;
+}
+
+// ============================================
+// FETCH STORE MEMBERS - Fetch all members of a store by store ID
+// ============================================
+
+export async function fetchStoreMembers(storeId: string): Promise<User[]> {
+    // Fetch member user IDs from store_members table
+    const { data: memberRelations, error } = await supabase
+        .from('store_members')
+        .select('user_id')
+        .eq('store_id', storeId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    const memberIds = (memberRelations as RelationRow[] | null)?.map((r: RelationRow) => r.user_id) || [];
+    
+    if (memberIds.length === 0) {
+        return [];
+    }
+
+    // Fetch user details for all members
+    const { data: users, error: usersError } = await supabase
+        .from('users')
+        .select('*')
+        .in('id', memberIds);
+
+    if (usersError) {
+        throw new Error(usersError.message);
+    }
+
+    return (users as DbUser[]).map(mapDbUserToUser);
+}
+
+// ============================================
+// SEARCH STORE MEMBERS - Search members by name with optional query
+// ============================================
+
+export async function searchStoreMembers(storeId: string, query?: string): Promise<User[]> {
+    // Fetch member user IDs from store_members table
+    const { data: memberRelations, error } = await supabase
+        .from('store_members')
+        .select('user_id')
+        .eq('store_id', storeId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    const memberIds = (memberRelations as RelationRow[] | null)?.map((r: RelationRow) => r.user_id) || [];
+    
+    if (memberIds.length === 0) {
+        return [];
+    }
+
+    // Fetch user details for all members, optionally filtering by name
+    let usersQuery = supabase
+        .from('users')
+        .select('*')
+        .in('id', memberIds);
+
+    if (query && query.trim()) {
+        usersQuery = usersQuery.ilike('name', `%${query.trim()}%`);
+    }
+
+    const { data: users, error: usersError } = await usersQuery;
+
+    if (usersError) {
+        throw new Error(usersError.message);
+    }
+
+    return (users as DbUser[]).map(mapDbUserToUser);
 }

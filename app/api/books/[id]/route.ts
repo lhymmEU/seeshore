@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateBook, deregisterBook, fetchBook } from "@/data/supabase";
+import { updateBook, deregisterBook, fetchBook, borrowBook, returnBook } from "@/data/supabase";
 
 // GET /api/books/[id] - Fetch a single book
 export async function GET(
@@ -39,6 +39,7 @@ export async function PUT(
             location,
             link,
             status,
+            borrowerId,
         } = body;
 
         // Extract access token from Authorization header
@@ -46,6 +47,18 @@ export async function PUT(
         const accessToken = authHeader?.startsWith("Bearer ")
             ? authHeader.slice(7)
             : undefined;
+
+        // If status is "borrowed" and borrowerId is provided, use borrowBook function
+        if (status === "borrowed" && borrowerId) {
+            const book = await borrowBook(id, borrowerId, accessToken);
+            return NextResponse.json(book);
+        }
+
+        // If status is "available", use returnBook function to clear borrower
+        if (status === "available") {
+            const book = await returnBook(id, accessToken);
+            return NextResponse.json(book);
+        }
 
         const book = await updateBook(
             id,
