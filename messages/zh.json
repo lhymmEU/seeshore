@@ -22,41 +22,29 @@
     "profile": "个人"
   },
   "welcome": {
-    "storeName": "海岸书店",
+    "storeName": "到站书园",
     "storeDescription": "发现你的下一本好书。精选书单，个性化推荐，与书友共享阅读时光。",
     "getStarted": "开始探索",
     "chooseRole": "选择你的身份",
-    "selectRoleDescription": "选择你使用海岸书店的方式"
+    "selectRoleDescription": "选择你进入到站书园的角色"
   },
   "roles": {
     "member": {
       "title": "会员",
-      "description": "浏览发现书籍，管理你的阅读清单",
+      "description": "发现好书，遇见活动",
       "subtitle": "你的阅读之旅从这里开始",
-      "feature1": "浏览与发现精选书籍",
-      "feature2": "收藏喜爱的书籍",
-      "feature3": "借阅图书馆的书籍",
-      "feature4": "参加优质活动",
       "cta": "开始阅读"
     },
     "owner": {
       "title": "店主",
-      "description": "管理你的书店库存和销售",
+      "description": "管理图书和活动",
       "subtitle": "轻松管理你的书店",
-      "feature1": "库存管理与追踪",
-      "feature2": "销售分析与报告",
-      "feature3": "客户关系管理",
-      "feature4": "员工排班与权限",
       "cta": "进入管理后台"
     },
     "assistant": {
       "title": "店员",
       "description": "帮助顾客找到心仪的书籍",
       "subtitle": "帮助顾客找到心仪的书籍",
-      "feature1": "快速搜索与查询书籍",
-      "feature2": "顾客服务工具",
-      "feature3": "库存状态查询",
-      "feature4": "订单处理与退换",
       "cta": "开始工作"
     }
   },

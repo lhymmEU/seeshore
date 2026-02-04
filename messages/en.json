@@ -33,30 +33,18 @@
       "title": "Member",
       "description": "Browse and discover books, manage your reading list",
       "subtitle": "Your personal reading journey starts here",
-      "feature1": "Browse & discover curated books",
-      "feature2": "Save favorites to your reading list",
-      "feature3": "Borrow books from the library",
-      "feature4": "Join high-quality events",
       "cta": "Start Reading"
     },
     "owner": {
       "title": "Owner",
       "description": "Manage your bookstore inventory and sales",
       "subtitle": "Manage your bookstore with ease",
-      "feature1": "Inventory management & tracking",
-      "feature2": "Sales analytics & reports",
-      "feature3": "Customer relationship tools",
-      "feature4": "Staff scheduling & permissions",
       "cta": "Access Dashboard"
     },
     "assistant": {
       "title": "Assistant",
       "description": "Help customers find their perfect reads",
       "subtitle": "Help customers find their perfect reads",
-      "feature1": "Quick book search & lookup",
-      "feature2": "Customer assistance tools",
-      "feature3": "Inventory status checking",
-      "feature4": "Order processing & returns",
       "cta": "Start Shift"
     }
   },

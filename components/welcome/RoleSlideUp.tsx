@@ -123,12 +123,6 @@ export function RoleSlideUp({
   // Get translated role details
   const roleTitle = tRoles(`${translationKey}.title`);
   const roleSubtitle = tRoles(`${translationKey}.subtitle`);
-  const roleFeatures = [
-    tRoles(`${translationKey}.feature1`),
-    tRoles(`${translationKey}.feature2`),
-    tRoles(`${translationKey}.feature3`),
-    tRoles(`${translationKey}.feature4`),
-  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -601,20 +595,6 @@ export function RoleSlideUp({
           </h2>
           <p className="text-sm text-zinc-500">{roleSubtitle}</p>
         </div>
-      </div>
-
-      {/* Features list */}
-      <div className="bg-zinc-50 rounded-2xl p-5 space-y-3">
-        {roleFeatures.map((feature, index) => (
-          <div key={index} className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-full bg-zinc-900 flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-xs font-medium">
-                {index + 1}
-              </span>
-            </div>
-            <span className="text-sm text-zinc-700">{feature}</span>
-          </div>
-        ))}
       </div>
 
       {/* Login/Register form */}
