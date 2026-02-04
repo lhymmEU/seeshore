@@ -111,3 +111,29 @@ export function combineDateTime(date: string, time: string): string | undefined 
   const combined = new Date(`${date}T${time}`);
   return combined.toISOString();
 }
+
+/**
+ * Check if a date has passed based on GMT+8 (Asia/Shanghai) timezone
+ * Returns true if the given date is in the past
+ */
+export function isEventPastDeadline(endDateString: string | null | undefined): boolean {
+  if (!endDateString) return false;
+  
+  // Get current time in GMT+8
+  const now = new Date();
+  const nowInGMT8 = new Date(now.toLocaleString("en-US", { timeZone: "Asia/Shanghai" }));
+  
+  // Parse the end date and convert to GMT+8
+  const endDate = new Date(endDateString);
+  const endDateInGMT8 = new Date(endDate.toLocaleString("en-US", { timeZone: "Asia/Shanghai" }));
+  
+  return nowInGMT8 > endDateInGMT8;
+}
+
+/**
+ * Get current time in GMT+8 timezone as Date object
+ */
+export function getNowInGMT8(): Date {
+  const now = new Date();
+  return new Date(now.toLocaleString("en-US", { timeZone: "Asia/Shanghai" }));
+}

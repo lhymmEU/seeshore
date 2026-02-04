@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, ChevronRight, Check, X } from "lucide-react";
+import { ArrowLeft, ChevronRight, Check, X, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Drawer,
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/ui/loading-spinner";
-import { formatDateRange } from "@/lib/date-utils";
+import { formatDateRange, isEventPastDeadline } from "@/lib/date-utils";
 import type { StoreEvent, User } from "@/types/type";
 
 // Generate dicebear avatar URL based on user ID or name
@@ -446,10 +446,28 @@ export default function EventDetailsPage() {
           </div>
 
           <div className="mt-auto pb-safe">
-            <SlideToAttendButton 
-              onComplete={handleAttend}
-              isLoading={isAttending}
-            />
+            {/* Show different UI based on event status */}
+            {event.status === 'finished' || isEventPastDeadline(event.endDate) ? (
+              <div className="h-14 rounded-full bg-zinc-100 flex items-center justify-center gap-2">
+                <Clock size={18} className="text-zinc-400" />
+                <span className="text-sm font-medium text-zinc-500">This event has ended</span>
+              </div>
+            ) : event.status === 'cancelled' ? (
+              <div className="h-14 rounded-full bg-zinc-100 flex items-center justify-center gap-2">
+                <X size={18} className="text-zinc-400" />
+                <span className="text-sm font-medium text-zinc-500">This event was cancelled</span>
+              </div>
+            ) : event.status === 'proposed' ? (
+              <div className="h-14 rounded-full bg-sky-50 flex items-center justify-center gap-2">
+                <Clock size={18} className="text-sky-400" />
+                <span className="text-sm font-medium text-sky-600">Pending approval</span>
+              </div>
+            ) : (
+              <SlideToAttendButton 
+                onComplete={handleAttend}
+                isLoading={isAttending}
+              />
+            )}
           </div>
         </div>
       </div>

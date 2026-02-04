@@ -7,7 +7,7 @@ import { Calendar, MapPin, Users, Sparkles } from "lucide-react";
 import { BottomNav } from "@/components/navigation";
 import { SearchInput } from "@/components/ui/search-input";
 import { EmptyState } from "@/components/ui/empty-state";
-import { formatDate, formatTime, formatDateShort } from "@/lib/date-utils";
+import { formatDate, formatTime, formatDateShort, getNowInGMT8 } from "@/lib/date-utils";
 import type { StoreEvent } from "@/types/type";
 
 // Compact event card for horizontal scroll
@@ -173,7 +173,8 @@ export default function EventsPage() {
           return;
         }
         
-        const response = await fetch(`/api/events?storeId=${storeId}&status=open`);
+        // Fetch all events (including past events) for the store
+        const response = await fetch(`/api/events?storeId=${storeId}`);
         if (response.ok) {
           const data = await response.json();
           setEvents(data);
@@ -201,12 +202,19 @@ export default function EventsPage() {
   }, [events, searchQuery]);
 
   const closestEvent = useMemo(() => {
-    const now = new Date();
-    return events.find(event => new Date(event.startDate) >= now) || events[0];
+    // Use GMT+8 timezone for consistency with deadline checks
+    const now = getNowInGMT8();
+    // Find the first upcoming "open" event (start date >= now and status is open)
+    // Only show live events that haven't started yet in the featured section
+    return events.find(event => 
+      event.status === 'open' && new Date(event.startDate) >= now
+    ) || null;
   }, [events]);
 
   const scrollEvents = useMemo(() => {
+    // If there's no closest event, show all filtered events in the scroll section
     if (!closestEvent) return filteredEvents;
+    // Otherwise, exclude the closest event from the scroll section (it's featured separately)
     return filteredEvents.filter(event => event.id !== closestEvent.id);
   }, [filteredEvents, closestEvent]);
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { attendEvent } from "@/data/supabase";
+import { attendEvent, fetchEvent } from "@/data/supabase";
+import { isEventPastDeadline } from "@/lib/date-utils";
 
 // POST /api/events/attend - Attend an event (requires authentication)
 export async function POST(request: NextRequest) {
@@ -30,6 +31,46 @@ export async function POST(request: NextRequest) {
         if (!userId) {
             return NextResponse.json(
                 { error: "User ID is required" },
+                { status: 400 }
+            );
+        }
+
+        // Fetch the event to check its status and deadline
+        const event = await fetchEvent(eventId);
+
+        // Check if event status allows attendance
+        if (event.status === 'finished') {
+            return NextResponse.json(
+                { error: "This event has already ended." },
+                { status: 400 }
+            );
+        }
+
+        if (event.status === 'cancelled') {
+            return NextResponse.json(
+                { error: "This event has been cancelled." },
+                { status: 400 }
+            );
+        }
+
+        if (event.status === 'rejected') {
+            return NextResponse.json(
+                { error: "This event is not available." },
+                { status: 400 }
+            );
+        }
+
+        if (event.status === 'proposed') {
+            return NextResponse.json(
+                { error: "This event is pending approval." },
+                { status: 400 }
+            );
+        }
+
+        // Double-check deadline (in case auto-finish hasn't run yet)
+        if (isEventPastDeadline(event.endDate)) {
+            return NextResponse.json(
+                { error: "This event has already ended." },
                 { status: 400 }
             );
         }

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Store, User, Book, Spending, Role, Task, StoreEvent } from '@/types/type';
+import { isEventPastDeadline } from '@/lib/date-utils';
 
 // ============================================
 // SUPABASE CLIENT INITIALIZATION
@@ -715,9 +716,23 @@ export async function fetchEvents(options?: {
         throw new Error(error.message);
     }
 
-    // Fetch attendees and hosts for each event
+    // Fetch attendees and hosts for each event, and auto-finish events past deadline
     const eventsWithRelations = await Promise.all(
         (events as DbEvent[]).map(async (event: DbEvent) => {
+            // Check if event should be auto-finished (past deadline in GMT+8)
+            // Only auto-finish events that are currently "open" or "full"
+            if ((event.status === 'open' || event.status === 'full') && 
+                isEventPastDeadline(event.end_date)) {
+                // Update the event status to "finished" in the database
+                await supabase
+                    .from('events')
+                    .update({ status: 'finished', updated_at: new Date().toISOString() })
+                    .eq('id', event.id);
+                
+                // Update local event object
+                event.status = 'finished';
+            }
+
             const { data: attendeeRelations } = await supabase
                 .from('event_attendees')
                 .select('user_id')
@@ -735,6 +750,11 @@ export async function fetchEvents(options?: {
             );
         })
     );
+
+    // If filtering by status, re-filter after auto-finishing to exclude finished events
+    if (options?.status && options.status !== 'finished') {
+        return eventsWithRelations.filter(event => event.status === options.status);
+    }
 
     return eventsWithRelations;
 }
@@ -754,6 +774,22 @@ export async function fetchEvent(eventId: string): Promise<StoreEvent> {
         throw new Error(error.message);
     }
 
+    const dbEvent = event as DbEvent;
+
+    // Check if event should be auto-finished (past deadline in GMT+8)
+    // Only auto-finish events that are currently "open" or "full"
+    if ((dbEvent.status === 'open' || dbEvent.status === 'full') && 
+        isEventPastDeadline(dbEvent.end_date)) {
+        // Update the event status to "finished" in the database
+        await supabase
+            .from('events')
+            .update({ status: 'finished', updated_at: new Date().toISOString() })
+            .eq('id', eventId);
+        
+        // Update local event object
+        dbEvent.status = 'finished';
+    }
+
     // Fetch attendees
     const { data: attendeeRelations } = await supabase
         .from('event_attendees')
@@ -767,7 +803,7 @@ export async function fetchEvent(eventId: string): Promise<StoreEvent> {
         .eq('event_id', eventId);
 
     return mapDbEventToStoreEvent(
-        event as DbEvent,
+        dbEvent,
         (attendeeRelations as RelationRow[] | null)?.map((r: RelationRow) => r.user_id) || [],
         (hostRelations as RelationRow[] | null)?.map((r: RelationRow) => r.user_id) || []
     );
@@ -1957,9 +1993,23 @@ export async function fetchEventsByIds(eventIds: string[]): Promise<StoreEvent[]
         throw new Error(error.message);
     }
 
-    // Fetch attendees and hosts for each event
+    // Fetch attendees and hosts for each event, and auto-finish events past deadline
     const eventsWithRelations = await Promise.all(
         (events as DbEvent[]).map(async (event: DbEvent) => {
+            // Check if event should be auto-finished (past deadline in GMT+8)
+            // Only auto-finish events that are currently "open" or "full"
+            if ((event.status === 'open' || event.status === 'full') && 
+                isEventPastDeadline(event.end_date)) {
+                // Update the event status to "finished" in the database
+                await supabase
+                    .from('events')
+                    .update({ status: 'finished', updated_at: new Date().toISOString() })
+                    .eq('id', event.id);
+                
+                // Update local event object
+                event.status = 'finished';
+            }
+
             const { data: attendeeRelations } = await supabase
                 .from('event_attendees')
                 .select('user_id')
