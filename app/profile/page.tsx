@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { 
   User as UserIcon, 
   BookOpen, 
@@ -18,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
 import { PageHeader } from "@/components/ui/page-header";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { 
@@ -32,7 +34,7 @@ import { formatDate } from "@/lib/date-utils";
 import type { User, Book, StoreEvent } from "@/types/type";
 
 // Compact book card for profile
-function BorrowedBookCard({ book, onClick }: { book: Book; onClick: () => void }) {
+function BorrowedBookCard({ book, onClick, unknownAuthorText, borrowedText }: { book: Book; onClick: () => void; unknownAuthorText: string; borrowedText: string }) {
   return (
     <button
       onClick={onClick}
@@ -49,10 +51,10 @@ function BorrowedBookCard({ book, onClick }: { book: Book; onClick: () => void }
       </div>
       <div className="flex-1 min-w-0">
         <h4 className="font-medium text-zinc-900 text-sm truncate">{book.title}</h4>
-        <p className="text-xs text-zinc-500 truncate">{book.author || "Unknown Author"}</p>
+        <p className="text-xs text-zinc-500 truncate">{book.author || unknownAuthorText}</p>
         {book.borrowedDate && (
           <p className="text-[10px] text-amber-600 mt-1">
-            Borrowed {formatDate(book.borrowedDate)}
+            {borrowedText}
           </p>
         )}
       </div>
@@ -83,7 +85,7 @@ function FavoriteBookCard({ book, onClick }: { book: Book; onClick: () => void }
 }
 
 // Compact event card for profile
-function AttendedEventCard({ event, onClick }: { event: StoreEvent; onClick: () => void }) {
+function AttendedEventCard({ event, onClick, upcomingText, completedText }: { event: StoreEvent; onClick: () => void; upcomingText: string; completedText: string }) {
   return (
     <button
       onClick={onClick}
@@ -108,7 +110,7 @@ function AttendedEventCard({ event, onClick }: { event: StoreEvent; onClick: () 
         event.status === "finished" ? "bg-zinc-100 text-zinc-600" :
         "bg-amber-100 text-amber-700"
       )}>
-        {event.status === "open" ? "Upcoming" : event.status === "finished" ? "Completed" : event.status}
+        {event.status === "open" ? upcomingText : event.status === "finished" ? completedText : event.status}
       </span>
     </button>
   );
@@ -116,6 +118,8 @@ function AttendedEventCard({ event, onClick }: { event: StoreEvent; onClick: () 
 
 export default function ProfilePage() {
   const router = useRouter();
+  const t = useTranslations("profile");
+  const tCommon = useTranslations("common");
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [borrowedBooks, setBorrowedBooks] = useState<Book[]>([]);
@@ -249,12 +253,12 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
         <UserIcon size={48} className="text-zinc-300 mb-4" />
-        <p className="text-zinc-600 font-medium">Not logged in</p>
+        <p className="text-zinc-600 font-medium">{tCommon("notLoggedIn")}</p>
         <button
           onClick={() => router.push("/")}
           className="mt-4 text-zinc-500 underline"
         >
-          Go to home
+          {tCommon("goToHome")}
         </button>
       </div>
     );
@@ -265,7 +269,12 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 pb-24">
-      <PageHeader title="Profile" showBack={false} />
+      <div className="relative">
+        <PageHeader title={t("title")} showBack={false} />
+        <div className="absolute right-4 top-3 z-50">
+          <LanguageSwitcher variant="icon" />
+        </div>
+      </div>
 
       <div className="px-4 pt-6 space-y-6">
         {/* Profile Card */}
@@ -302,7 +311,7 @@ export default function ProfilePage() {
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    placeholder="Your name"
+                    placeholder={t("yourName")}
                     className="w-full px-3 py-2 rounded-xl bg-zinc-100 text-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
                   />
                   <div className="flex items-center gap-2">
@@ -311,7 +320,7 @@ export default function ProfilePage() {
                       type="text"
                       value={editLocation}
                       onChange={(e) => setEditLocation(e.target.value)}
-                      placeholder="Location (optional)"
+                      placeholder={t("location")}
                       className="flex-1 px-3 py-2 rounded-xl bg-zinc-100 text-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
                     />
                   </div>
@@ -321,7 +330,7 @@ export default function ProfilePage() {
                       disabled={isSaving || !editName.trim()}
                       className="flex-1 py-2 rounded-xl bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-800 disabled:opacity-50 transition-colors"
                     >
-                      {isSaving ? "Saving..." : "Save"}
+                      {isSaving ? tCommon("saving") : tCommon("save")}
                     </button>
                     <button
                       onClick={() => {
@@ -331,7 +340,7 @@ export default function ProfilePage() {
                       }}
                       className="px-4 py-2 rounded-xl bg-zinc-100 text-zinc-700 text-sm font-medium hover:bg-zinc-200 transition-colors"
                     >
-                      Cancel
+                      {tCommon("cancel")}
                     </button>
                   </div>
                 </div>
@@ -355,17 +364,17 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-3 mt-3">
                     <div className="text-center">
                       <p className="text-lg font-bold text-zinc-900">{borrowedBooks.length}</p>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Borrowed</p>
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-wide">{t("borrowed")}</p>
                     </div>
                     <div className="w-px h-8 bg-zinc-200" />
                     <div className="text-center">
                       <p className="text-lg font-bold text-zinc-900">{favoriteBooks.length}</p>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Favorites</p>
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-wide">{t("favorites")}</p>
                     </div>
                     <div className="w-px h-8 bg-zinc-200" />
                     <div className="text-center">
                       <p className="text-lg font-bold text-zinc-900">{attendedEvents.length}</p>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Events</p>
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-wide">{tCommon("events")}</p>
                     </div>
                   </div>
                 </>
@@ -377,8 +386,8 @@ export default function ProfilePage() {
         {/* Borrowed Books Section */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-zinc-900">Borrowed Books</h3>
-            <span className="text-xs text-zinc-500">{borrowedBooks.length} items</span>
+            <h3 className="font-semibold text-zinc-900">{t("borrowedBooks")}</h3>
+            <span className="text-xs text-zinc-500">{borrowedBooks.length} {tCommon("items")}</span>
           </div>
           {borrowedBooks.length > 0 ? (
             <div className="space-y-2">
@@ -386,7 +395,9 @@ export default function ProfilePage() {
                 <BorrowedBookCard 
                   key={book.id} 
                   book={book} 
-                  onClick={() => handleViewBook(book.id)} 
+                  onClick={() => handleViewBook(book.id)}
+                  unknownAuthorText={t("unknownAuthor")}
+                  borrowedText={book.borrowedDate ? t("borrowedOn", { date: formatDate(book.borrowedDate) }) : ""}
                 />
               ))}
             </div>
@@ -394,8 +405,8 @@ export default function ProfilePage() {
             <div className="bg-white rounded-2xl p-6 border border-zinc-100">
               <EmptyState
                 icon={BookOpen}
-                title="No borrowed books"
-                message="Browse the library to borrow books"
+                title={t("noBorrowedBooks")}
+                message={t("browseLibrary")}
               />
             </div>
           )}
@@ -404,8 +415,8 @@ export default function ProfilePage() {
         {/* Favorite Books Section */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-zinc-900">Favorites</h3>
-            <span className="text-xs text-zinc-500">{favoriteBooks.length} items</span>
+            <h3 className="font-semibold text-zinc-900">{t("favoriteBooks")}</h3>
+            <span className="text-xs text-zinc-500">{favoriteBooks.length} {tCommon("items")}</span>
           </div>
           {favoriteBooks.length > 0 ? (
             <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
@@ -421,8 +432,8 @@ export default function ProfilePage() {
             <div className="bg-white rounded-2xl p-6 border border-zinc-100">
               <EmptyState
                 icon={Heart}
-                title="No favorites yet"
-                message="Like books to add them here"
+                title={t("noFavorites")}
+                message={t("likeBooks")}
               />
             </div>
           )}
@@ -431,8 +442,8 @@ export default function ProfilePage() {
         {/* Attended Events Section */}
         <section>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-zinc-900">My Events</h3>
-            <span className="text-xs text-zinc-500">{attendedEvents.length} events</span>
+            <h3 className="font-semibold text-zinc-900">{t("myEvents")}</h3>
+            <span className="text-xs text-zinc-500">{attendedEvents.length} {tCommon("events")}</span>
           </div>
           {attendedEvents.length > 0 ? (
             <div className="space-y-2">
@@ -440,7 +451,9 @@ export default function ProfilePage() {
                 <AttendedEventCard 
                   key={event.id} 
                   event={event} 
-                  onClick={() => handleViewEvent(event.id)} 
+                  onClick={() => handleViewEvent(event.id)}
+                  upcomingText={t("upcoming")}
+                  completedText={t("completed")}
                 />
               ))}
               {attendedEvents.length > 3 && (
@@ -448,7 +461,7 @@ export default function ProfilePage() {
                   onClick={() => router.push("/events")}
                   className="w-full py-3 text-sm text-zinc-600 font-medium hover:text-zinc-900 transition-colors"
                 >
-                  View all {attendedEvents.length} events
+                  {tCommon("viewAll", { count: attendedEvents.length })}
                 </button>
               )}
             </div>
@@ -456,8 +469,8 @@ export default function ProfilePage() {
             <div className="bg-white rounded-2xl p-6 border border-zinc-100">
               <EmptyState
                 icon={Calendar}
-                title="No events yet"
-                message="Join events to see them here"
+                title={t("noEvents")}
+                message={t("joinEvents")}
               />
             </div>
           )}
@@ -474,7 +487,7 @@ export default function ProfilePage() {
           ) : (
             <LogOut size={18} />
           )}
-          {isLoggingOut ? "Logging out..." : "Log Out"}
+          {isLoggingOut ? tCommon("loggingOut") : tCommon("logOut")}
         </button>
       </div>
 

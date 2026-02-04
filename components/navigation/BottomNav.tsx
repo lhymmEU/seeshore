@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Blocks, BookCheck, PartyPopper, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -9,18 +10,19 @@ import { useState } from "react";
 interface NavItem {
   href: string;
   icon: typeof Blocks;
-  label: string;
+  labelKey: string;
   disabled?: boolean;
 }
 
-const baseNavItems: NavItem[] = [
-  { href: "/collaborate", icon: Blocks, label: "Collaborate", disabled: true },
-  { href: "/items", icon: BookCheck, label: "Items" },
-  { href: "/events", icon: PartyPopper, label: "Events" },
+const baseNavConfigs: NavItem[] = [
+  { href: "/collaborate", icon: Blocks, labelKey: "collaborate", disabled: true },
+  { href: "/items", icon: BookCheck, labelKey: "items" },
+  { href: "/events", icon: PartyPopper, labelKey: "events" },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const t = useTranslations("nav");
   
   // Initialize role synchronously from sessionStorage
   const [isStaff] = useState<boolean>(() => {
@@ -30,10 +32,10 @@ export function BottomNav() {
   });
 
   const navItems: NavItem[] = [
-    ...baseNavItems,
+    ...baseNavConfigs,
     isStaff
-      ? { href: "/manage", icon: Settings, label: "Manage" }
-      : { href: "/profile", icon: User, label: "Profile" },
+      ? { href: "/manage", icon: Settings, labelKey: "manage" }
+      : { href: "/profile", icon: User, labelKey: "profile" },
   ];
 
   return (
@@ -43,6 +45,7 @@ export function BottomNav() {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           const isDisabled = item.disabled;
           const Icon = item.icon;
+          const label = t(item.labelKey);
 
           if (isDisabled) {
             return (
@@ -51,7 +54,7 @@ export function BottomNav() {
                 className="flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl text-zinc-300 cursor-not-allowed"
               >
                 <Icon size={24} strokeWidth={1.5} />
-                <span className="text-xs font-medium">{item.label}</span>
+                <span className="text-xs font-medium">{label}</span>
               </div>
             );
           }
@@ -75,7 +78,7 @@ export function BottomNav() {
                   isActive && "scale-110"
                 )}
               />
-              <span className="text-xs font-medium">{item.label}</span>
+              <span className="text-xs font-medium">{label}</span>
             </Link>
           );
         })}

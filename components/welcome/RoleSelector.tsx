@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { RoleCard, RoleType } from "./RoleCard";
 import { RoleSlideUp } from "./RoleSlideUp";
 
@@ -14,6 +15,7 @@ export function RoleSelector({ onContinue }: RoleSelectorProps) {
   const [selectedRole, setSelectedRole] = useState<RoleType | null>(null);
   const [slideUpRole, setSlideUpRole] = useState<RoleType | null>(null);
   const [isSlideUpOpen, setIsSlideUpOpen] = useState(false);
+  const t = useTranslations("welcome");
 
   const handleRoleClick = (role: RoleType) => {
     setSelectedRole(role);
@@ -35,9 +37,9 @@ export function RoleSelector({ onContinue }: RoleSelectorProps) {
       <div className="flex flex-col gap-6">
         {/* Header */}
         <div className="text-center px-4">
-          <h2 className="text-lg font-semibold text-zinc-900">Choose your role</h2>
+          <h2 className="text-lg font-semibold text-zinc-900">{t("chooseRole")}</h2>
           <p className="text-sm text-zinc-500 mt-1">
-            Select how you&apos;ll be using SeeShore Books
+            {t("selectRoleDescription")}
           </p>
         </div>
 

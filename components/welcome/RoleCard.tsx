@@ -1,6 +1,7 @@
 "use client";
 
 import { LucideIcon, User, Headphones, Store } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export type RoleType = "user" | "assistant" | "owner";
 
@@ -10,34 +11,22 @@ interface RoleCardProps {
   onClick?: () => void;
 }
 
-const roleConfig: Record<
-  RoleType,
-  {
-    icon: LucideIcon;
-    title: string;
-    description: string;
-  }
-> = {
-  user: {
-    icon: User,
-    title: "Member",
-    description: "Browse and discover books, manage your reading list",
-  },
-  assistant: {
-    icon: Headphones,
-    title: "Assistant",
-    description: "Help customers find their perfect reads",
-  },
-  owner: {
-    icon: Store,
-    title: "Owner",
-    description: "Manage your bookstore inventory and sales",
-  },
+const roleIcons: Record<RoleType, LucideIcon> = {
+  user: User,
+  assistant: Headphones,
+  owner: Store,
+};
+
+const roleTranslationKeys: Record<RoleType, string> = {
+  user: "member",
+  assistant: "assistant",
+  owner: "owner",
 };
 
 export function RoleCard({ role, isSelected = false, onClick }: RoleCardProps) {
-  const config = roleConfig[role];
-  const Icon = config.icon;
+  const t = useTranslations("roles");
+  const translationKey = roleTranslationKeys[role];
+  const Icon = roleIcons[role];
 
   return (
     <button
@@ -69,12 +58,12 @@ export function RoleCard({ role, isSelected = false, onClick }: RoleCardProps) {
         <h3
           className={`font-semibold text-base ${isSelected ? "text-white" : "text-zinc-900"}`}
         >
-          {config.title}
+          {t(`${translationKey}.title`)}
         </h3>
         <p
           className={`text-xs leading-relaxed ${isSelected ? "text-zinc-300" : "text-zinc-500"}`}
         >
-          {config.description}
+          {t(`${translationKey}.description`)}
         </p>
       </div>
     </button>

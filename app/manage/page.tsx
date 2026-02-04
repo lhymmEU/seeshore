@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { 
   Store, 
   Users, 
@@ -16,36 +17,37 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/loading-spinner";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { logout } from "@/data/supabase";
 
 type UserRole = "owner" | "assistant";
 
 interface DashboardCard {
   id: string;
-  title: string;
+  titleKey: string;
   icon: typeof Store;
   href: string;
   size?: "large" | "medium" | "wide";
   disabled?: boolean;
 }
 
-const ownerCards: DashboardCard[] = [
-  { id: "edit-bookstore", title: "Edit Bookstore", icon: Edit3, href: "/manage/bookstore", size: "large" },
-  { id: "featured-books", title: "This Week's Books", icon: Star, href: "/manage/featured", size: "medium" },
-  { id: "manage-events", title: "Manage Events", icon: CalendarDays, href: "/manage/events", size: "medium" },
-  { id: "internal-tasks", title: "Manage Internal Tasks", icon: ClipboardList, href: "/manage/tasks", size: "medium", disabled: true },
-  { id: "register-items", title: "Manage Items", icon: Package, href: "/manage/items", size: "medium" },
+const ownerCardConfigs: DashboardCard[] = [
+  { id: "edit-bookstore", titleKey: "editBookstore", icon: Edit3, href: "/manage/bookstore", size: "large" },
+  { id: "featured-books", titleKey: "thisWeeksBooks", icon: Star, href: "/manage/featured", size: "medium" },
+  { id: "manage-events", titleKey: "manageEvents", icon: CalendarDays, href: "/manage/events", size: "medium" },
+  { id: "internal-tasks", titleKey: "manageInternalTasks", icon: ClipboardList, href: "/manage/tasks", size: "medium", disabled: true },
+  { id: "register-items", titleKey: "manageItems", icon: Package, href: "/manage/items", size: "medium" },
 ];
 
-const assistantCards: DashboardCard[] = [
-  { id: "edit-bookstore", title: "Edit Bookstore", icon: Store, href: "/manage/bookstore", size: "large" },
-  { id: "manage-roles", title: "Manage Roles", icon: Users, href: "/manage/roles", size: "medium", disabled: true },
-  { id: "draft-events", title: "Draft Events", icon: CalendarDays, href: "/manage/events", size: "medium" },
-  { id: "task-list", title: "Task List", icon: ClipboardList, href: "/manage/tasks", size: "medium", disabled: true },
-  { id: "register-items", title: "Register Items", icon: Package, href: "/manage/items", size: "medium" },
+const assistantCardConfigs: DashboardCard[] = [
+  { id: "edit-bookstore", titleKey: "editBookstore", icon: Store, href: "/manage/bookstore", size: "large" },
+  { id: "manage-roles", titleKey: "manageRoles", icon: Users, href: "/manage/roles", size: "medium", disabled: true },
+  { id: "draft-events", titleKey: "draftEvents", icon: CalendarDays, href: "/manage/events", size: "medium" },
+  { id: "task-list", titleKey: "taskList", icon: ClipboardList, href: "/manage/tasks", size: "medium", disabled: true },
+  { id: "register-items", titleKey: "registerItems", icon: Package, href: "/manage/items", size: "medium" },
 ];
 
-function DashboardCardComponent({ card }: { card: DashboardCard }) {
+function DashboardCardComponent({ card, title, comingSoonText }: { card: DashboardCard; title: string; comingSoonText: string }) {
   const Icon = card.icon;
   
   const sizeClasses = {
@@ -86,14 +88,14 @@ function DashboardCardComponent({ card }: { card: DashboardCard }) {
         card.size === "wide" ? "text-sm" : "text-[13px]",
         card.disabled ? "text-zinc-400" : "text-zinc-800"
       )}>
-        {card.title}
+        {title}
       </span>
       {card.disabled && (
         <span className={cn(
           "absolute text-[10px] font-medium text-zinc-400 uppercase tracking-wide",
           card.size === "wide" ? "right-4" : "bottom-3"
         )}>
-          Coming Soon
+          {comingSoonText}
         </span>
       )}
     </>
@@ -119,6 +121,8 @@ function DashboardCardComponent({ card }: { card: DashboardCard }) {
 
 export default function ManagePage() {
   const router = useRouter();
+  const t = useTranslations("manage");
+  const tCommon = useTranslations("common");
   
   const [role] = useState<UserRole | null>(() => {
     if (typeof window === "undefined") return null;
@@ -154,15 +158,23 @@ export default function ManagePage() {
     return <PageLoader />;
   }
 
-  const cards = role === "owner" ? ownerCards : assistantCards;
+  const cardConfigs = role === "owner" ? ownerCardConfigs : assistantCardConfigs;
 
   return (
     <div className="min-h-screen bg-zinc-50">
       <div className="px-4 pt-14 pb-8">
-        <h1 className="text-2xl font-bold text-zinc-900 mb-6">Dashboard</h1>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-zinc-900">{t("dashboard")}</h1>
+          <LanguageSwitcher variant="full" />
+        </div>
         <div className="grid grid-cols-2 gap-3">
-          {cards.map((card) => (
-            <DashboardCardComponent key={card.id} card={card} />
+          {cardConfigs.map((card) => (
+            <DashboardCardComponent 
+              key={card.id} 
+              card={card} 
+              title={t(card.titleKey)}
+              comingSoonText={tCommon("comingSoon")}
+            />
           ))}
         </div>
 
@@ -177,7 +189,7 @@ export default function ManagePage() {
           ) : (
             <LogOut size={18} />
           )}
-          {isLoggingOut ? "Logging out..." : "Log Out"}
+          {isLoggingOut ? tCommon("loggingOut") : tCommon("logOut")}
         </button>
       </div>
     </div>

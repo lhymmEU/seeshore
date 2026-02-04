@@ -1,0 +1,176 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "logOut": "Log Out",
+    "loggingOut": "Logging out...",
+    "notLoggedIn": "Not logged in",
+    "goToHome": "Go to home",
+    "comingSoon": "Coming Soon",
+    "items": "items",
+    "events": "events",
+    "viewAll": "View all {count} events",
+    "seeMore": "See More"
+  },
+  "nav": {
+    "collaborate": "Collaborate",
+    "items": "Items",
+    "events": "Events",
+    "manage": "Manage",
+    "profile": "Profile"
+  },
+  "welcome": {
+    "storeName": "SeeShore Books",
+    "storeDescription": "Discover your next great read. Curated collections, personalized recommendations, and a community of book lovers.",
+    "getStarted": "Get Started",
+    "chooseRole": "Choose your role",
+    "selectRoleDescription": "Select how you'll be using SeeShore Books"
+  },
+  "roles": {
+    "member": {
+      "title": "Member",
+      "description": "Browse and discover books, manage your reading list",
+      "subtitle": "Your personal reading journey starts here",
+      "feature1": "Browse & discover curated books",
+      "feature2": "Save favorites to your reading list",
+      "feature3": "Borrow books from the library",
+      "feature4": "Join high-quality events",
+      "cta": "Start Reading"
+    },
+    "owner": {
+      "title": "Owner",
+      "description": "Manage your bookstore inventory and sales",
+      "subtitle": "Manage your bookstore with ease",
+      "feature1": "Inventory management & tracking",
+      "feature2": "Sales analytics & reports",
+      "feature3": "Customer relationship tools",
+      "feature4": "Staff scheduling & permissions",
+      "cta": "Access Dashboard"
+    },
+    "assistant": {
+      "title": "Assistant",
+      "description": "Help customers find their perfect reads",
+      "subtitle": "Help customers find their perfect reads",
+      "feature1": "Quick book search & lookup",
+      "feature2": "Customer assistance tools",
+      "feature3": "Inventory status checking",
+      "feature4": "Order processing & returns",
+      "cta": "Start Shift"
+    }
+  },
+  "auth": {
+    "login": "Log In",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "inviteCode": "Invite Code",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "enterName": "Enter your name",
+    "enterInviteCode": "Enter invite code",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "verifying": "Verifying...",
+    "verified": "Verified!",
+    "invalidCode": "Invalid invite code",
+    "loginFailed": "Login failed. Please check your credentials.",
+    "registerFailed": "Registration failed. Please try again.",
+    "welcomeBack": "Welcome back!",
+    "redirecting": "Redirecting to your dashboard..."
+  },
+  "stores": {
+    "selectStore": "Select a Store",
+    "chooseStore": "Choose a bookstore to continue",
+    "noStores": "No stores available",
+    "continue": "Continue"
+  },
+  "memberWelcome": {
+    "title": "Welcome to SeeShore",
+    "subtitle": "Your reading adventure begins",
+    "features": {
+      "library": {
+        "title": "Explore the Library",
+        "description": "Discover curated collections of books across all genres"
+      },
+      "favorites": {
+        "title": "Save Your Favorites",
+        "description": "Build your personal reading list with books you love"
+      },
+      "events": {
+        "title": "Join Events",
+        "description": "Participate in book clubs, readings, and literary events"
+      },
+      "borrow": {
+        "title": "Borrow & Read",
+        "description": "Check out books and enjoy them at your own pace"
+      }
+    },
+    "continue": "Continue to Browse"
+  },
+  "profile": {
+    "title": "Profile",
+    "yourName": "Your name",
+    "location": "Location (optional)",
+    "borrowed": "Borrowed",
+    "favorites": "Favorites",
+    "borrowedBooks": "Borrowed Books",
+    "favoriteBooks": "Favorites",
+    "myEvents": "My Events",
+    "unknownAuthor": "Unknown Author",
+    "borrowedOn": "Borrowed {date}",
+    "upcoming": "Upcoming",
+    "completed": "Completed",
+    "noBorrowedBooks": "No borrowed books",
+    "browseLibrary": "Browse the library to borrow books",
+    "noFavorites": "No favorites yet",
+    "likeBooks": "Like books to add them here",
+    "noEvents": "No events yet",
+    "joinEvents": "Join events to see them here"
+  },
+  "manage": {
+    "dashboard": "Dashboard",
+    "editBookstore": "Edit Bookstore",
+    "thisWeeksBooks": "This Week's Books",
+    "manageEvents": "Manage Events",
+    "manageInternalTasks": "Manage Internal Tasks",
+    "manageItems": "Manage Items",
+    "manageRoles": "Manage Roles",
+    "draftEvents": "Draft Events",
+    "taskList": "Task List",
+    "registerItems": "Register Items"
+  },
+  "books": {
+    "browseBooks": "Browse Books",
+    "thisWeeksBook": "This Week's Book",
+    "searchBooks": "Search books...",
+    "all": "All",
+    "noBooksFound": "No books found",
+    "tryAdjusting": "Try adjusting your filters",
+    "checkBackLater": "Check back later for new additions",
+    "available": "Available",
+    "borrowed": "Borrowed",
+    "viewDetails": "View Details"
+  },
+  "events": {
+    "title": "Events",
+    "searchEvents": "Search events...",
+    "closestEvent": "The Closest Event",
+    "noUpcoming": "No upcoming events",
+    "noEventsScheduled": "No events scheduled",
+    "attending": "attending",
+    "viewEvent": "View Event"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "about": "About Us"
+  },
+  "language": {
+    "switchTo": "Switch to {language}",
+    "english": "English",
+    "chinese": "中文"
+  }
+}

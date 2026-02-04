@@ -1,0 +1,176 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "saving": "保存中...",
+    "logOut": "退出登录",
+    "loggingOut": "正在退出...",
+    "notLoggedIn": "未登录",
+    "goToHome": "返回首页",
+    "comingSoon": "即将推出",
+    "items": "本",
+    "events": "场活动",
+    "viewAll": "查看全部 {count} 场活动",
+    "seeMore": "查看更多"
+  },
+  "nav": {
+    "collaborate": "协作",
+    "items": "书籍",
+    "events": "活动",
+    "manage": "管理",
+    "profile": "个人"
+  },
+  "welcome": {
+    "storeName": "海岸书店",
+    "storeDescription": "发现你的下一本好书。精选书单，个性化推荐，与书友共享阅读时光。",
+    "getStarted": "开始探索",
+    "chooseRole": "选择你的身份",
+    "selectRoleDescription": "选择你使用海岸书店的方式"
+  },
+  "roles": {
+    "member": {
+      "title": "会员",
+      "description": "浏览发现书籍，管理你的阅读清单",
+      "subtitle": "你的阅读之旅从这里开始",
+      "feature1": "浏览与发现精选书籍",
+      "feature2": "收藏喜爱的书籍",
+      "feature3": "借阅图书馆的书籍",
+      "feature4": "参加优质活动",
+      "cta": "开始阅读"
+    },
+    "owner": {
+      "title": "店主",
+      "description": "管理你的书店库存和销售",
+      "subtitle": "轻松管理你的书店",
+      "feature1": "库存管理与追踪",
+      "feature2": "销售分析与报告",
+      "feature3": "客户关系管理",
+      "feature4": "员工排班与权限",
+      "cta": "进入管理后台"
+    },
+    "assistant": {
+      "title": "店员",
+      "description": "帮助顾客找到心仪的书籍",
+      "subtitle": "帮助顾客找到心仪的书籍",
+      "feature1": "快速搜索与查询书籍",
+      "feature2": "顾客服务工具",
+      "feature3": "库存状态查询",
+      "feature4": "订单处理与退换",
+      "cta": "开始工作"
+    }
+  },
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "email": "邮箱",
+    "password": "密码",
+    "name": "姓名",
+    "inviteCode": "邀请码",
+    "enterEmail": "请输入邮箱",
+    "enterPassword": "请输入密码",
+    "enterName": "请输入姓名",
+    "enterInviteCode": "请输入邀请码",
+    "noAccount": "还没有账号？",
+    "hasAccount": "已有账号？",
+    "verifying": "验证中...",
+    "verified": "验证成功！",
+    "invalidCode": "邀请码无效",
+    "loginFailed": "登录失败，请检查您的凭据。",
+    "registerFailed": "注册失败，请重试。",
+    "welcomeBack": "欢迎回来！",
+    "redirecting": "正在跳转到管理后台..."
+  },
+  "stores": {
+    "selectStore": "选择书店",
+    "chooseStore": "选择一家书店继续",
+    "noStores": "暂无可用书店",
+    "continue": "继续"
+  },
+  "memberWelcome": {
+    "title": "欢迎来到海岸书店",
+    "subtitle": "你的阅读冒险即将开始",
+    "features": {
+      "library": {
+        "title": "探索图书馆",
+        "description": "发现各种类型的精选书籍"
+      },
+      "favorites": {
+        "title": "收藏喜爱的书",
+        "description": "建立你的个人阅读清单"
+      },
+      "events": {
+        "title": "参加活动",
+        "description": "参与读书会、朗读会等文学活动"
+      },
+      "borrow": {
+        "title": "借阅",
+        "description": "借阅书籍，按自己的节奏阅读"
+      }
+    },
+    "continue": "开始浏览"
+  },
+  "profile": {
+    "title": "个人中心",
+    "yourName": "你的名字",
+    "location": "位置（选填）",
+    "borrowed": "借阅",
+    "favorites": "收藏",
+    "borrowedBooks": "借阅的书籍",
+    "favoriteBooks": "我的收藏",
+    "myEvents": "我的活动",
+    "unknownAuthor": "未知作者",
+    "borrowedOn": "借阅于 {date}",
+    "upcoming": "即将开始",
+    "completed": "已完成",
+    "noBorrowedBooks": "暂无借阅",
+    "browseLibrary": "浏览图书馆借阅书籍",
+    "noFavorites": "暂无收藏",
+    "likeBooks": "喜欢的书会显示在这里",
+    "noEvents": "暂无活动",
+    "joinEvents": "参加的活动会显示在这里"
+  },
+  "manage": {
+    "dashboard": "管理后台",
+    "editBookstore": "编辑书店",
+    "thisWeeksBooks": "本周推荐",
+    "manageEvents": "管理活动",
+    "manageInternalTasks": "内部任务管理",
+    "manageItems": "物品管理",
+    "manageRoles": "角色管理",
+    "draftEvents": "活动草稿",
+    "taskList": "任务列表",
+    "registerItems": "登记物品"
+  },
+  "books": {
+    "browseBooks": "浏览书籍",
+    "thisWeeksBook": "本周推荐",
+    "searchBooks": "搜索书籍...",
+    "all": "全部",
+    "noBooksFound": "未找到书籍",
+    "tryAdjusting": "尝试调整筛选条件",
+    "checkBackLater": "稍后再来看看新书",
+    "available": "可借",
+    "borrowed": "已借出",
+    "viewDetails": "查看详情"
+  },
+  "events": {
+    "title": "活动",
+    "searchEvents": "搜索活动...",
+    "closestEvent": "最近的活动",
+    "noUpcoming": "暂无即将开始的活动",
+    "noEventsScheduled": "暂无活动安排",
+    "attending": "人参加",
+    "viewEvent": "查看活动"
+  },
+  "footer": {
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "about": "关于我们"
+  },
+  "language": {
+    "switchTo": "切换到{language}",
+    "english": "English",
+    "chinese": "中文"
+  }
+}

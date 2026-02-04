@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { X, Store, Headphones, User, LogIn, UserPlus, CheckCircle, XCircle, Loader2, MapPin, BookOpen, ArrowRight, Mail, Heart, Calendar, Library, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,52 +25,16 @@ interface RoleSlideUpProps {
   onContinue?: (role: RoleType, credentials: { email: string; password: string }) => void;
 }
 
-const roleDetails: Record<
-  RoleType,
-  {
-    icon: typeof Store;
-    title: string;
-    subtitle: string;
-    features: string[];
-    ctaText: string;
-  }
-> = {
-  user: {
-    icon: User,
-    title: "Member",
-    subtitle: "Your personal reading journey starts here",
-    features: [
-      "Browse & discover curated books",
-      "Save favorites to your reading list",
-      "Borrow books from the library",
-      "Join high-quality events",
-    ],
-    ctaText: "Start Reading",
-  },
-  owner: {
-    icon: Store,
-    title: "Store Owner",
-    subtitle: "Manage your bookstore with ease",
-    features: [
-      "Inventory management & tracking",
-      "Sales analytics & reports",
-      "Customer relationship tools",
-      "Staff scheduling & permissions",
-    ],
-    ctaText: "Access Dashboard",
-  },
-  assistant: {
-    icon: Headphones,
-    title: "Store Assistant",
-    subtitle: "Help customers find their perfect reads",
-    features: [
-      "Quick book search & lookup",
-      "Customer assistance tools",
-      "Inventory status checking",
-      "Order processing & returns",
-    ],
-    ctaText: "Start Shift",
-  },
+const roleIcons: Record<RoleType, typeof Store> = {
+  user: User,
+  owner: Store,
+  assistant: Headphones,
+};
+
+const roleTranslationKeys: Record<RoleType, string> = {
+  user: "member",
+  owner: "owner",
+  assistant: "assistant",
 };
 
 export function RoleSlideUp({
@@ -79,6 +44,13 @@ export function RoleSlideUp({
   onContinue,
 }: RoleSlideUpProps) {
   const router = useRouter();
+  const t = useTranslations();
+  const tRoles = useTranslations("roles");
+  const tAuth = useTranslations("auth");
+  const tStores = useTranslations("stores");
+  const tMemberWelcome = useTranslations("memberWelcome");
+  const tFooter = useTranslations("footer");
+  
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -145,8 +117,18 @@ export function RoleSlideUp({
   // Don't render if no role selected
   if (!role) return null;
 
-  const details = roleDetails[role];
-  const Icon = details.icon;
+  const translationKey = roleTranslationKeys[role];
+  const Icon = roleIcons[role];
+  
+  // Get translated role details
+  const roleTitle = tRoles(`${translationKey}.title`);
+  const roleSubtitle = tRoles(`${translationKey}.subtitle`);
+  const roleFeatures = [
+    tRoles(`${translationKey}.feature1`),
+    tRoles(`${translationKey}.feature2`),
+    tRoles(`${translationKey}.feature3`),
+    tRoles(`${translationKey}.feature4`),
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -307,10 +289,10 @@ export function RoleSlideUp({
           </div>
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-zinc-900">
-              {authMode === "login" ? "Signing in..." : "Creating account..."}
+              {tAuth("verifying")}
             </h2>
             <p className="text-sm text-zinc-500">
-              Please wait while we verify your credentials
+              {t("common.loading")}
             </p>
           </div>
         </>
@@ -323,10 +305,10 @@ export function RoleSlideUp({
           </div>
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-zinc-900">
-              {authMode === "login" ? "Welcome Back!" : "Account Created!"}
+              {tAuth("welcomeBack")}
             </h2>
             <p className="text-sm text-zinc-500">
-              Loading your stores...
+              {tAuth("redirecting")}
             </p>
           </div>
         </>
@@ -339,10 +321,10 @@ export function RoleSlideUp({
           </div>
           <div className="text-center space-y-2">
             <h2 className="text-xl font-semibold text-zinc-900">
-              {authMode === "login" ? "Login Failed" : "Registration Failed"}
+              {authMode === "login" ? tAuth("loginFailed") : tAuth("registerFailed")}
             </h2>
             <p className="text-sm text-zinc-500">
-              {errorMessage || "Unable to verify your credentials"}
+              {errorMessage || tAuth("loginFailed")}
             </p>
           </div>
           <Button
@@ -350,7 +332,7 @@ export function RoleSlideUp({
             size="lg"
             className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white"
           >
-            Try Again
+            {t("common.cancel")}
           </Button>
         </>
       )}
@@ -367,10 +349,10 @@ export function RoleSlideUp({
         </div>
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-zinc-900">
-            Select Your Store
+            {tStores("selectStore")}
           </h2>
           <p className="text-sm text-zinc-500">
-            Choose which store you want to manage today
+            {tStores("chooseStore")}
           </p>
         </div>
       </div>
@@ -423,8 +405,7 @@ export function RoleSlideUp({
             </button>
           )) : (
             <div className="flex-1 text-center py-8 text-zinc-500">
-              <p>No stores available</p>
-              <p className="text-sm mt-1">Contact admin to create a store</p>
+              <p>{tStores("noStores")}</p>
             </div>
           )}
         </div>
@@ -437,7 +418,7 @@ export function RoleSlideUp({
         disabled={!selectedStore}
         className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Enter Store
+        {tStores("continue")}
         <ArrowRight size={18} className="ml-2" />
       </Button>
     </div>
@@ -453,25 +434,24 @@ export function RoleSlideUp({
         </div>
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-zinc-900">
-            Welcome to SeeShore Books!
+            {tMemberWelcome("title")}
           </h2>
           <p className="text-sm text-zinc-500">
-            You&apos;re all set to start your reading journey
+            {tMemberWelcome("subtitle")}
           </p>
         </div>
       </div>
 
       {/* Quick access features */}
       <div className="bg-zinc-50 rounded-2xl p-5 space-y-4">
-        <h3 className="text-sm font-medium text-zinc-700">What you can do now:</h3>
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
               <Library size={20} className="text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-zinc-900">Browse Books</p>
-              <p className="text-xs text-zinc-500">Discover our curated collection</p>
+              <p className="text-sm font-medium text-zinc-900">{tMemberWelcome("features.library.title")}</p>
+              <p className="text-xs text-zinc-500">{tMemberWelcome("features.library.description")}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -479,8 +459,8 @@ export function RoleSlideUp({
               <Heart size={20} className="text-rose-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-zinc-900">Save Favorites</p>
-              <p className="text-xs text-zinc-500">Build your personal reading list</p>
+              <p className="text-sm font-medium text-zinc-900">{tMemberWelcome("features.favorites.title")}</p>
+              <p className="text-xs text-zinc-500">{tMemberWelcome("features.favorites.description")}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -488,8 +468,8 @@ export function RoleSlideUp({
               <Calendar size={20} className="text-amber-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-zinc-900">Join Events</p>
-              <p className="text-xs text-zinc-500">Connect with fellow readers</p>
+              <p className="text-sm font-medium text-zinc-900">{tMemberWelcome("features.events.title")}</p>
+              <p className="text-xs text-zinc-500">{tMemberWelcome("features.events.description")}</p>
             </div>
           </div>
         </div>
@@ -501,7 +481,7 @@ export function RoleSlideUp({
         size="lg"
         className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white"
       >
-        Start Exploring
+        {tMemberWelcome("continue")}
         <ArrowRight size={18} className="ml-2" />
       </Button>
     </div>
@@ -517,10 +497,10 @@ export function RoleSlideUp({
         </div>
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-zinc-900">
-            Choose A Store
+            {tStores("selectStore")}
           </h2>
           <p className="text-sm text-zinc-500">
-            Select the store you want to join
+            {tStores("chooseStore")}
           </p>
         </div>
       </div>
@@ -588,8 +568,7 @@ export function RoleSlideUp({
             </button>
           )) : (
             <div className="flex-1 text-center py-8 text-zinc-500">
-              <p>No libraries available</p>
-              <p className="text-sm mt-1">Please check back later</p>
+              <p>{tStores("noStores")}</p>
             </div>
           )}
         </div>
@@ -602,7 +581,7 @@ export function RoleSlideUp({
         disabled={!selectedStore}
         className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Continue
+        {tStores("continue")}
         <ArrowRight size={18} className="ml-2" />
       </Button>
     </div>
@@ -618,15 +597,15 @@ export function RoleSlideUp({
         </div>
         <div className="space-y-1">
           <h2 className="text-xl font-semibold text-zinc-900">
-            {details.title}
+            {roleTitle}
           </h2>
-          <p className="text-sm text-zinc-500">{details.subtitle}</p>
+          <p className="text-sm text-zinc-500">{roleSubtitle}</p>
         </div>
       </div>
 
       {/* Features list */}
       <div className="bg-zinc-50 rounded-2xl p-5 space-y-3">
-        {details.features.map((feature, index) => (
+        {roleFeatures.map((feature, index) => (
           <div key={index} className="flex items-center gap-3">
             <div className="w-6 h-6 rounded-full bg-zinc-900 flex items-center justify-center flex-shrink-0">
               <span className="text-white text-xs font-medium">
@@ -645,14 +624,14 @@ export function RoleSlideUp({
           {authMode === "register" && (
             <div className="space-y-1.5">
               <label htmlFor="name" className="text-sm font-medium text-zinc-700">
-                Full Name
+                {tAuth("name")}
               </label>
               <input
                 id="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your full name"
+                placeholder={tAuth("enterName")}
                 className="w-full h-12 px-4 rounded-xl border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-shadow"
                 autoComplete="name"
               />
@@ -661,7 +640,7 @@ export function RoleSlideUp({
           
           <div className="space-y-1.5">
             <label htmlFor="email" className="text-sm font-medium text-zinc-700">
-              Email
+              {tAuth("email")}
             </label>
             <div className="relative">
               <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
@@ -670,7 +649,7 @@ export function RoleSlideUp({
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={tAuth("enterEmail")}
                 className="w-full h-12 pl-11 pr-4 rounded-xl border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-shadow"
                 autoComplete="email"
               />
@@ -678,14 +657,14 @@ export function RoleSlideUp({
           </div>
           <div className="space-y-1.5">
             <label htmlFor="password" className="text-sm font-medium text-zinc-700">
-              Password
+              {tAuth("password")}
             </label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={authMode === "register" ? "Create a password" : "Enter your password"}
+              placeholder={tAuth("enterPassword")}
               className="w-full h-12 px-4 rounded-xl border border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-shadow"
               autoComplete={authMode === "register" ? "new-password" : "current-password"}
             />
@@ -695,7 +674,7 @@ export function RoleSlideUp({
           {authMode === "register" && role === "user" && (
             <div className="space-y-1.5">
               <label htmlFor="inviteCode" className="text-sm font-medium text-zinc-700">
-                Invite Code
+                {tAuth("inviteCode")}
               </label>
               <div className="relative">
                 <Ticket size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
@@ -707,7 +686,7 @@ export function RoleSlideUp({
                     setInviteCode(e.target.value.toUpperCase());
                     setInviteCodeError("");
                   }}
-                  placeholder="Enter your invite code"
+                  placeholder={tAuth("enterInviteCode")}
                   className={`w-full h-12 pl-11 pr-4 rounded-xl border bg-white text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-shadow ${
                     inviteCodeError ? "border-red-300" : "border-zinc-200"
                   }`}
@@ -717,9 +696,6 @@ export function RoleSlideUp({
               {inviteCodeError && (
                 <p className="text-xs text-red-600">{inviteCodeError}</p>
               )}
-              <p className="text-xs text-zinc-400">
-                Ask a store owner or assistant for an invite code
-              </p>
             </div>
           )}
         </div>
@@ -737,7 +713,7 @@ export function RoleSlideUp({
               className="flex-1 rounded-full h-12 text-base font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-900"
             >
               <UserPlus size={18} className="mr-2" />
-              Sign Up
+              {tAuth("register")}
             </Button>
             <Button
               type="submit"
@@ -746,7 +722,7 @@ export function RoleSlideUp({
               className="flex-1 rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <LogIn size={18} className="mr-2" />
-              Sign In
+              {tAuth("login")}
             </Button>
           </div>
         ) : (
@@ -758,7 +734,7 @@ export function RoleSlideUp({
               className="w-full rounded-full h-12 text-base font-medium bg-zinc-900 hover:bg-zinc-800 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <UserPlus size={18} className="mr-2" />
-              Create Account
+              {tAuth("register")}
             </Button>
             <Button
               type="button"
@@ -767,7 +743,7 @@ export function RoleSlideUp({
               variant="ghost"
               className="w-full rounded-full h-12 text-base font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
             >
-              Already have an account? Sign in
+              {tAuth("hasAccount")} {tAuth("login")}
             </Button>
           </div>
         )}
@@ -775,7 +751,7 @@ export function RoleSlideUp({
 
       {/* Footer note */}
       <p className="text-xs text-center text-zinc-400">
-        By continuing, you agree to our Terms of Service and Privacy Policy
+        {tFooter("terms")} & {tFooter("privacy")}
       </p>
     </div>
   );
