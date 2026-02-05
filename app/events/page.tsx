@@ -10,6 +10,35 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate, formatTime, formatDateShort, getNowInGMT8 } from "@/lib/date-utils";
 import type { StoreEvent } from "@/types/type";
 
+// Extract plain text from rich text JSON for preview
+function extractPlainText(content: string): string {
+  if (!content) return "";
+  
+  try {
+    const parsed = JSON.parse(content);
+    return extractTextFromNode(parsed);
+  } catch {
+    // If it's not JSON, return as-is
+    return content;
+  }
+}
+
+function extractTextFromNode(node: unknown): string {
+  if (!node || typeof node !== 'object') return "";
+  
+  const n = node as { type?: string; text?: string; content?: unknown[] };
+  
+  if (n.type === "text" && typeof n.text === "string") {
+    return n.text;
+  }
+  
+  if (Array.isArray(n.content)) {
+    return n.content.map(extractTextFromNode).join(" ");
+  }
+  
+  return "";
+}
+
 // Compact event card for horizontal scroll
 function EventScrollCard({
   event,
@@ -117,7 +146,7 @@ function FeaturedEventCard({
           </h3>
           {event.description && (
             <p className="text-sm text-zinc-500 mt-1 line-clamp-2">
-              {event.description}
+              {extractPlainText(event.description)}
             </p>
           )}
         </div>
@@ -194,7 +223,7 @@ export default function EventsPage() {
       const matchesSearch =
         !searchQuery ||
         event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        extractPlainText(event.description || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         event.location?.toLowerCase().includes(searchQuery.toLowerCase());
       
       return matchesSearch;

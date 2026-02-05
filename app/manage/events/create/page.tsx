@@ -1,7 +1,7 @@
 "use client";
 
-import { EventForm } from "@/components/events";
+import { EventPreviewEditor } from "@/components/events";
 
 export default function CreateEventPage() {
-  return <EventForm mode="create" />;
+  return <EventPreviewEditor mode="create" />;
 }
