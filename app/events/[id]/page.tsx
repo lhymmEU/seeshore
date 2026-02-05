@@ -4,7 +4,6 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft, ChevronRight, Check, X, Clock } from "lucide-react";
-import { RichTextRenderer } from "@/components/ui/rich-text-editor";
 import { cn } from "@/lib/utils";
 import {
   Drawer,
@@ -441,13 +440,9 @@ export default function EventDetailsPage() {
             <h2 className="text-base font-semibold text-zinc-900 mb-2">
               About Event
             </h2>
-            {event.description ? (
-              <RichTextRenderer content={event.description} />
-            ) : (
-              <p className="text-sm text-zinc-600 leading-relaxed">
-                No description provided for this event.
-              </p>
-            )}
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              {event.description || "Lorem ipsum dolor sit amet consectetur. Duis habitant lectus congue ut. Nisi pellentesque diam metus dictum feugiat duis sit ipsum pulvinar. Magna lectus amet sodales cursus"}
+            </p>
           </div>
 
           <div className="mt-auto pb-safe">

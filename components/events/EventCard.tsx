@@ -6,35 +6,6 @@ import { cn } from "@/lib/utils";
 import { formatDate, formatTime } from "@/lib/date-utils";
 import type { StoreEvent } from "@/types/type";
 
-// Extract plain text from rich text JSON for preview
-function extractPlainText(content: string): string {
-  if (!content) return "";
-  
-  try {
-    const parsed = JSON.parse(content);
-    return extractTextFromNode(parsed);
-  } catch {
-    // If it's not JSON, return as-is
-    return content;
-  }
-}
-
-function extractTextFromNode(node: unknown): string {
-  if (!node || typeof node !== 'object') return "";
-  
-  const n = node as { type?: string; text?: string; content?: unknown[] };
-  
-  if (n.type === "text" && typeof n.text === "string") {
-    return n.text;
-  }
-  
-  if (Array.isArray(n.content)) {
-    return n.content.map(extractTextFromNode).join(" ");
-  }
-  
-  return "";
-}
-
 function getStatusBadge(status: StoreEvent["status"]) {
   const statusConfig = {
     open: { label: "Open", className: "bg-emerald-100 text-emerald-700" },
@@ -112,7 +83,7 @@ export function EventCard({
         
         {event.description && (
           <p className="text-sm text-zinc-500 line-clamp-2">
-            {extractPlainText(event.description)}
+            {event.description}
           </p>
         )}
         

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { EventPreviewEditor } from "@/components/events";
+import { EventForm } from "@/components/events";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { fetchEvent } from "@/data/supabase";
 import type { StoreEvent } from "@/types/type";
@@ -43,7 +43,7 @@ export default function EditEventPage() {
   }
 
   return (
-    <EventPreviewEditor
+    <EventForm
       mode="edit"
       eventId={eventId}
       initialData={event}
