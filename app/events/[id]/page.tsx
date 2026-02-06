@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
-import { ArrowLeft, ChevronRight, Check, X, Clock } from "lucide-react";
+import { ArrowLeft, ChevronRight, Check, X, Clock, Eye } from "lucide-react";
 import { RichTextRenderer } from "@/components/ui/rich-text-editor";
 import { cn } from "@/lib/utils";
 import {
@@ -209,17 +209,22 @@ function UserAvatar({
   );
 }
 
-// Avatar stack for participants
+// Avatar stack for participants (clickable)
 function ParticipantAvatars({ 
   attendees,
+  onClick,
 }: { 
   attendees: User[];
+  onClick?: () => void;
 }) {
   const displayCount = Math.min(5, attendees.length);
   const displayedAttendees = attendees.slice(0, displayCount);
   
   return (
-    <div className="flex items-center gap-3">
+    <button 
+      className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+      onClick={onClick}
+    >
       <div className="flex -space-x-2">
         {displayedAttendees.map((attendee) => (
           <UserAvatar key={attendee.id} user={attendee} />
@@ -232,7 +237,53 @@ function ParticipantAvatars({
           </div>
         )}
       </div>
-      <span className="text-sm text-zinc-500">Participants</span>
+      <div className="flex items-center gap-1">
+        <span className="text-sm text-zinc-500">Participants</span>
+        {attendees.length > 0 && (
+          <ChevronRight size={14} className="text-zinc-400" />
+        )}
+      </div>
+    </button>
+  );
+}
+
+// Attendee row in the drawer list
+function AttendeeRow({ 
+  user, 
+  onView 
+}: { 
+  user: User; 
+  onView: () => void;
+}) {
+  const avatarUrl = user.avatar || getDicebearAvatar(user.id || user.name);
+
+  return (
+    <div className="flex items-center gap-3 py-3">
+      <Image
+        src={avatarUrl}
+        alt={user.name}
+        width={40}
+        height={40}
+        className="w-10 h-10 rounded-full border border-zinc-200 object-cover bg-zinc-100"
+        unoptimized
+      />
+      <div className="flex-1 min-w-0">
+        <h4 className="font-medium text-zinc-900 text-sm truncate">
+          {user.name}
+        </h4>
+        {user.location && (
+          <p className="text-xs text-zinc-500 truncate">{user.location}</p>
+        )}
+      </div>
+      <Button
+        onClick={onView}
+        variant="outline"
+        size="sm"
+        className="rounded-xl text-xs h-8 px-3 gap-1 border-zinc-200"
+      >
+        <Eye size={12} />
+        View
+      </Button>
     </div>
   );
 }
@@ -249,6 +300,7 @@ export default function EventDetailsPage() {
   const [isAttending, setIsAttending] = useState(false);
   const [showSuccessDrawer, setShowSuccessDrawer] = useState(false);
   const [showFailureDrawer, setShowFailureDrawer] = useState(false);
+  const [showAttendeesDrawer, setShowAttendeesDrawer] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const fetchAttendees = useCallback(async (attendeeIds: string[]) => {
@@ -428,7 +480,10 @@ export default function EventDetailsPage() {
           </div>
 
           <div className="flex items-center justify-between mb-6">
-            <ParticipantAvatars attendees={attendeeUsers} />
+            <ParticipantAvatars 
+              attendees={attendeeUsers} 
+              onClick={() => attendeeUsers.length > 0 && setShowAttendeesDrawer(true)}
+            />
             
             <button
               disabled
@@ -547,6 +602,45 @@ export default function EventDetailsPage() {
             <Button
               onClick={handleCloseFailure}
               className="w-full h-14 rounded-2xl bg-zinc-100 text-zinc-700 font-medium hover:bg-zinc-200 text-base"
+              variant="secondary"
+            >
+              Close
+            </Button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+
+      {/* Attendees List Drawer */}
+      <Drawer open={showAttendeesDrawer} onOpenChange={setShowAttendeesDrawer}>
+        <DrawerContent className="bg-white max-h-[70vh]">
+          <DrawerHeader className="text-center pb-0">
+            <DrawerTitle className="text-lg text-zinc-900">
+              Participants
+            </DrawerTitle>
+            <DrawerDescription className="text-zinc-500 mt-0.5">
+              {attendeeUsers.length} attendee{attendeeUsers.length !== 1 ? "s" : ""}
+            </DrawerDescription>
+          </DrawerHeader>
+
+          <div className="px-6 py-2 overflow-y-auto flex-1">
+            <div className="divide-y divide-zinc-100">
+              {attendeeUsers.map((attendee) => (
+                <AttendeeRow
+                  key={attendee.id}
+                  user={attendee}
+                  onView={() => {
+                    setShowAttendeesDrawer(false);
+                    router.push(`/members/${attendee.id}`);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <DrawerFooter className="pt-0">
+            <Button
+              onClick={() => setShowAttendeesDrawer(false)}
+              className="w-full h-12 rounded-2xl bg-zinc-100 text-zinc-700 font-medium hover:bg-zinc-200 text-sm"
               variant="secondary"
             >
               Close

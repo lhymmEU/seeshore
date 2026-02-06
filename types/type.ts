@@ -16,6 +16,14 @@ export interface Store {
     featuredBooks: string[], // The ids of the featured "This Week's Books"
 }
 
+export interface DisplayConfig {
+    enabled: boolean, // Whether the display page is active
+    bio?: string, // A short bio for the display page
+    selectedEvents: string[], // The ids of the events to display
+    selectedBooks: string[], // The ids of borrowed books to display
+    selectedFavorites: string[], // The ids of favorite books to display
+}
+
 export interface User {
     id: string, // Unique identifier for a user
     name: string,
@@ -26,6 +34,7 @@ export interface User {
     attendedEvents?: string[], // The ids of the events
     hostedEvents?: string[], // The ids of the events
     borrowed: string[], // The ids of the books
+    displayConfig?: DisplayConfig, // Display page configuration
 }
 
 export interface Book {

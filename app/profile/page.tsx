@@ -15,7 +15,8 @@ import {
   Edit3,
   ChevronRight,
   Loader2,
-  Clock
+  Clock,
+  LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
@@ -459,6 +460,25 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Display Page Setup */}
+        <button
+          onClick={() => router.push("/profile/display")}
+          className="w-full bg-white rounded-2xl p-4 border border-zinc-100 flex items-center gap-3 hover:border-zinc-200 transition-all text-left"
+        >
+          <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
+            <LayoutGrid size={18} className="text-zinc-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-medium text-zinc-900 text-sm">Display Page</h3>
+            <p className="text-xs text-zinc-500">
+              {user.displayConfig?.enabled
+                ? "Your display page is live"
+                : "Set up your public profile display"}
+            </p>
+          </div>
+          <ChevronRight size={16} className="text-zinc-400 flex-shrink-0" />
+        </button>
 
         {/* Tab Navigation */}
         <div className="bg-white rounded-2xl p-1.5 border border-zinc-100 flex">

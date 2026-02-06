@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { Store, User, Book, Spending, Role, Task, StoreEvent, CollaboratePost, CollaborateReply } from '@/types/type';
+import type { Store, User, Book, Spending, Role, Task, StoreEvent, CollaboratePost, CollaborateReply, DisplayConfig } from '@/types/type';
 import { isEventPastDeadline } from '@/lib/date-utils';
 
 // ============================================
@@ -33,6 +33,7 @@ interface DbUser {
     avatar: string | null;
     type: 'Guest' | 'Member' | 'Owner' | 'Assistant';
     location: string | null;
+    display_config: DisplayConfig | null;
     created_at: string;
     updated_at: string;
 }
@@ -166,6 +167,7 @@ function mapDbUserToUser(dbUser: DbUser): User {
         type: dbUser.type,
         location: dbUser.location || undefined,
         borrowed: [],
+        displayConfig: dbUser.display_config || undefined,
     };
 }
 
@@ -2482,4 +2484,45 @@ export async function deleteCollaborateReply(
     if (error) {
         throw new Error(error.message);
     }
+}
+
+// ============================================
+// UPDATE DISPLAY CONFIG - Update user's display page configuration
+// ============================================
+
+export async function updateDisplayConfig(
+    userId: string,
+    displayConfig: DisplayConfig,
+    accessToken?: string
+): Promise<User> {
+    const client = accessToken ? createAuthenticatedClient(accessToken) : supabase;
+
+    const { error } = await client
+        .from('users')
+        .update({ display_config: displayConfig })
+        .eq('id', userId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return fetchUser(userId);
+}
+
+// ============================================
+// FETCH USER DISPLAY CONFIG - Fetch a user's display config (public)
+// ============================================
+
+export async function fetchUserDisplayConfig(userId: string): Promise<DisplayConfig | null> {
+    const { data, error } = await supabase
+        .from('users')
+        .select('display_config')
+        .eq('id', userId)
+        .single();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return (data as { display_config: DisplayConfig | null }).display_config;
 }

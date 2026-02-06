@@ -19,6 +19,7 @@ CREATE TABLE users (
     avatar TEXT,
     type TEXT CHECK (type IN ('Guest', 'Member', 'Owner', 'Assistant')) DEFAULT 'Guest',
     location TEXT,
+    display_config JSONB DEFAULT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
