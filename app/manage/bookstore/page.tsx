@@ -326,7 +326,7 @@ export default function BookstoreEditorPage() {
             ) : (
               <EmptyState
                 icon={Package}
-                title="No items registered"
+                title="No Available Items"
                 message="Start by adding books to your bookstore"
                 action={
                   <button

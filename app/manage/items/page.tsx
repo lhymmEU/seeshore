@@ -42,6 +42,79 @@ function formatCountdown(daysRemaining: number): string {
   }
 }
 
+function BorrowedBookCard({
+  book,
+  onReturnBook,
+}: {
+  book: Book;
+  onReturnBook: () => Promise<void>;
+}) {
+  const [isReturning, setIsReturning] = useState(false);
+
+  const daysRemaining = book.borrowedDate
+    ? calculateDaysRemaining(book.borrowedDate)
+    : null;
+
+  const handleClick = async () => {
+    if (!confirm(`Return "${book.title}"?`)) return;
+    setIsReturning(true);
+    try {
+      await onReturnBook();
+    } finally {
+      setIsReturning(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={isReturning}
+      className="flex-shrink-0 w-28 group cursor-pointer disabled:opacity-50"
+    >
+      {/* Book Cover */}
+      <div className="relative w-28 h-40 rounded-2xl overflow-hidden bg-zinc-200 shadow-sm group-hover:shadow-md transition-shadow">
+        {book.cover ? (
+          <Image
+            src={book.cover}
+            alt={book.title}
+            fill
+            className="object-cover"
+            unoptimized
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-300 to-zinc-200">
+            <BookOpen size={24} className="text-zinc-400" />
+          </div>
+        )}
+        {/* Gradient overlay at bottom */}
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
+        {/* Countdown badge */}
+        {daysRemaining !== null && (
+          <div
+            className={cn(
+              "absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-semibold whitespace-nowrap backdrop-blur-sm",
+              daysRemaining <= 0
+                ? "bg-red-500/90 text-white"
+                : daysRemaining <= 7
+                ? "bg-amber-400/90 text-amber-950"
+                : "bg-white/90 text-zinc-700"
+            )}
+          >
+            <Clock size={10} />
+            <span>{formatCountdown(daysRemaining)}</span>
+          </div>
+        )}
+        {/* Loading overlay */}
+        {isReturning && (
+          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+            <Loader2 size={20} className="text-white animate-spin" />
+          </div>
+        )}
+      </div>
+    </button>
+  );
+}
+
 function ItemCard({
   book,
   onEdit,
@@ -273,6 +346,21 @@ export default function ManageItemsPage() {
     );
   }, [books, searchQuery]);
 
+  // Split into borrowed and available books
+  const borrowedBooks = useMemo(() => {
+    return filteredBooks
+      .filter((book) => book.status === "borrowed")
+      .sort((a, b) => {
+        const daysA = a.borrowedDate ? calculateDaysRemaining(a.borrowedDate) : Infinity;
+        const daysB = b.borrowedDate ? calculateDaysRemaining(b.borrowedDate) : Infinity;
+        return daysA - daysB; // Closest to return deadline first
+      });
+  }, [filteredBooks]);
+
+  const availableBooks = useMemo(() => {
+    return filteredBooks.filter((book) => book.status !== "borrowed");
+  }, [filteredBooks]);
+
   const handleAddNew = () => {
     setEditingBook(null);
     setDrawerOpen(true);
@@ -369,6 +457,31 @@ export default function ManageItemsPage() {
           placeholder="Search by title, author, or ISBN..."
         />
 
+        {/* Borrowed Books Section */}
+        {!isLoading && borrowedBooks.length > 0 && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-zinc-700">
+                Borrowed
+                <span className="ml-1.5 text-xs font-normal text-zinc-400">
+                  {borrowedBooks.length}
+                </span>
+              </h2>
+            </div>
+            <div className="-mx-4 px-4 overflow-x-auto scrollbar-hide">
+              <div className="flex gap-3 pb-2">
+                {borrowedBooks.map((book) => (
+                  <BorrowedBookCard
+                    key={book.id}
+                    book={book}
+                    onReturnBook={() => handleReturnBook(book.id)}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Items Count */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-zinc-500">
@@ -377,16 +490,16 @@ export default function ManageItemsPage() {
             ) : (
               <>
                 <span className="font-medium text-zinc-700">
-                  {filteredBooks.length}
+                  {availableBooks.length}
                 </span>{" "}
-                {filteredBooks.length === 1 ? "item" : "items"}
+                {availableBooks.length === 1 ? "item" : "items"}
                 {searchQuery && ` found`}
               </>
             )}
           </p>
         </div>
 
-        {/* Items List */}
+        {/* Items List (available books only) */}
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -403,9 +516,9 @@ export default function ManageItemsPage() {
               </div>
             ))}
           </div>
-        ) : filteredBooks.length > 0 ? (
+        ) : availableBooks.length > 0 ? (
           <div className="space-y-3">
-            {filteredBooks.map((book) => (
+            {availableBooks.map((book) => (
               <ItemCard
                 key={book.id}
                 book={book}
@@ -419,11 +532,11 @@ export default function ManageItemsPage() {
         ) : (
           <EmptyState
             icon={BookOpen}
-            title={searchQuery ? "No items found" : "No items registered"}
+            title={searchQuery ? "No items found" : "No Available Items"}
             message={
               searchQuery
                 ? "Try adjusting your search"
-                : "Tap the + button to register your first item"
+                : "Tap the + button to register an item"
             }
           />
         )}
