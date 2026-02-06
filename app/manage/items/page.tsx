@@ -18,7 +18,14 @@ import { PageHeader } from "@/components/ui/page-header";
 import { SearchInput } from "@/components/ui/search-input";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ItemRegistrationDrawer, BorrowDrawer } from "@/components/manage";
-import type { Book } from "@/types/type";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerFooter,
+} from "@/components/ui/drawer";
+import type { Book, User } from "@/types/type";
 import { session } from "@/lib/session";
 
 // Calculate days remaining for a borrowed book (30-day lending period)
@@ -45,32 +52,19 @@ function formatCountdown(daysRemaining: number): string {
 
 function BorrowedBookCard({
   book,
-  onReturnBook,
+  onClick,
 }: {
   book: Book;
-  onReturnBook: () => Promise<void>;
+  onClick: () => void;
 }) {
-  const [isReturning, setIsReturning] = useState(false);
-
   const daysRemaining = book.borrowedDate
     ? calculateDaysRemaining(book.borrowedDate)
     : null;
 
-  const handleClick = async () => {
-    if (!confirm(`Return "${book.title}"?`)) return;
-    setIsReturning(true);
-    try {
-      await onReturnBook();
-    } finally {
-      setIsReturning(false);
-    }
-  };
-
   return (
     <button
-      onClick={handleClick}
-      disabled={isReturning}
-      className="flex-shrink-0 w-28 group cursor-pointer disabled:opacity-50"
+      onClick={onClick}
+      className="flex-shrink-0 w-28 group cursor-pointer"
     >
       {/* Book Cover */}
       <div className="relative w-28 h-40 rounded-2xl overflow-hidden bg-zinc-200 shadow-sm group-hover:shadow-md transition-shadow">
@@ -103,12 +97,6 @@ function BorrowedBookCard({
           >
             <Clock size={10} />
             <span>{formatCountdown(daysRemaining)}</span>
-          </div>
-        )}
-        {/* Loading overlay */}
-        {isReturning && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-            <Loader2 size={20} className="text-white animate-spin" />
           </div>
         )}
       </div>
@@ -307,6 +295,10 @@ export default function ManageItemsPage() {
   const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [borrowDrawerOpen, setBorrowDrawerOpen] = useState(false);
   const [selectedBookForBorrow, setSelectedBookForBorrow] = useState<Book | null>(null);
+  const [returnDrawerOpen, setReturnDrawerOpen] = useState(false);
+  const [selectedBorrowedBook, setSelectedBorrowedBook] = useState<Book | null>(null);
+  const [borrowerName, setBorrowerName] = useState<string | null>(null);
+  const [isReturningBook, setIsReturningBook] = useState(false);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -402,6 +394,40 @@ export default function ManageItemsPage() {
     setBorrowDrawerOpen(true);
   };
 
+  // Open return drawer for a borrowed book
+  const handleOpenReturnDrawer = async (book: Book) => {
+    setSelectedBorrowedBook(book);
+    setBorrowerName(null);
+    setReturnDrawerOpen(true);
+
+    // Fetch borrower name
+    if (book.borrower) {
+      try {
+        const response = await fetch(`/api/users?id=${book.borrower}`);
+        if (response.ok) {
+          const user: User = await response.json();
+          setBorrowerName(user.name);
+        }
+      } catch (error) {
+        console.error("Failed to fetch borrower:", error);
+      }
+    }
+  };
+
+  // Handle return from drawer
+  const handleReturnFromDrawer = async () => {
+    if (!selectedBorrowedBook) return;
+    setIsReturningBook(true);
+    try {
+      await handleReturnBook(selectedBorrowedBook.id);
+      setReturnDrawerOpen(false);
+    } catch {
+      // error already handled in handleReturnBook
+    } finally {
+      setIsReturningBook(false);
+    }
+  };
+
   // Return a borrowed book
   const handleReturnBook = async (bookId: string) => {
     try {
@@ -475,7 +501,7 @@ export default function ManageItemsPage() {
                   <BorrowedBookCard
                     key={book.id}
                     book={book}
-                    onReturnBook={() => handleReturnBook(book.id)}
+                    onClick={() => handleOpenReturnDrawer(book)}
                   />
                 ))}
               </div>
@@ -565,6 +591,78 @@ export default function ManageItemsPage() {
         book={selectedBookForBorrow}
         onSuccess={handleBorrowSuccess}
       />
+
+      {/* Return Book Drawer */}
+      <Drawer open={returnDrawerOpen} onOpenChange={setReturnDrawerOpen}>
+        <DrawerContent>
+          <DrawerHeader className="text-center pt-6 pb-2">
+            <DrawerTitle className="text-lg font-semibold text-zinc-900">
+              {selectedBorrowedBook?.title}
+            </DrawerTitle>
+          </DrawerHeader>
+
+          <div className="px-6 pb-2 space-y-4">
+            {/* Borrower */}
+            <div className="flex items-center justify-between py-3 border-b border-zinc-100">
+              <span className="text-sm text-zinc-500">Borrower</span>
+              <span className="text-sm font-medium text-zinc-900">
+                {borrowerName ?? "Loading..."}
+              </span>
+            </div>
+
+            {/* Remaining Time */}
+            <div className="flex items-center justify-between py-3 border-b border-zinc-100">
+              <span className="text-sm text-zinc-500">Remaining</span>
+              {selectedBorrowedBook?.borrowedDate ? (
+                (() => {
+                  const days = calculateDaysRemaining(selectedBorrowedBook.borrowedDate);
+                  return (
+                    <span
+                      className={cn(
+                        "flex items-center gap-1.5 text-sm font-medium",
+                        days <= 0
+                          ? "text-red-600"
+                          : days <= 7
+                          ? "text-amber-600"
+                          : "text-zinc-900"
+                      )}
+                    >
+                      <Clock size={14} />
+                      {formatCountdown(days)}
+                    </span>
+                  );
+                })()
+              ) : (
+                <span className="text-sm text-zinc-400">Unknown</span>
+              )}
+            </div>
+          </div>
+
+          <DrawerFooter className="flex-row gap-3 px-6 pb-6 pt-4">
+            <button
+              onClick={handleReturnFromDrawer}
+              disabled={isReturningBook}
+              className="flex-1 py-3 rounded-xl font-semibold text-base bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isReturningBook ? (
+                <>
+                  <Loader2 size={18} className="animate-spin" />
+                  Returning...
+                </>
+              ) : (
+                "Return"
+              )}
+            </button>
+            <button
+              onClick={() => setReturnDrawerOpen(false)}
+              disabled={isReturningBook}
+              className="flex-1 py-3 rounded-xl font-semibold text-base bg-zinc-100 text-zinc-700 hover:bg-zinc-200 active:scale-[0.98] transition-all disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
 
       <BottomNav />
     </div>
