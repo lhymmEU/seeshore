@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { uploadImage } from "@/data/supabase";
+import { session } from "@/lib/session";
 
 interface CreatePostDrawerProps {
   open: boolean;
@@ -69,9 +70,9 @@ export function CreatePostDrawer({
     setIsSubmitting(true);
 
     try {
-      const storeId = sessionStorage.getItem("selectedStore");
-      const userId = sessionStorage.getItem("userId");
-      const accessToken = sessionStorage.getItem("accessToken");
+      const storeId = session.getItem("selectedStore");
+      const userId = session.getItem("userId");
+      const accessToken = session.getItem("accessToken");
 
       if (!storeId || !userId) {
         console.error("Missing store or user ID");

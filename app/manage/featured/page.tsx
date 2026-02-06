@@ -15,6 +15,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { SearchInput } from "@/components/ui/search-input";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { Book, Store } from "@/types/type";
+import { session } from "@/lib/session";
 
 function BookSelectionCard({
   book,
@@ -88,7 +89,7 @@ export default function ManageFeaturedBooksPage() {
 
   useEffect(() => {
     const checkAuth = () => {
-      const role = sessionStorage.getItem("userRole");
+      const role = session.getItem("userRole");
       if (role !== "owner") {
         router.push("/");
         return false;
@@ -100,7 +101,7 @@ export default function ManageFeaturedBooksPage() {
       if (!checkAuth()) return;
 
       try {
-        const storeId = sessionStorage.getItem("selectedStore");
+        const storeId = session.getItem("selectedStore");
         if (!storeId) {
           router.push("/");
           return;
@@ -160,7 +161,7 @@ export default function ManageFeaturedBooksPage() {
 
     setIsSaving(true);
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = session.getItem("accessToken");
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (accessToken) {
         headers["Authorization"] = `Bearer ${accessToken}`;

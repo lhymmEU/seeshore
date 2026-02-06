@@ -7,6 +7,7 @@ import Image from "next/image";
 import { ArrowLeft, Send, Trash2, Loader2, MessageCircle } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { CollaboratePost, CollaborateReply } from "@/types/type";
+import { session } from "@/lib/session";
 
 export default function PostDetailPage({
   params,
@@ -26,7 +27,7 @@ export default function PostDetailPage({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
-    const userId = sessionStorage.getItem("userId");
+    const userId = session.getItem("userId");
     setCurrentUserId(userId);
   }, []);
 
@@ -62,8 +63,8 @@ export default function PostDetailPage({
     setIsSubmitting(true);
 
     try {
-      const userId = sessionStorage.getItem("userId");
-      const accessToken = sessionStorage.getItem("accessToken");
+      const userId = session.getItem("userId");
+      const accessToken = session.getItem("accessToken");
 
       if (!userId) {
         console.error("No user ID");
@@ -96,7 +97,7 @@ export default function PostDetailPage({
   };
 
   const handleDeleteReply = async (replyId: string) => {
-    const accessToken = sessionStorage.getItem("accessToken");
+    const accessToken = session.getItem("accessToken");
 
     try {
       const response = await fetch(`/api/collaborate/replies/${replyId}`, {
@@ -117,7 +118,7 @@ export default function PostDetailPage({
   const handleDeletePost = async () => {
     if (!post) return;
 
-    const accessToken = sessionStorage.getItem("accessToken");
+    const accessToken = session.getItem("accessToken");
 
     try {
       const response = await fetch(`/api/collaborate/posts/${post.id}`, {

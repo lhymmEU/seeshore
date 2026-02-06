@@ -12,6 +12,7 @@ import {
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { session } from "@/lib/session";
 import { PageHeader } from "@/components/ui/page-header";
 
 export interface InviteCodeRow {
@@ -39,7 +40,7 @@ export default function InvitationCodesPage() {
 
   const fetchCodes = async (sid: string) => {
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = session.getItem("accessToken");
       const headers: Record<string, string> = {};
       if (accessToken) {
         headers["Authorization"] = `Bearer ${accessToken}`;
@@ -65,12 +66,12 @@ export default function InvitationCodesPage() {
   };
 
   useEffect(() => {
-    const role = sessionStorage.getItem("userRole");
+    const role = session.getItem("userRole");
     if (role !== "owner") {
       router.push("/manage");
       return;
     }
-    const sid = sessionStorage.getItem("selectedStore");
+    const sid = session.getItem("selectedStore");
     if (!sid) {
       setStoreId(null);
       setIsLoading(false);
@@ -84,7 +85,7 @@ export default function InvitationCodesPage() {
     if (!storeId) return;
     setIsGenerating(true);
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = session.getItem("accessToken");
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };
@@ -114,7 +115,7 @@ export default function InvitationCodesPage() {
     if (!t("revokeConfirm") || !confirm(t("revokeConfirm"))) return;
     setRevokingId(id);
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = session.getItem("accessToken");
       const headers: Record<string, string> = {};
       if (accessToken) {
         headers["Authorization"] = `Bearer ${accessToken}`;

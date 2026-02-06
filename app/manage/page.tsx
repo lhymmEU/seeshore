@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { logout } from "@/data/supabase";
+import { session } from "@/lib/session";
 
 type UserRole = "owner" | "assistant";
 
@@ -127,14 +128,14 @@ export default function ManagePage() {
   
   const [role] = useState<UserRole | null>(() => {
     if (typeof window === "undefined") return null;
-    const storedRole = sessionStorage.getItem("userRole") as UserRole | null;
+    const storedRole = session.getItem("userRole") as UserRole | null;
     return storedRole === "owner" || storedRole === "assistant" ? storedRole : null;
   });
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedRole = sessionStorage.getItem("userRole") as UserRole | null;
+      const storedRole = session.getItem("userRole") as UserRole | null;
       if (!storedRole || (storedRole !== "owner" && storedRole !== "assistant")) {
         router.push("/");
       }
@@ -145,7 +146,7 @@ export default function ManagePage() {
     setIsLoggingOut(true);
     try {
       await logout();
-      sessionStorage.clear();
+      session.clear();
       router.push("/");
     } catch (error) {
       console.error("Failed to logout:", error);

@@ -32,6 +32,7 @@ import {
   logout 
 } from "@/data/supabase";
 import { formatDate, isEventPastDeadline } from "@/lib/date-utils";
+import { session } from "@/lib/session";
 import type { User, Book, StoreEvent } from "@/types/type";
 
 // Calculate days remaining for a borrowed book (30-day lending period)
@@ -210,8 +211,8 @@ export default function ProfilePage() {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        const userId = sessionStorage.getItem("userId");
-        const userRole = sessionStorage.getItem("userRole");
+        const userId = session.getItem("userId");
+        const userRole = session.getItem("userRole");
         
         if (!userId) {
           router.push("/");
@@ -251,7 +252,7 @@ export default function ProfilePage() {
 
     setIsSaving(true);
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = session.getItem("accessToken");
       const avatarUrl = await uploadImage(file, "images", "avatars");
       const updatedUser = await updateUserProfile(user.id, { avatar: avatarUrl }, accessToken || undefined);
       setUser(updatedUser);
@@ -268,7 +269,7 @@ export default function ProfilePage() {
 
     setIsSaving(true);
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = session.getItem("accessToken");
       const updatedUser = await updateUserProfile(
         user.id, 
         { 
@@ -291,7 +292,7 @@ export default function ProfilePage() {
     setIsLoggingOut(true);
     try {
       await logout();
-      sessionStorage.clear();
+      session.clear();
       router.push("/");
     } catch (error) {
       console.error("Failed to logout:", error);

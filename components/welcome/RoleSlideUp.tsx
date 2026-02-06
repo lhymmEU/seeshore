@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/drawer";
 import { RoleType } from "./RoleCard";
 import { loginWithEmail, registerWithInviteCode, fetchStores, validateInviteCode } from "@/data/supabase";
+import { session } from "@/lib/session";
 import type { Store as StoreType } from "@/types/type";
 
 type VerificationStatus = "idle" | "loading" | "success" | "error";
@@ -208,14 +209,14 @@ export function RoleSlideUp({
 
   const handleEnterStore = () => {
     if (selectedStore && role) {
-      // Store the role and user info in sessionStorage for the management page
-      sessionStorage.setItem("userRole", role);
-      sessionStorage.setItem("selectedStore", selectedStore);
+      // Store the role and user info in persistent session (7-day TTL)
+      session.setItem("userRole", role);
+      session.setItem("selectedStore", selectedStore);
       if (userId) {
-        sessionStorage.setItem("userId", userId);
+        session.setItem("userId", userId);
       }
       if (accessToken) {
-        sessionStorage.setItem("accessToken", accessToken);
+        session.setItem("accessToken", accessToken);
       }
       
       // Call onContinue if provided
@@ -230,16 +231,16 @@ export function RoleSlideUp({
 
   const handleMemberContinue = () => {
     if (role) {
-      // Store the member info in sessionStorage
-      sessionStorage.setItem("userRole", "member");
+      // Store the member info in persistent session (7-day TTL)
+      session.setItem("userRole", "member");
       if (selectedStore) {
-        sessionStorage.setItem("selectedStore", selectedStore);
+        session.setItem("selectedStore", selectedStore);
       }
       if (userId) {
-        sessionStorage.setItem("userId", userId);
+        session.setItem("userId", userId);
       }
       if (accessToken) {
-        sessionStorage.setItem("accessToken", accessToken);
+        session.setItem("accessToken", accessToken);
       }
       
       // Call onContinue if provided

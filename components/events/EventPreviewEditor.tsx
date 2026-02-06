@@ -18,6 +18,7 @@ import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { uploadImage } from "@/data/supabase";
 import { combineDateTime, parseDateTime, formatDateRange, getNowInGMT8 } from "@/lib/date-utils";
 import type { StoreEvent } from "@/types/type";
+import { session } from "@/lib/session";
 
 export interface EventFormData {
   title: string;
@@ -369,9 +370,9 @@ export function EventPreviewEditor({
 
     setIsSaving(true);
     try {
-      const storeId = sessionStorage.getItem("selectedStore");
-      const userId = sessionStorage.getItem("userId");
-      const accessToken = sessionStorage.getItem("accessToken");
+      const storeId = session.getItem("selectedStore");
+      const userId = session.getItem("userId");
+      const accessToken = session.getItem("accessToken");
 
       if (!storeId && mode === "create") {
         throw new Error("No store found");

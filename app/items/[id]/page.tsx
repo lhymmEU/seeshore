@@ -18,6 +18,7 @@ import {
   removeBookFromFavorites 
 } from "@/data/supabase";
 import type { Book } from "@/types/type";
+import { session } from "@/lib/session";
 
 export default function ItemDetailsPage() {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function ItemDetailsPage() {
     const loadData = async () => {
       try {
         // Get user ID from session
-        const storedUserId = sessionStorage.getItem("userId");
+        const storedUserId = session.getItem("userId");
         setUserId(storedUserId);
 
         // Fetch book data

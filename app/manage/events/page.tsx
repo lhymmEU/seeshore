@@ -27,6 +27,7 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 import type { StoreEvent } from "@/types/type";
+import { session } from "@/lib/session";
 
 type EventFilter = "live" | "proposed";
 
@@ -41,7 +42,7 @@ export default function EventsManagePage() {
   const [isOwner, setIsOwner] = useState(false);
 
   const refetchEvents = useCallback(async () => {
-    const storeId = sessionStorage.getItem("selectedStore");
+    const storeId = session.getItem("selectedStore");
     if (!storeId) return;
 
     try {
@@ -54,7 +55,7 @@ export default function EventsManagePage() {
 
   useEffect(() => {
     const checkAuthAndFetch = async () => {
-      const role = sessionStorage.getItem("userRole");
+      const role = session.getItem("userRole");
       if (role !== "owner" && role !== "assistant") {
         router.push("/");
         return;
@@ -62,7 +63,7 @@ export default function EventsManagePage() {
 
       setIsOwner(role === "owner");
 
-      const storeId = sessionStorage.getItem("selectedStore");
+      const storeId = session.getItem("selectedStore");
       if (!storeId) {
         console.error("No store ID found");
         setIsLoading(false);

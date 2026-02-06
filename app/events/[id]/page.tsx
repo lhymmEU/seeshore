@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { formatDateRange, isEventPastDeadline } from "@/lib/date-utils";
 import type { StoreEvent, User } from "@/types/type";
+import { session } from "@/lib/session";
 
 // Generate dicebear avatar URL based on user ID or name
 function getDicebearAvatar(seed: string): string {
@@ -304,8 +305,8 @@ export default function EventDetailsPage() {
     
     setIsAttending(true);
     try {
-      const userId = sessionStorage.getItem("userId");
-      const accessToken = sessionStorage.getItem("accessToken");
+      const userId = session.getItem("userId");
+      const accessToken = session.getItem("accessToken");
       
       if (!userId || !accessToken) {
         setErrorMessage("Please log in to attend events.");

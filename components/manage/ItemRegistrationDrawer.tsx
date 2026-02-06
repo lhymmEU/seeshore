@@ -28,6 +28,7 @@ import { TabSwitcher } from "@/components/ui/tab-switcher";
 import { FormInput, FormTextarea } from "@/components/ui/form-input";
 import { uploadImage } from "@/data/supabase";
 import type { Book } from "@/types/type";
+import { session } from "@/lib/session";
 
 type RegistrationTab = "manual" | "scan";
 
@@ -122,8 +123,8 @@ export function ItemRegistrationDrawer({
 
     setIsSaving(true);
     try {
-      const storeId = sessionStorage.getItem("selectedStore");
-      const accessToken = sessionStorage.getItem("accessToken");
+      const storeId = session.getItem("selectedStore");
+      const accessToken = session.getItem("accessToken");
 
       if (!storeId) {
         throw new Error("No store found");

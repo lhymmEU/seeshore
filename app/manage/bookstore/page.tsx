@@ -13,6 +13,7 @@ import { TabSwitcher } from "@/components/ui/tab-switcher";
 import { FormInput, FormTextarea } from "@/components/ui/form-input";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { Book } from "@/types/type";
+import { session } from "@/lib/session";
 
 type Tab = "basic" | "items";
 
@@ -91,14 +92,14 @@ export default function BookstoreEditorPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const role = sessionStorage.getItem("userRole");
+      const role = session.getItem("userRole");
       if (role !== "owner" && role !== "assistant") {
         router.push("/");
         return;
       }
 
-      // Try to get storeId from sessionStorage or selectedStore
-      const savedStoreId = sessionStorage.getItem("storeId") || sessionStorage.getItem("selectedStore");
+      // Try to get storeId from session or selectedStore
+      const savedStoreId = session.getItem("storeId") || session.getItem("selectedStore");
       if (savedStoreId) {
         setStoreId(savedStoreId);
         try {
@@ -128,7 +129,7 @@ export default function BookstoreEditorPage() {
   // Fetch books when switching to items tab
   useEffect(() => {
     const fetchBooks = async () => {
-      const currentStoreId = storeId || sessionStorage.getItem("selectedStore");
+      const currentStoreId = storeId || session.getItem("selectedStore");
       if (activeTab === "items" && currentStoreId && books.length === 0) {
         setIsLoadingBooks(true);
         try {
@@ -169,8 +170,8 @@ export default function BookstoreEditorPage() {
 
     setIsSaving(true);
     try {
-      const userId = sessionStorage.getItem("userId");
-      const accessToken = sessionStorage.getItem("accessToken");
+      const userId = session.getItem("userId");
+      const accessToken = session.getItem("accessToken");
 
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (accessToken) {
@@ -192,7 +193,7 @@ export default function BookstoreEditorPage() {
       }
 
       const savedStore = await response.json();
-      sessionStorage.setItem("storeId", savedStore.id);
+      session.setItem("storeId", savedStore.id);
       setStoreId(savedStore.id);
       
       router.push("/manage");

@@ -19,6 +19,7 @@ import { SearchInput } from "@/components/ui/search-input";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ItemRegistrationDrawer, BorrowDrawer } from "@/components/manage";
 import type { Book } from "@/types/type";
+import { session } from "@/lib/session";
 
 // Calculate days remaining for a borrowed book (30-day lending period)
 function calculateDaysRemaining(borrowedDate: string): number {
@@ -309,7 +310,7 @@ export default function ManageItemsPage() {
 
   useEffect(() => {
     const checkAuth = () => {
-      const role = sessionStorage.getItem("userRole");
+      const role = session.getItem("userRole");
       if (role !== "owner" && role !== "assistant") {
         router.push("/");
         return;
@@ -322,7 +323,7 @@ export default function ManageItemsPage() {
 
   const fetchBooks = async () => {
     try {
-      const storeId = sessionStorage.getItem("selectedStore");
+      const storeId = session.getItem("selectedStore");
       const url = storeId ? `/api/books?storeId=${storeId}` : "/api/books";
       const response = await fetch(url);
       if (response.ok) {
@@ -373,7 +374,7 @@ export default function ManageItemsPage() {
 
   const handleDelete = async (bookId: string) => {
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = session.getItem("accessToken");
       const headers: Record<string, string> = {};
       if (accessToken) {
         headers["Authorization"] = `Bearer ${accessToken}`;
@@ -404,7 +405,7 @@ export default function ManageItemsPage() {
   // Return a borrowed book
   const handleReturnBook = async (bookId: string) => {
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = session.getItem("accessToken");
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };

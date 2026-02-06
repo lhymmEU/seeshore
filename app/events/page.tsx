@@ -9,6 +9,7 @@ import { SearchInput } from "@/components/ui/search-input";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate, formatTime, formatDateShort, getNowInGMT8 } from "@/lib/date-utils";
 import type { StoreEvent } from "@/types/type";
+import { session } from "@/lib/session";
 
 // Extract plain text from rich text JSON for preview
 function extractPlainText(content: string): string {
@@ -195,7 +196,7 @@ export default function EventsPage() {
   useEffect(() => {
     const fetchEventsData = async () => {
       try {
-        const storeId = sessionStorage.getItem("selectedStore");
+        const storeId = session.getItem("selectedStore");
         if (!storeId) {
           console.error("No store selected");
           setIsLoading(false);

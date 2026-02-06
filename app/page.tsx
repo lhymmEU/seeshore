@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -11,16 +12,40 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Logo, WelcomeHero, Footer, RoleSelector } from "@/components/welcome";
+import { session } from "@/lib/session";
 
 export default function WelcomePage() {
+  const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
   const t = useTranslations("welcome");
+
+  // Check for an existing valid session and auto-redirect
+  useEffect(() => {
+    if (session.isActive()) {
+      const role = session.getRole();
+      if (role === "owner" || role === "assistant") {
+        router.replace("/manage");
+        return;
+      }
+      if (role === "member" || role === "user") {
+        router.replace("/items");
+        return;
+      }
+    }
+    setIsCheckingSession(false);
+  }, [router]);
 
   const handleRoleSelected = (role: string) => {
     console.log("Selected role:", role);
     // TODO: Navigate to the appropriate page based on role
     setIsDrawerOpen(false);
   };
+
+  // Show nothing while checking for existing session to avoid flash
+  if (isCheckingSession) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col">

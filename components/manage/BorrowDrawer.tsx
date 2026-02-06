@@ -20,6 +20,7 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 import type { Book, User } from "@/types/type";
+import { session } from "@/lib/session";
 
 interface BorrowDrawerProps {
   open: boolean;
@@ -57,7 +58,7 @@ export function BorrowDrawer({
 
   // Search for members when input contains @
   const searchMembers = useCallback(async (query: string) => {
-    const storeId = sessionStorage.getItem("selectedStore");
+    const storeId = session.getItem("selectedStore");
     if (!storeId) return;
 
     setIsSearching(true);
@@ -111,7 +112,7 @@ export function BorrowDrawer({
 
     setIsLending(true);
     try {
-      const accessToken = sessionStorage.getItem("accessToken");
+      const accessToken = session.getItem("accessToken");
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };

@@ -11,6 +11,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { SearchInput } from "@/components/ui/search-input";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { Book } from "@/types/type";
+import { session } from "@/lib/session";
 
 export default function ItemsPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function ItemsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const storeId = sessionStorage.getItem("selectedStore");
+        const storeId = session.getItem("selectedStore");
         
         // Validate storeId is a non-empty, valid-looking value
         const isValidStoreId = storeId && 

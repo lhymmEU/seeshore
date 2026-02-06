@@ -9,6 +9,7 @@ import { SearchInput } from "@/components/ui/search-input";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PostCard, CreatePostDrawer } from "@/components/collaborate";
 import type { CollaboratePost } from "@/types/type";
+import { session } from "@/lib/session";
 
 export default function CollaboratePage() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function CollaboratePage() {
 
   const fetchPosts = async () => {
     try {
-      const storeId = sessionStorage.getItem("selectedStore");
+      const storeId = session.getItem("selectedStore");
       if (!storeId) {
         console.error("No store selected");
         setIsLoading(false);

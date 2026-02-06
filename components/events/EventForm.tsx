@@ -12,6 +12,7 @@ import { BottomNav } from "@/components/navigation";
 import { uploadImage } from "@/data/supabase";
 import { combineDateTime, parseDateTime } from "@/lib/date-utils";
 import type { StoreEvent } from "@/types/type";
+import { session } from "@/lib/session";
 
 export interface EventFormData {
   title: string;
@@ -113,9 +114,9 @@ export function EventForm({ mode, eventId, initialData, isLoading = false }: Eve
 
     setIsSaving(true);
     try {
-      const storeId = sessionStorage.getItem("selectedStore");
-      const userId = sessionStorage.getItem("userId");
-      const accessToken = sessionStorage.getItem("accessToken");
+      const storeId = session.getItem("selectedStore");
+      const userId = session.getItem("userId");
+      const accessToken = session.getItem("accessToken");
       
       if (!storeId && mode === "create") {
         throw new Error("No store found");

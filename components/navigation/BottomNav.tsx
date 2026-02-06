@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Blocks, BookCheck, PartyPopper, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { session } from "@/lib/session";
 import { useState } from "react";
 
 interface NavItem {
@@ -24,10 +25,10 @@ export function BottomNav() {
   const pathname = usePathname();
   const t = useTranslations("nav");
   
-  // Initialize role synchronously from sessionStorage
+  // Initialize role synchronously from session
   const [isStaff] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
-    const userRole = sessionStorage.getItem("userRole");
+    const userRole = session.getItem("userRole");
     return userRole === "owner" || userRole === "assistant";
   });
 
