@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
@@ -21,6 +21,7 @@ import { PageLoader } from "@/components/ui/loading-spinner";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { logout } from "@/data/supabase";
 import { session } from "@/lib/session";
+import type { Book } from "@/types/type";
 
 type UserRole = "owner" | "assistant";
 
@@ -31,6 +32,16 @@ interface DashboardCard {
   href: string;
   size?: "large" | "medium" | "wide";
   disabled?: boolean;
+}
+
+// Calculate days remaining for a borrowed book (30-day lending period)
+function calculateDaysRemaining(borrowedDate: string): number {
+  const borrowed = new Date(borrowedDate);
+  const dueDate = new Date(borrowed);
+  dueDate.setDate(dueDate.getDate() + 30);
+  const now = new Date();
+  const diffTime = dueDate.getTime() - now.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
 const ownerCardConfigs: DashboardCard[] = [
@@ -49,8 +60,9 @@ const assistantCardConfigs: DashboardCard[] = [
   { id: "register-items", titleKey: "registerItems", icon: Package, href: "/manage/items", size: "medium" },
 ];
 
-function DashboardCardComponent({ card, title, comingSoonText }: { card: DashboardCard; title: string; comingSoonText: string }) {
+function DashboardCardComponent({ card, title, comingSoonText, alertCount }: { card: DashboardCard; title: string; comingSoonText: string; alertCount?: number }) {
   const Icon = card.icon;
+  const hasAlert = alertCount !== undefined && alertCount > 0;
   
   const sizeClasses = {
     large: "col-span-2 h-40",
@@ -64,23 +76,36 @@ function DashboardCardComponent({ card, title, comingSoonText }: { card: Dashboa
     card.size === "wide" ? "justify-center gap-3" : "justify-center flex-col gap-3"
   );
 
-  const enabledClasses = "bg-white border border-zinc-200/80 shadow-sm hover:shadow-md hover:border-zinc-300 active:scale-[0.98]";
+  const enabledClasses = cn(
+    "shadow-sm hover:shadow-md active:scale-[0.98]",
+    hasAlert
+      ? "bg-amber-50 border border-amber-300 hover:border-amber-400"
+      : "bg-white border border-zinc-200/80 hover:border-zinc-300"
+  );
   const disabledClasses = "bg-zinc-100/50 border border-zinc-200/50 cursor-not-allowed";
 
   const content = (
     <>
+      {/* Alert badge */}
+      {hasAlert && (
+        <div className="absolute top-3 right-3 flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-amber-500 text-white text-[11px] font-bold shadow-sm animate-in fade-in zoom-in duration-300">
+          {alertCount}
+        </div>
+      )}
       <div className={cn(
-        "flex items-center justify-center rounded-2xl transition-colors",
+        "relative flex items-center justify-center rounded-2xl transition-colors",
         card.size === "wide" ? "w-10 h-10" : "w-14 h-14",
         card.disabled 
           ? "bg-zinc-200/50" 
+          : hasAlert
+          ? "bg-amber-100 group-hover:bg-amber-200/80"
           : "bg-zinc-100 group-hover:bg-zinc-200/80"
       )}>
         <Icon 
           size={card.size === "wide" ? 20 : 26} 
           className={cn(
             "transition-colors",
-            card.disabled ? "text-zinc-400" : "text-zinc-700"
+            card.disabled ? "text-zinc-400" : hasAlert ? "text-amber-700" : "text-zinc-700"
           )} 
           strokeWidth={1.5} 
         />
@@ -88,10 +113,15 @@ function DashboardCardComponent({ card, title, comingSoonText }: { card: Dashboa
       <span className={cn(
         "font-medium tracking-tight",
         card.size === "wide" ? "text-sm" : "text-[13px]",
-        card.disabled ? "text-zinc-400" : "text-zinc-800"
+        card.disabled ? "text-zinc-400" : hasAlert ? "text-amber-900" : "text-zinc-800"
       )}>
         {title}
       </span>
+      {hasAlert && (
+        <span className="text-[10px] font-medium text-amber-600">
+          Due soon
+        </span>
+      )}
       {card.disabled && (
         <span className={cn(
           "absolute text-[10px] font-medium text-zinc-400 uppercase tracking-wide",
@@ -132,6 +162,16 @@ export default function ManagePage() {
     return storedRole === "owner" || storedRole === "assistant" ? storedRole : null;
   });
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [books, setBooks] = useState<Book[]>([]);
+
+  // Count of borrowed items due within 7 days (or overdue)
+  const dueSoonCount = useMemo(() => {
+    return books.filter((book) => {
+      if (book.status !== "borrowed" || !book.borrowedDate) return false;
+      const daysRemaining = calculateDaysRemaining(book.borrowedDate);
+      return daysRemaining <= 7;
+    }).length;
+  }, [books]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -141,6 +181,24 @@ export default function ManagePage() {
       }
     }
   }, [router]);
+
+  // Fetch books to check for due-soon alerts
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const storeId = session.getItem("selectedStore");
+        const url = storeId ? `/api/books?storeId=${storeId}` : "/api/books";
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          setBooks(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch books for alerts:", error);
+      }
+    };
+    fetchBooks();
+  }, []);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -176,6 +234,7 @@ export default function ManagePage() {
               card={card} 
               title={t(card.titleKey)}
               comingSoonText={tCommon("comingSoon")}
+              alertCount={card.id === "register-items" ? dueSoonCount : undefined}
             />
           ))}
         </div>
