@@ -11,7 +11,6 @@ import {
   MapPin,
   UserX,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";

@@ -17,7 +17,6 @@ import { session } from "@/lib/session";
 export default function WelcomePage() {
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isCheckingSession, setIsCheckingSession] = useState(true);
   const t = useTranslations("welcome");
 
   // Check for an existing valid session and auto-redirect
@@ -33,7 +32,6 @@ export default function WelcomePage() {
         return;
       }
     }
-    setIsCheckingSession(false);
   }, [router]);
 
   const handleRoleSelected = (role: string) => {
@@ -41,11 +39,6 @@ export default function WelcomePage() {
     // TODO: Navigate to the appropriate page based on role
     setIsDrawerOpen(false);
   };
-
-  // Show nothing while checking for existing session to avoid flash
-  if (isCheckingSession) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
