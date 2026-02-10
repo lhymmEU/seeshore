@@ -248,6 +248,30 @@ export default function DisplaySetupPage() {
     });
   };
 
+  const toggleAllEvents = () => {
+    if (selectedEvents.size === allEvents.length) {
+      setSelectedEvents(new Set());
+    } else {
+      setSelectedEvents(new Set(allEvents.map((e) => e.id)));
+    }
+  };
+
+  const toggleAllBooks = () => {
+    if (selectedBooks.size === borrowedBooks.length) {
+      setSelectedBooks(new Set());
+    } else {
+      setSelectedBooks(new Set(borrowedBooks.map((b) => b.id)));
+    }
+  };
+
+  const toggleAllFavorites = () => {
+    if (selectedFavorites.size === favoriteBooks.length) {
+      setSelectedFavorites(new Set());
+    } else {
+      setSelectedFavorites(new Set(favoriteBooks.map((b) => b.id)));
+    }
+  };
+
   const handleSave = async () => {
     if (!user) return;
 
@@ -335,7 +359,10 @@ export default function DisplaySetupPage() {
 
         {/* Bio */}
         <div className="bg-white rounded-2xl p-5 border border-zinc-100">
-          <h3 className="font-semibold text-zinc-900 mb-3">About Me</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-zinc-900">About Me</h3>
+            <span className="text-xs text-zinc-400">Always saved</span>
+          </div>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
@@ -346,21 +373,21 @@ export default function DisplaySetupPage() {
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-white rounded-2xl p-1.5 border border-zinc-100 flex">
+        <div className="bg-white rounded-2xl p-1.5 border border-zinc-100 flex overflow-hidden">
           <button
             onClick={() => setActiveTab("events")}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
+              "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-sm font-medium transition-all",
               activeTab === "events"
                 ? "bg-zinc-900 text-white shadow-sm"
                 : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
             )}
           >
-            <Calendar size={16} />
-            <span>Events</span>
+            <Calendar size={16} className="flex-shrink-0" />
+            <span className="truncate">Events</span>
             {selectedEvents.size > 0 && (
               <span className={cn(
-                "px-1.5 py-0.5 rounded-full text-xs",
+                "px-1.5 py-0.5 rounded-full text-xs flex-shrink-0",
                 activeTab === "events" ? "bg-white/20" : "bg-zinc-200"
               )}>
                 {selectedEvents.size}
@@ -370,17 +397,17 @@ export default function DisplaySetupPage() {
           <button
             onClick={() => setActiveTab("borrowed")}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
+              "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-sm font-medium transition-all",
               activeTab === "borrowed"
                 ? "bg-zinc-900 text-white shadow-sm"
                 : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
             )}
           >
-            <BookOpen size={16} />
-            <span>Borrowed</span>
+            <BookOpen size={16} className="flex-shrink-0" />
+            <span className="truncate">Borrowed</span>
             {selectedBooks.size > 0 && (
               <span className={cn(
-                "px-1.5 py-0.5 rounded-full text-xs",
+                "px-1.5 py-0.5 rounded-full text-xs flex-shrink-0",
                 activeTab === "borrowed" ? "bg-white/20" : "bg-zinc-200"
               )}>
                 {selectedBooks.size}
@@ -390,17 +417,17 @@ export default function DisplaySetupPage() {
           <button
             onClick={() => setActiveTab("favorites")}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
+              "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-sm font-medium transition-all",
               activeTab === "favorites"
                 ? "bg-zinc-900 text-white shadow-sm"
                 : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
             )}
           >
-            <Heart size={16} />
-            <span>Favorites</span>
+            <Heart size={16} className="flex-shrink-0" />
+            <span className="truncate">Favorites</span>
             {selectedFavorites.size > 0 && (
               <span className={cn(
-                "px-1.5 py-0.5 rounded-full text-xs",
+                "px-1.5 py-0.5 rounded-full text-xs flex-shrink-0",
                 activeTab === "favorites" ? "bg-white/20" : "bg-zinc-200"
               )}>
                 {selectedFavorites.size}
@@ -417,9 +444,19 @@ export default function DisplaySetupPage() {
                 <h3 className="font-semibold text-zinc-900">
                   Select Events to Display
                 </h3>
-                <span className="text-xs text-zinc-500">
-                  {allEvents.length} available
-                </span>
+                <div className="flex items-center gap-2">
+                  {allEvents.length > 0 && (
+                    <button
+                      onClick={toggleAllEvents}
+                      className="text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                    >
+                      {selectedEvents.size === allEvents.length ? "Deselect All" : "Select All"}
+                    </button>
+                  )}
+                  <span className="text-xs text-zinc-500">
+                    {allEvents.length} available
+                  </span>
+                </div>
               </div>
               {allEvents.length > 0 ? (
                 <div className="space-y-2">
@@ -450,9 +487,19 @@ export default function DisplaySetupPage() {
                 <h3 className="font-semibold text-zinc-900">
                   Select Books to Display
                 </h3>
-                <span className="text-xs text-zinc-500">
-                  {borrowedBooks.length} available
-                </span>
+                <div className="flex items-center gap-2">
+                  {borrowedBooks.length > 0 && (
+                    <button
+                      onClick={toggleAllBooks}
+                      className="text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                    >
+                      {selectedBooks.size === borrowedBooks.length ? "Deselect All" : "Select All"}
+                    </button>
+                  )}
+                  <span className="text-xs text-zinc-500">
+                    {borrowedBooks.length} available
+                  </span>
+                </div>
               </div>
               {borrowedBooks.length > 0 ? (
                 <div className="space-y-2">
@@ -483,9 +530,19 @@ export default function DisplaySetupPage() {
                 <h3 className="font-semibold text-zinc-900">
                   Select Favorites to Display
                 </h3>
-                <span className="text-xs text-zinc-500">
-                  {favoriteBooks.length} available
-                </span>
+                <div className="flex items-center gap-2">
+                  {favoriteBooks.length > 0 && (
+                    <button
+                      onClick={toggleAllFavorites}
+                      className="text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                    >
+                      {selectedFavorites.size === favoriteBooks.length ? "Deselect All" : "Select All"}
+                    </button>
+                  )}
+                  <span className="text-xs text-zinc-500">
+                    {favoriteBooks.length} available
+                  </span>
+                </div>
               </div>
               {favoriteBooks.length > 0 ? (
                 <div className="space-y-2">
