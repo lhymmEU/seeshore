@@ -284,11 +284,6 @@ export function StepsBanner() {
       // Current "focus" as continuous value
       const progress = (elapsed % LOOP_DURATION) / LOOP_DURATION;
       const focusIndex = progress * STEP_COUNT;
-      const currentStep = Math.floor(focusIndex) % STEP_COUNT;
-
-      // Sub-step progress for smooth transition
-      const subProgress = focusIndex - Math.floor(focusIndex);
-
       // Smoothly interpolate the scroll offset
       // Center position shifts by -spacing * focusIndex
       const centerOffset = -spacing * focusIndex;

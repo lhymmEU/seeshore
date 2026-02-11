@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
@@ -40,7 +40,7 @@ export default function InvitationCodesPage() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [storeId, setStoreId] = useState<string | null>(null);
 
-  const fetchCodes = async (sid: string) => {
+  const fetchCodes = useCallback(async (sid: string) => {
     try {
       const accessToken = session.getItem("accessToken");
       const headers: Record<string, string> = {};
@@ -65,7 +65,7 @@ export default function InvitationCodesPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [router]);
 
   useEffect(() => {
     const role = session.getItem("userRole");
@@ -81,7 +81,7 @@ export default function InvitationCodesPage() {
     }
     setStoreId(sid);
     fetchCodes(sid);
-  }, [router]);
+  }, [router, fetchCodes]);
 
   const handleGenerate = async () => {
     if (!storeId) return;

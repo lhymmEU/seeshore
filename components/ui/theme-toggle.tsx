@@ -1,33 +1,50 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getTheme, setTheme, initTheme, type Theme } from "@/lib/theme";
+import { setTheme, initTheme, type Theme } from "@/lib/theme";
 
+// ── Tiny external store for theme state ────────────────────────
+// Avoids calling setState inside an effect (react-hooks/set-state-in-effect).
+let listeners: Array<() => void> = [];
+let currentTheme: Theme = "light";
+
+function subscribe(cb: () => void) {
+  listeners = [...listeners, cb];
+  return () => {
+    listeners = listeners.filter((l) => l !== cb);
+  };
+}
+function getSnapshot(): Theme {
+  return currentTheme;
+}
+function getServerSnapshot(): Theme {
+  return "light";
+}
+function updateTheme(t: Theme) {
+  currentTheme = t;
+  for (const l of listeners) l();
+}
+
+// ── Component ──────────────────────────────────────────────────
 interface ThemeToggleProps {
   variant?: "icon" | "full";
   className?: string;
 }
 
 export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
-  const [theme, setLocalTheme] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
+  const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
+  // Sync persisted preference into the store & listen for system changes
   useEffect(() => {
-    setLocalTheme(getTheme());
-    setMounted(true);
+    if (typeof window !== "undefined") {
+      const stored = (localStorage.getItem("theme") as Theme) || "system";
+      updateTheme(stored);
+    }
     const cleanup = initTheme();
     return cleanup;
   }, []);
-
-  // Avoid hydration mismatch — render nothing until mounted
-  if (!mounted) {
-    if (variant === "icon") {
-      return <div className={cn("p-2 w-9 h-9", className)} />;
-    }
-    return <div className={cn("flex items-center gap-2 px-3 py-2 w-24 h-9", className)} />;
-  }
 
   const isDark =
     theme === "dark" ||
@@ -38,7 +55,7 @@ export function ThemeToggle({ variant = "icon", className }: ThemeToggleProps) {
   const toggle = () => {
     const next: Theme = isDark ? "light" : "dark";
     setTheme(next);
-    setLocalTheme(next);
+    updateTheme(next);
   };
 
   if (variant === "icon") {
