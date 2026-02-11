@@ -19,6 +19,7 @@ import { PageLoader } from "@/components/ui/loading-spinner";
 import { formatDateRange, isEventPastDeadline } from "@/lib/date-utils";
 import type { StoreEvent, User } from "@/types/type";
 import { session } from "@/lib/session";
+import { useTranslations } from "next-intl";
 
 // Generate dicebear avatar URL based on user ID or name
 function getDicebearAvatar(seed: string): string {
@@ -33,6 +34,7 @@ function SlideToAttendButton({
   onComplete: () => void;
   isLoading: boolean;
 }) {
+  const t = useTranslations("events");
   const [progress, setProgress] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -141,7 +143,7 @@ function SlideToAttendButton({
             )}
             style={{ opacity: 1 - progress * 0.5 }}
           >
-            {isCompleted ? "Event Joined!" : "Attend Event – ¥xx/Free"}
+            {isCompleted ? "Event Joined!" : t("attendEventFree")}
           </span>
         </div>
 
@@ -217,6 +219,7 @@ function ParticipantAvatars({
   attendees: User[];
   onClick?: () => void;
 }) {
+  const t = useTranslations("events");
   const displayCount = Math.min(5, attendees.length);
   const displayedAttendees = attendees.slice(0, displayCount);
   
@@ -238,7 +241,7 @@ function ParticipantAvatars({
         )}
       </div>
       <div className="flex items-center gap-1">
-        <span className="text-sm text-zinc-500">Participants</span>
+        <span className="text-sm text-zinc-500">{t("participants")}</span>
         {attendees.length > 0 && (
           <ChevronRight size={14} className="text-zinc-400" />
         )}
@@ -255,6 +258,7 @@ function AttendeeRow({
   user: User; 
   onView: () => void;
 }) {
+  const tCommon = useTranslations("common");
   const avatarUrl = user.avatar || getDicebearAvatar(user.id || user.name);
 
   return (
@@ -282,7 +286,7 @@ function AttendeeRow({
         className="rounded-xl text-xs h-8 px-3 gap-1 border-zinc-200"
       >
         <Eye size={12} />
-        View
+        {tCommon("view")}
       </Button>
     </div>
   );
@@ -291,6 +295,8 @@ function AttendeeRow({
 export default function EventDetailsPage() {
   const router = useRouter();
   const params = useParams();
+  const t = useTranslations("events");
+  const tCommon = useTranslations("common");
   const eventId = params.id as string;
 
   const [event, setEvent] = useState<StoreEvent | null>(null);
@@ -420,9 +426,9 @@ export default function EventDetailsPage() {
   if (!event) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
-        <p className="text-zinc-600 mb-4">Event not found</p>
+        <p className="text-zinc-600 mb-4">{t("eventNotFound")}</p>
         <Button onClick={() => router.back()} variant="outline">
-          Go Back
+          {tCommon("goBack")}
         </Button>
       </div>
     );
@@ -431,8 +437,8 @@ export default function EventDetailsPage() {
   const hostNames = hostUsers.length > 0 
     ? hostUsers.map(h => h.name).join(", ")
     : event.hosts.length > 0 
-      ? `${event.hosts.length} host${event.hosts.length > 1 ? "s" : ""}`
-      : "No hosts";
+      ? `${event.hosts.length} ${t("hosts")}`
+      : t("noHosts");
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -456,7 +462,7 @@ export default function EventDetailsPage() {
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <p className="text-zinc-500 text-center px-8">
-              This area is designed to display the event poster
+              {t("posterAreaPlaceholder")}
             </p>
           </div>
         )}
@@ -470,12 +476,12 @@ export default function EventDetailsPage() {
 
         <div className="px-5 pb-6 flex-1 flex flex-col">
           <div className="mb-4">
-            <h1 className="text-xl font-bold text-zinc-900 mb-2">
+            <h1 className="font-display text-xl font-bold text-zinc-900 mb-2">
               {event.title}
             </h1>
             <div className="flex items-center justify-between text-sm text-zinc-500">
               <span>{formatDateRange(event.startDate, event.endDate)}</span>
-              <span>Hosts: {hostNames}</span>
+              <span>{t("hostsLabel")}{hostNames}</span>
             </div>
           </div>
 
@@ -489,19 +495,21 @@ export default function EventDetailsPage() {
               disabled
               className="px-4 py-2.5 bg-zinc-100 rounded-xl text-sm font-medium text-zinc-400 cursor-not-allowed"
             >
-              Map Button
+              {t("mapButton")}
             </button>
           </div>
 
           <div className="flex-1 mb-6">
-            <h2 className="text-base font-semibold text-zinc-900 mb-2">
-              About Event
+            <h2 className="font-display text-base font-semibold text-zinc-900 mb-2">
+              {t("aboutEvent")}
             </h2>
             {event.description ? (
-              <RichTextRenderer content={event.description} />
+              <div className="font-serif">
+                <RichTextRenderer content={event.description} />
+              </div>
             ) : (
-              <p className="text-sm text-zinc-600 leading-relaxed">
-                No description provided for this event.
+              <p className="font-serif text-sm text-zinc-600 leading-relaxed">
+                {t("noDescription")}
               </p>
             )}
           </div>
@@ -511,17 +519,17 @@ export default function EventDetailsPage() {
             {event.status === 'finished' || isEventPastDeadline(event.endDate) ? (
               <div className="h-14 rounded-full bg-zinc-100 flex items-center justify-center gap-2">
                 <Clock size={18} className="text-zinc-400" />
-                <span className="text-sm font-medium text-zinc-500">This event has ended</span>
+                <span className="text-sm font-medium text-zinc-500">{t("eventEnded")}</span>
               </div>
             ) : event.status === 'cancelled' ? (
               <div className="h-14 rounded-full bg-zinc-100 flex items-center justify-center gap-2">
                 <X size={18} className="text-zinc-400" />
-                <span className="text-sm font-medium text-zinc-500">This event was cancelled</span>
+                <span className="text-sm font-medium text-zinc-500">{t("eventCancelled")}</span>
               </div>
             ) : event.status === 'proposed' ? (
               <div className="h-14 rounded-full bg-sky-50 flex items-center justify-center gap-2">
                 <Clock size={18} className="text-sky-400" />
-                <span className="text-sm font-medium text-sky-600">Pending approval</span>
+                <span className="text-sm font-medium text-sky-600">{t("pendingApproval")}</span>
               </div>
             ) : (
               <SlideToAttendButton 
@@ -564,7 +572,7 @@ export default function EventDetailsPage() {
               className="w-full h-14 rounded-2xl bg-zinc-100 text-zinc-700 font-medium hover:bg-zinc-200 text-base"
               variant="secondary"
             >
-              Close
+              {tCommon("close")}
             </Button>
           </DrawerFooter>
         </DrawerContent>
@@ -575,7 +583,7 @@ export default function EventDetailsPage() {
         <DrawerContent className="bg-white">
           <DrawerHeader className="text-center pb-0">
             <DrawerTitle className="text-xl text-zinc-900">
-              Unable to Attend
+              {t("unableToAttend")}
             </DrawerTitle>
             <DrawerDescription className="text-zinc-500 mt-1">
               {event.title}
@@ -589,7 +597,7 @@ export default function EventDetailsPage() {
                   <X size={32} className="text-rose-600" />
                 </div>
                 <p className="text-rose-600 font-medium mb-2">
-                  Attendance Failed
+                  {t("attendanceFailed")}
                 </p>
                 <p className="text-zinc-500 text-sm">
                   {errorMessage}
@@ -604,7 +612,7 @@ export default function EventDetailsPage() {
               className="w-full h-14 rounded-2xl bg-zinc-100 text-zinc-700 font-medium hover:bg-zinc-200 text-base"
               variant="secondary"
             >
-              Close
+              {tCommon("close")}
             </Button>
           </DrawerFooter>
         </DrawerContent>
@@ -615,10 +623,10 @@ export default function EventDetailsPage() {
         <DrawerContent className="bg-white max-h-[70vh]">
           <DrawerHeader className="text-center pb-0">
             <DrawerTitle className="text-lg text-zinc-900">
-              Participants
+              {t("participants")}
             </DrawerTitle>
             <DrawerDescription className="text-zinc-500 mt-0.5">
-              {attendeeUsers.length} attendee{attendeeUsers.length !== 1 ? "s" : ""}
+              {attendeeUsers.length} {attendeeUsers.length !== 1 ? t("attendees") : t("attendee")}
             </DrawerDescription>
           </DrawerHeader>
 
@@ -643,7 +651,7 @@ export default function EventDetailsPage() {
               className="w-full h-12 rounded-2xl bg-zinc-100 text-zinc-700 font-medium hover:bg-zinc-200 text-sm"
               variant="secondary"
             >
-              Close
+              {tCommon("close")}
             </Button>
           </DrawerFooter>
         </DrawerContent>

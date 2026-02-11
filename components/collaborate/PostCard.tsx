@@ -61,7 +61,7 @@ export function PostCard({ post, onClick }: PostCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-zinc-900 line-clamp-1">
+              <h3 className="font-display font-semibold text-zinc-900 line-clamp-1">
                 {post.title}
               </h3>
               <p className="text-sm text-zinc-500 mt-0.5">
@@ -71,7 +71,7 @@ export function PostCard({ post, onClick }: PostCardProps) {
             <ChevronRight size={18} className="text-zinc-400 flex-shrink-0 mt-1" />
           </div>
 
-          <p className="text-sm text-zinc-600 mt-2 line-clamp-2">
+          <p className="font-serif text-sm text-zinc-600 mt-2 line-clamp-2">
             {post.description}
           </p>
 

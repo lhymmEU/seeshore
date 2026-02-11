@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import {
   User as UserIcon,
@@ -44,6 +45,8 @@ export function BorrowDrawer({
   const [isSuccess, setIsSuccess] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const tManage = useTranslations("manage");
+  const tCommon = useTranslations("common");
 
   // Reset state when drawer opens/closes
   useEffect(() => {
@@ -173,8 +176,8 @@ export function BorrowDrawer({
       <DrawerContent className="max-h-[85vh]">
         <DrawerHeader className="border-b border-zinc-100">
           <div className="flex items-center justify-between">
-            <DrawerTitle className="text-lg font-semibold">
-              Lend Book
+            <DrawerTitle className="font-display text-lg font-semibold">
+              {tManage("lendBook")}
             </DrawerTitle>
             <DrawerClose className="p-2 rounded-full hover:bg-zinc-100 transition-colors">
               <X size={20} className="text-zinc-500" />
@@ -202,11 +205,11 @@ export function BorrowDrawer({
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-zinc-900 line-clamp-2">
+                <h3 className="font-display font-semibold text-zinc-900 line-clamp-2">
                   {book.title}
                 </h3>
                 <p className="text-sm text-zinc-500 mt-1">
-                  {book.author || "Unknown Author"}
+                  {book.author || tCommon("unknownAuthor")}
                 </p>
               </div>
             </div>
@@ -215,10 +218,10 @@ export function BorrowDrawer({
           {/* Member Search Input */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-zinc-700">
-              Select Member
+              {tManage("selectMember")}
             </label>
             <p className="text-xs text-zinc-500">
-              Type @ to search for a member
+              {tManage("typeToSearchMember")}
             </p>
             <div className="relative">
               <div className="relative">
@@ -231,7 +234,7 @@ export function BorrowDrawer({
                   type="text"
                   value={inputValue}
                   onChange={handleInputChange}
-                  placeholder="Type @ to search members..."
+                  placeholder={tManage("searchMembersPlaceholder")}
                   className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-100 text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all"
                 />
                 {isSearching && (
@@ -279,12 +282,12 @@ export function BorrowDrawer({
                   ) : isSearching ? (
                     <div className="p-4 text-center text-zinc-500">
                       <Loader2 size={20} className="animate-spin mx-auto mb-2" />
-                      <p className="text-sm">Searching...</p>
+                      <p className="text-sm">{tCommon("searching")}</p>
                     </div>
                   ) : (
                     <div className="p-4 text-center text-zinc-500">
                       <UserIcon size={20} className="mx-auto mb-2 text-zinc-400" />
-                      <p className="text-sm">No members found</p>
+                      <p className="text-sm">{tManage("noMembersFound")}</p>
                     </div>
                   )}
                 </div>
@@ -308,7 +311,7 @@ export function BorrowDrawer({
                     {selectedMember.name}
                   </p>
                   <p className="text-xs text-emerald-700">
-                    Selected as borrower
+                    {tManage("selectedAsBorrower")}
                   </p>
                 </div>
                 <Check size={20} className="text-emerald-600 flex-shrink-0" />
@@ -331,15 +334,15 @@ export function BorrowDrawer({
             {isSuccess ? (
               <>
                 <Check size={20} />
-                Book Lent Successfully
+                {tManage("bookLentSuccessfully")}
               </>
             ) : isLending ? (
               <>
                 <Loader2 size={20} className="animate-spin" />
-                Lending...
+                {tManage("lending")}
               </>
             ) : (
-              "Lend Book"
+              tManage("lendBook")
             )}
           </button>
         </DrawerFooter>

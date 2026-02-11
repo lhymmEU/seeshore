@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Calendar, MapPin, FileText, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/page-header";
@@ -33,6 +34,9 @@ interface EventFormProps {
 
 export function EventForm({ mode, eventId, initialData, isLoading = false }: EventFormProps) {
   const router = useRouter();
+  const t = useTranslations("events");
+  const tManage = useTranslations("manage");
+  const tCommon = useTranslations("common");
   
   const [isSaving, setIsSaving] = useState(false);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
@@ -108,7 +112,7 @@ export function EventForm({ mode, eventId, initialData, isLoading = false }: Eve
 
   const handleSubmit = async () => {
     if (!formData.title.trim()) {
-      alert("Please enter an event title");
+      alert(t("enterEventTitle"));
       return;
     }
 
@@ -187,27 +191,27 @@ export function EventForm({ mode, eventId, initialData, isLoading = false }: Eve
 
   return (
     <div className="min-h-screen bg-white pb-24">
-      <PageHeader title={mode === "create" ? "Create Event" : "Edit Event"} />
+      <PageHeader title={mode === "create" ? tManage("createEvent") : tManage("editEvent")} />
 
       <div className="px-4 pt-6 space-y-5">
         <ImageUpload
           preview={coverPreview}
           onFileSelect={handleFileSelect}
-          label="Upload Event Cover"
+          label={t("uploadEventCover")}
         />
 
         <FormInput
-          label="Event Title"
+          label={t("title")}
           icon={FileText}
           name="title"
           value={formData.title}
           onChange={handleInputChange}
-          placeholder="Enter event title"
+          placeholder={t("enterEventTitlePlaceholder")}
           required
         />
 
         <DateTimeInput
-          label="Start Date & Time"
+          label={t("startDateTime")}
           icon={Calendar}
           dateName="startDate"
           timeName="startTime"
@@ -218,7 +222,7 @@ export function EventForm({ mode, eventId, initialData, isLoading = false }: Eve
         />
 
         <DateTimeInput
-          label="End Date & Time"
+          label={t("endDateTime")}
           icon={Calendar}
           dateName="endDate"
           timeName="endTime"
@@ -229,21 +233,21 @@ export function EventForm({ mode, eventId, initialData, isLoading = false }: Eve
         />
 
         <FormInput
-          label="Location"
+          label={tCommon("location")}
           icon={MapPin}
           name="location"
           value={formData.location}
           onChange={handleInputChange}
-          placeholder="Where will the event take place?"
+          placeholder={t("locationPlaceholder")}
         />
 
         <FormTextarea
-          label="Description"
+          label={tCommon("description")}
           icon={FileText}
           name="description"
           value={formData.description}
           onChange={handleInputChange}
-          placeholder="Describe your event..."
+          placeholder={t("describeEventPlaceholder")}
           rows={4}
         />
 
@@ -260,14 +264,14 @@ export function EventForm({ mode, eventId, initialData, isLoading = false }: Eve
           {isSaving ? (
             <span className="flex items-center justify-center gap-2">
               <Loader2 size={18} className="animate-spin" />
-              {mode === "create" ? "Creating..." : "Saving..."}
+              {mode === "create" ? tCommon("creating") : tCommon("saving")}
             </span>
           ) : mode === "edit" && !hasChanges ? (
-            "No Changes"
+            tCommon("noChanges")
           ) : mode === "create" ? (
-            "Create Event"
+            tManage("createEvent")
           ) : (
-            "Confirm Edit"
+            tCommon("confirmEdit")
           )}
         </button>
       </div>

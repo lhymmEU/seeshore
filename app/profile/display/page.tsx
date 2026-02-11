@@ -11,6 +11,7 @@ import {
   Eye,
   Loader2,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/page-header";
 import { PageLoader } from "@/components/ui/loading-spinner";
@@ -62,7 +63,7 @@ function SelectableEventCard({
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-zinc-900 text-sm truncate">
+        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">
           {event.title}
         </h4>
         <p className="text-xs text-zinc-500">{formatDate(event.startDate)}</p>
@@ -86,11 +87,13 @@ function SelectableBookCard({
   isSelected,
   onToggle,
   variant = "default",
+  unknownAuthorText,
 }: {
   book: Book;
   isSelected: boolean;
   onToggle: () => void;
   variant?: "default" | "favorite";
+  unknownAuthorText: string;
 }) {
   return (
     <button
@@ -118,11 +121,11 @@ function SelectableBookCard({
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-zinc-900 text-sm truncate">
+        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">
           {book.title}
         </h4>
         <p className="text-xs text-zinc-500 truncate">
-          {book.author || "Unknown author"}
+          {book.author || unknownAuthorText}
         </p>
       </div>
       {variant === "favorite" && (
@@ -144,6 +147,8 @@ function SelectableBookCard({
 
 export default function DisplaySetupPage() {
   const router = useRouter();
+  const t = useTranslations("profile");
+  const tCommon = useTranslations("common");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -326,18 +331,18 @@ export default function DisplaySetupPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 pb-32">
-      <PageHeader title="Display Page Setup" />
+      <PageHeader title={t("displayPageSetup")} />
 
       <div className="px-4 pt-6 space-y-6">
         {/* Enable/Disable Toggle */}
         <div className="bg-white rounded-2xl p-5 border border-zinc-100">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-zinc-900">
-                Enable Display Page
+              <h3 className="font-display font-semibold text-zinc-900">
+                {t("enableDisplayPage")}
               </h3>
               <p className="text-sm text-zinc-500 mt-0.5">
-                Other members can view your page
+                {t("displayPageDescription")}
               </p>
             </div>
             <button
@@ -360,15 +365,15 @@ export default function DisplaySetupPage() {
         {/* Bio */}
         <div className="bg-white rounded-2xl p-5 border border-zinc-100">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-zinc-900">About Me</h3>
-            <span className="text-xs text-zinc-400">Always saved</span>
+            <h3 className="font-display font-semibold text-zinc-900">{t("aboutMe")}</h3>
+            <span className="text-xs text-zinc-400">{t("alwaysSaved")}</span>
           </div>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
-            placeholder="Write a short bio to introduce yourself..."
+            placeholder={t("bioPlaceholder")}
             rows={3}
-            className="w-full px-4 py-3 rounded-xl bg-zinc-50 text-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-300 resize-none placeholder:text-zinc-400"
+            className="w-full px-4 py-3 rounded-xl bg-zinc-50 text-zinc-900 text-sm font-serif focus:outline-none focus:ring-2 focus:ring-zinc-300 resize-none placeholder:text-zinc-400"
           />
         </div>
 
@@ -384,7 +389,7 @@ export default function DisplaySetupPage() {
             )}
           >
             <Calendar size={16} className="flex-shrink-0" />
-            <span className="truncate">Events</span>
+            <span className="truncate">{tCommon("events")}</span>
             {selectedEvents.size > 0 && (
               <span className={cn(
                 "px-1.5 py-0.5 rounded-full text-xs flex-shrink-0",
@@ -404,7 +409,7 @@ export default function DisplaySetupPage() {
             )}
           >
             <BookOpen size={16} className="flex-shrink-0" />
-            <span className="truncate">Borrowed</span>
+            <span className="truncate">{tCommon("borrowed")}</span>
             {selectedBooks.size > 0 && (
               <span className={cn(
                 "px-1.5 py-0.5 rounded-full text-xs flex-shrink-0",
@@ -424,7 +429,7 @@ export default function DisplaySetupPage() {
             )}
           >
             <Heart size={16} className="flex-shrink-0" />
-            <span className="truncate">Favorites</span>
+            <span className="truncate">{tCommon("favorites")}</span>
             {selectedFavorites.size > 0 && (
               <span className={cn(
                 "px-1.5 py-0.5 rounded-full text-xs flex-shrink-0",
@@ -441,8 +446,8 @@ export default function DisplaySetupPage() {
           {activeTab === "events" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-zinc-900">
-                  Select Events to Display
+                <h3 className="font-display font-semibold text-zinc-900">
+                  {t("selectEventsToDisplay")}
                 </h3>
                 <div className="flex items-center gap-2">
                   {allEvents.length > 0 && (
@@ -450,11 +455,11 @@ export default function DisplaySetupPage() {
                       onClick={toggleAllEvents}
                       className="text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
                     >
-                      {selectedEvents.size === allEvents.length ? "Deselect All" : "Select All"}
+                      {selectedEvents.size === allEvents.length ? tCommon("deselectAll") : tCommon("selectAll")}
                     </button>
                   )}
                   <span className="text-xs text-zinc-500">
-                    {allEvents.length} available
+                    {allEvents.length} {tCommon("available").toLowerCase()}
                   </span>
                 </div>
               </div>
@@ -473,8 +478,8 @@ export default function DisplaySetupPage() {
                 <div className="bg-white rounded-2xl p-6 border border-zinc-100">
                   <EmptyState
                     icon={Calendar}
-                    title="No events yet"
-                    message="Attend or host events to display them on your page"
+                    title={t("noEventsYet")}
+                    message={t("noEventsMessage")}
                   />
                 </div>
               )}
@@ -484,8 +489,8 @@ export default function DisplaySetupPage() {
           {activeTab === "borrowed" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-zinc-900">
-                  Select Books to Display
+                <h3 className="font-display font-semibold text-zinc-900">
+                  {t("selectBooksToDisplay")}
                 </h3>
                 <div className="flex items-center gap-2">
                   {borrowedBooks.length > 0 && (
@@ -493,11 +498,11 @@ export default function DisplaySetupPage() {
                       onClick={toggleAllBooks}
                       className="text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
                     >
-                      {selectedBooks.size === borrowedBooks.length ? "Deselect All" : "Select All"}
+                      {selectedBooks.size === borrowedBooks.length ? tCommon("deselectAll") : tCommon("selectAll")}
                     </button>
                   )}
                   <span className="text-xs text-zinc-500">
-                    {borrowedBooks.length} available
+                    {borrowedBooks.length} {tCommon("available").toLowerCase()}
                   </span>
                 </div>
               </div>
@@ -509,6 +514,7 @@ export default function DisplaySetupPage() {
                       book={book}
                       isSelected={selectedBooks.has(book.id)}
                       onToggle={() => toggleBook(book.id)}
+                      unknownAuthorText={tCommon("unknownAuthor")}
                     />
                   ))}
                 </div>
@@ -516,8 +522,8 @@ export default function DisplaySetupPage() {
                 <div className="bg-white rounded-2xl p-6 border border-zinc-100">
                   <EmptyState
                     icon={BookOpen}
-                    title="No borrowed books"
-                    message="Borrow books to display them on your page"
+                    title={t("noBorrowedBooks")}
+                    message={t("noBorrowedBooksMessage")}
                   />
                 </div>
               )}
@@ -527,8 +533,8 @@ export default function DisplaySetupPage() {
           {activeTab === "favorites" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-zinc-900">
-                  Select Favorites to Display
+                <h3 className="font-display font-semibold text-zinc-900">
+                  {t("selectFavoritesToDisplay")}
                 </h3>
                 <div className="flex items-center gap-2">
                   {favoriteBooks.length > 0 && (
@@ -536,11 +542,11 @@ export default function DisplaySetupPage() {
                       onClick={toggleAllFavorites}
                       className="text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
                     >
-                      {selectedFavorites.size === favoriteBooks.length ? "Deselect All" : "Select All"}
+                      {selectedFavorites.size === favoriteBooks.length ? tCommon("deselectAll") : tCommon("selectAll")}
                     </button>
                   )}
                   <span className="text-xs text-zinc-500">
-                    {favoriteBooks.length} available
+                    {favoriteBooks.length} {tCommon("available").toLowerCase()}
                   </span>
                 </div>
               </div>
@@ -553,6 +559,7 @@ export default function DisplaySetupPage() {
                       isSelected={selectedFavorites.has(book.id)}
                       onToggle={() => toggleFavorite(book.id)}
                       variant="favorite"
+                      unknownAuthorText={tCommon("unknownAuthor")}
                     />
                   ))}
                 </div>
@@ -560,8 +567,8 @@ export default function DisplaySetupPage() {
                 <div className="bg-white rounded-2xl p-6 border border-zinc-100">
                   <EmptyState
                     icon={Heart}
-                    title="No favorite books"
-                    message="Favorite some books to display them on your page"
+                    title={t("noFavoriteBooks")}
+                    message={t("noFavoriteBooksMessage")}
                   />
                 </div>
               )}
@@ -575,10 +582,10 @@ export default function DisplaySetupPage() {
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <p className="text-sm font-medium text-zinc-900">
-              {totalSelected} items selected
+              {tCommon("itemsSelected", { count: totalSelected })}
             </p>
             <p className="text-xs text-zinc-500">
-              {displayEnabled ? "Display page is on" : "Display page is off"}
+              {displayEnabled ? t("displayPageOn") : t("displayPageOff")}
             </p>
           </div>
           {displayEnabled && user && (
@@ -589,7 +596,7 @@ export default function DisplaySetupPage() {
               size="sm"
             >
               <Eye size={14} className="mr-1" />
-              Preview
+              {tCommon("preview")}
             </Button>
           )}
           <Button
@@ -600,7 +607,7 @@ export default function DisplaySetupPage() {
             {isSaving ? (
               <Loader2 size={16} className="animate-spin" />
             ) : (
-              "Save"
+              tCommon("save")
             )}
           </Button>
         </div>

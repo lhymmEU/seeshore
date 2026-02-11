@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Calendar, MapPin, Users, Edit2, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { formatDate, formatTime } from "@/lib/date-utils";
 import type { StoreEvent } from "@/types/type";
@@ -35,14 +36,14 @@ function extractTextFromNode(node: unknown): string {
   return "";
 }
 
-function getStatusBadge(status: StoreEvent["status"]) {
+function getStatusBadge(status: StoreEvent["status"], t: (key: string) => string) {
   const statusConfig = {
-    open: { label: "Open", className: "bg-emerald-100 text-emerald-700" },
-    full: { label: "Full", className: "bg-amber-100 text-amber-700" },
-    proposed: { label: "Proposed", className: "bg-sky-100 text-sky-700" },
-    cancelled: { label: "Cancelled", className: "bg-zinc-100 text-zinc-500" },
-    rejected: { label: "Rejected", className: "bg-rose-100 text-rose-700" },
-    finished: { label: "Finished", className: "bg-zinc-100 text-zinc-600" },
+    open: { label: t("statusOpen"), className: "bg-emerald-100 text-emerald-700" },
+    full: { label: t("statusFull"), className: "bg-amber-100 text-amber-700" },
+    proposed: { label: t("statusProposed"), className: "bg-sky-100 text-sky-700" },
+    cancelled: { label: t("statusCancelled"), className: "bg-zinc-100 text-zinc-500" },
+    rejected: { label: t("statusRejected"), className: "bg-rose-100 text-rose-700" },
+    finished: { label: t("statusFinished"), className: "bg-zinc-100 text-zinc-600" },
   };
   
   return statusConfig[status] || { label: status, className: "bg-zinc-100 text-zinc-600" };
@@ -63,7 +64,9 @@ export function EventCard({
   onDelete,
   showActions = false
 }: EventCardProps) {
-  const statusBadge = getStatusBadge(event.status);
+  const t = useTranslations("events");
+  const tCommon = useTranslations("common");
+  const statusBadge = getStatusBadge(event.status, t);
   const attendeeCount = event.attendees?.length || 0;
   
   return (
@@ -106,12 +109,12 @@ export function EventCard({
       
       {/* Event Info */}
       <div className="p-4 space-y-3">
-        <h3 className="font-semibold text-zinc-900 text-lg leading-tight line-clamp-2">
+        <h3 className="font-display font-semibold text-zinc-900 text-lg leading-tight line-clamp-2">
           {event.title}
         </h3>
         
         {event.description && (
-          <p className="text-sm text-zinc-500 line-clamp-2">
+          <p className="font-serif text-sm text-zinc-500 line-clamp-2">
             {extractPlainText(event.description)}
           </p>
         )}
@@ -141,7 +144,7 @@ export function EventCard({
           {/* Attendees */}
           <div className="flex items-center gap-2 text-sm text-zinc-600">
             <Users size={14} className="text-zinc-400 shrink-0" />
-            <span>{attendeeCount} attending</span>
+            <span>{attendeeCount} {t("attending")}</span>
           </div>
         </div>
         
@@ -156,7 +159,7 @@ export function EventCard({
               className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-zinc-200/80 text-zinc-700 font-medium text-sm hover:bg-zinc-300/80 transition-colors active:scale-[0.98]"
             >
               <Edit2 size={16} />
-              Edit
+              {tCommon("edit")}
             </button>
             <button
               onClick={(e) => {

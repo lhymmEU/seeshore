@@ -30,6 +30,8 @@ export interface InviteCodeRow {
 export default function InvitationCodesPage() {
   const router = useRouter();
   const t = useTranslations("manage.invitationCodes");
+  const tManage = useTranslations("manage");
+  const tCommon = useTranslations("common");
 
   const [codes, setCodes] = useState<InviteCodeRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -143,7 +145,7 @@ export default function InvitationCodesPage() {
       setCopiedCode(code);
       setTimeout(() => setCopiedCode(null), 2000);
     } catch {
-      alert("Copy failed");
+      alert(tCommon("copyFailed"));
     }
   };
 
@@ -169,7 +171,7 @@ export default function InvitationCodesPage() {
             href="/manage"
             className="mt-4 inline-block text-emerald-600 font-medium"
           >
-            ← Back to Dashboard
+            {tManage("backToDashboard")}
           </a>
         </div>
       </div>

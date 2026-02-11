@@ -2,13 +2,14 @@
 
 import Image from "next/image";
 import { BookOpen } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { Book } from "@/types/type";
 
-function getStatusBadge(status: Book["status"]) {
+function getStatusBadge(status: Book["status"], t: (key: string) => string) {
   const statusConfig = {
-    available: { label: "Available", className: "bg-emerald-100 text-emerald-700" },
-    borrowed: { label: "Borrowed", className: "bg-amber-100 text-amber-700" },
+    available: { label: t("available"), className: "bg-emerald-100 text-emerald-700" },
+    borrowed: { label: t("borrowed"), className: "bg-amber-100 text-amber-700" },
   };
   
   return statusConfig[status] || { label: status, className: "bg-zinc-100 text-zinc-600" };
@@ -20,7 +21,8 @@ export interface BookCardProps {
 }
 
 export function BookCard({ book, onView }: BookCardProps) {
-  const statusBadge = getStatusBadge(book.status);
+  const t = useTranslations("books");
+  const statusBadge = getStatusBadge(book.status, t);
   
   return (
     <div className="bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 transition-colors hover:border-zinc-200">
@@ -54,7 +56,7 @@ export function BookCard({ book, onView }: BookCardProps) {
       {/* Book Info */}
       <div className="p-4 space-y-3">
         <div>
-          <h3 className="font-semibold text-zinc-900 text-base leading-tight line-clamp-2">
+          <h3 className="font-display font-semibold text-zinc-900 text-base leading-tight line-clamp-2">
             {book.title}
           </h3>
           <p className="text-sm text-zinc-500 mt-1">
@@ -67,7 +69,7 @@ export function BookCard({ book, onView }: BookCardProps) {
           onClick={onView}
           className="w-full flex items-center justify-center py-2.5 px-4 rounded-xl bg-zinc-900 text-white font-medium text-sm hover:bg-zinc-800 transition-colors active:scale-[0.98]"
         >
-          View Details
+          {t("viewDetails")}
         </button>
       </div>
     </div>

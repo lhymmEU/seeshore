@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   BookOpen,
   User,
@@ -74,6 +75,9 @@ export function ItemRegistrationDrawer({
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [formData, setFormData] = useState<BookFormData>(initialFormData);
 
+  const tManage = useTranslations("manage");
+  const tBooks = useTranslations("books");
+  const tCommon = useTranslations("common");
   const isEditMode = !!editBook;
 
   // Populate form when editing
@@ -195,16 +199,16 @@ export function ItemRegistrationDrawer({
   const isFormValid = formData.title.trim().length > 0;
 
   const tabs = [
-    { id: "manual", label: "Manual Entry", icon: PenLine },
-    { id: "scan", label: "Scan ISBN", icon: Scan, disabled: true },
+    { id: "manual", label: tManage("manualEntry"), icon: PenLine },
+    { id: "scan", label: tManage("scanISBN"), icon: Scan, disabled: true },
   ];
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[90vh]">
         <DrawerHeader className="relative border-b border-zinc-100 pb-4">
-          <DrawerTitle className="text-lg font-semibold text-zinc-900">
-            {isEditMode ? "Edit Item" : "Register Item"}
+          <DrawerTitle className="font-display text-lg font-semibold text-zinc-900">
+            {isEditMode ? tManage("editItem") : tManage("registerItem")}
           </DrawerTitle>
           <DrawerClose className="absolute right-4 top-4 p-1 rounded-full hover:bg-zinc-100 transition-colors">
             <X size={20} className="text-zinc-500" />
@@ -225,41 +229,41 @@ export function ItemRegistrationDrawer({
               <ImageUpload
                 preview={coverPreview}
                 onFileSelect={handleCoverSelect}
-                label="Upload Book Cover"
+                label={tManage("uploadBookCover")}
               />
 
               <FormInput
-                label="ISBN"
+                label={tBooks("isbn")}
                 icon={BookOpen}
                 name="isbn"
                 value={formData.isbn}
                 onChange={handleInputChange}
-                placeholder="Enter ISBN (e.g., 978-0-13-468599-1)"
+                placeholder={tManage("enterISBNPlaceholder")}
               />
 
               <FormInput
-                label="Book Title"
+                label={tBooks("bookTitle")}
                 icon={FileText}
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                placeholder="Enter book title"
+                placeholder={tManage("enterBookTitle")}
                 required
               />
 
               <FormInput
-                label="Author"
+                label={tBooks("author")}
                 icon={User}
                 name="author"
                 value={formData.author}
                 onChange={handleInputChange}
-                placeholder="Enter author name"
+                placeholder={tManage("enterAuthorName")}
               />
 
               <div className="space-y-2">
                 <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
                   <Calendar size={14} className="text-zinc-400" />
-                  Publication Date
+                  {tBooks("publicationDate")}
                 </label>
                 <div className="bg-zinc-100 rounded-2xl overflow-hidden">
                   <input
@@ -273,40 +277,40 @@ export function ItemRegistrationDrawer({
               </div>
 
               <FormInput
-                label="Categories"
+                label={tBooks("categories")}
                 icon={Tag}
                 name="categories"
                 value={formData.categories}
                 onChange={handleInputChange}
-                placeholder="Fiction, Mystery, Thriller (comma-separated)"
+                placeholder={tManage("categoriesPlaceholder")}
               />
 
               <FormInput
-                label="Location"
+                label={tCommon("location")}
                 icon={MapPin}
                 name="location"
                 value={formData.location}
                 onChange={handleInputChange}
-                placeholder="Shelf A3, Row 2"
+                placeholder={tManage("locationPlaceholder")}
               />
 
               <FormInput
-                label="External Link"
+                label={tBooks("externalLink")}
                 icon={LinkIcon}
                 name="link"
                 value={formData.link}
                 onChange={handleInputChange}
-                placeholder="https://example.com/book"
+                placeholder={tManage("externalLinkPlaceholder")}
                 type="url"
               />
 
               <FormTextarea
-                label="Description"
+                label={tCommon("description")}
                 icon={FileText}
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Enter book description..."
+                placeholder={tManage("enterBookDescription")}
                 rows={4}
               />
 
@@ -325,17 +329,17 @@ export function ItemRegistrationDrawer({
                 {isSuccess ? (
                   <span className="flex items-center justify-center gap-2">
                     <Check size={18} strokeWidth={2.5} />
-                    {isEditMode ? "Updated!" : "Registered!"}
+                    {isEditMode ? tCommon("updated") : tCommon("registered")}
                   </span>
                 ) : isSaving ? (
                   <span className="flex items-center justify-center gap-2">
                     <Loader2 size={18} className="animate-spin" />
-                    {isEditMode ? "Updating..." : "Registering..."}
+                    {isEditMode ? tCommon("updating") : tCommon("registering")}
                   </span>
                 ) : isEditMode ? (
-                  "Update Book"
+                  tManage("updateBook")
                 ) : (
-                  "Register Book"
+                  tManage("registerBook")
                 )}
               </button>
             </>
@@ -345,9 +349,9 @@ export function ItemRegistrationDrawer({
                 <Scan size={36} className="text-zinc-400" />
               </div>
               <div className="text-center">
-                <p className="text-zinc-600 font-medium">ISBN Scanning</p>
+                <p className="text-zinc-600 font-medium">{tManage("isbnScanning")}</p>
                 <p className="text-zinc-400 text-sm mt-1">
-                  Coming soon. Use manual entry for now.
+                  {tManage("isbnScanningComingSoon")}
                 </p>
               </div>
             </div>

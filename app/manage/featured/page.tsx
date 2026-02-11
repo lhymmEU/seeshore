@@ -9,6 +9,7 @@ import {
   Loader2,
   Star,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
 import { PageHeader } from "@/components/ui/page-header";
@@ -26,6 +27,7 @@ function BookSelectionCard({
   isSelected: boolean;
   onToggle: () => void;
 }) {
+  const tCommon = useTranslations("common");
   return (
     <button
       onClick={onToggle}
@@ -65,11 +67,11 @@ function BookSelectionCard({
 
       {/* Book Info */}
       <div className="p-3 text-left">
-        <h3 className="font-medium text-zinc-900 text-sm leading-tight line-clamp-2">
+        <h3 className="font-display font-medium text-zinc-900 text-sm leading-tight line-clamp-2">
           {book.title}
         </h3>
         <p className="text-xs text-zinc-500 mt-1 line-clamp-1">
-          {book.author || "Unknown Author"}
+          {book.author || tCommon("unknownAuthor")}
         </p>
       </div>
     </button>
@@ -78,6 +80,8 @@ function BookSelectionCard({
 
 export default function ManageFeaturedBooksPage() {
   const router = useRouter();
+  const t = useTranslations("manage");
+  const tCommon = useTranslations("common");
 
   const [books, setBooks] = useState<Book[]>([]);
   const [store, setStore] = useState<Store | null>(null);
@@ -202,7 +206,7 @@ export default function ManageFeaturedBooksPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 pb-32">
-      <PageHeader title="This Week's Books" />
+      <PageHeader title={t("thisWeeksBooks")} />
 
       <div className="px-4 pt-5 space-y-4">
         {/* Info Banner */}
@@ -210,10 +214,10 @@ export default function ManageFeaturedBooksPage() {
           <Star size={20} className="text-amber-500 flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm text-amber-800 font-medium">
-              Select your featured books
+              {t("selectFeaturedBooks")}
             </p>
-            <p className="text-xs text-amber-600 mt-1">
-              These books will appear in the &quot;This Week&apos;s Book&quot; section on the browse page. You can select up to 10 books.
+            <p className="text-xs text-amber-600 mt-1 font-serif">
+              {t("featuredBooksDescription")}
             </p>
           </div>
         </div>
@@ -221,21 +225,21 @@ export default function ManageFeaturedBooksPage() {
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search books..."
+          placeholder={t("searchBooksPlaceholder")}
         />
 
         {/* Selection Count */}
         <div className="flex items-center justify-between">
           <p className="text-sm text-zinc-500">
             <span className="font-medium text-zinc-700">{selectedBookIds.length}</span>
-            {" / 10 selected"}
+            {t("selectedOutOfTen")}
           </p>
           {selectedBookIds.length > 0 && (
             <button
               onClick={() => setSelectedBookIds([])}
               className="text-sm text-zinc-500 hover:text-zinc-700 underline"
             >
-              Clear all
+              {tCommon("clearAll")}
             </button>
           )}
         </div>
@@ -270,11 +274,11 @@ export default function ManageFeaturedBooksPage() {
         ) : (
           <EmptyState
             icon={BookOpen}
-            title={searchQuery ? "No books found" : "No books available"}
+            title={searchQuery ? t("noBooksFound") : t("noBooksAvailable")}
             message={
               searchQuery
-                ? "Try adjusting your search"
-                : "Register some books first to feature them"
+                ? tCommon("tryAdjustingSearch")
+                : t("registerBooksFirst")
             }
           />
         )}
@@ -297,15 +301,15 @@ export default function ManageFeaturedBooksPage() {
           {isSuccess ? (
             <span className="flex items-center justify-center gap-2">
               <Check size={18} strokeWidth={2.5} />
-              Saved!
+              {tCommon("saved")}
             </span>
           ) : isSaving ? (
             <span className="flex items-center justify-center gap-2">
               <Loader2 size={18} className="animate-spin" />
-              Saving...
+              {tCommon("saving")}
             </span>
           ) : (
-            "Save Changes"
+            tCommon("saveChanges")
           )}
         </button>
       </div>

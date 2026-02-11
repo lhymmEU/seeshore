@@ -19,6 +19,7 @@ import {
 import { cn } from "@/lib/utils";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { logout } from "@/data/supabase";
 import { session } from "@/lib/session";
 import type { Book } from "@/types/type";
@@ -60,7 +61,7 @@ const assistantCardConfigs: DashboardCard[] = [
   { id: "register-items", titleKey: "registerItems", icon: Package, href: "/manage/items", size: "medium" },
 ];
 
-function DashboardCardComponent({ card, title, comingSoonText, alertCount }: { card: DashboardCard; title: string; comingSoonText: string; alertCount?: number }) {
+function DashboardCardComponent({ card, title, comingSoonText, dueSoonText, alertCount }: { card: DashboardCard; title: string; comingSoonText: string; dueSoonText: string; alertCount?: number }) {
   const Icon = card.icon;
   const hasAlert = alertCount !== undefined && alertCount > 0;
   
@@ -79,10 +80,10 @@ function DashboardCardComponent({ card, title, comingSoonText, alertCount }: { c
   const enabledClasses = cn(
     "shadow-sm hover:shadow-md active:scale-[0.98]",
     hasAlert
-      ? "bg-amber-50 border border-amber-300 hover:border-amber-400"
-      : "bg-white border border-zinc-200/80 hover:border-zinc-300"
+      ? "bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-700 hover:border-amber-400"
+      : "bg-card border border-border hover:border-muted-foreground/30"
   );
-  const disabledClasses = "bg-zinc-100/50 border border-zinc-200/50 cursor-not-allowed";
+  const disabledClasses = "bg-secondary/50 border border-border/50 cursor-not-allowed";
 
   const content = (
     <>
@@ -96,16 +97,16 @@ function DashboardCardComponent({ card, title, comingSoonText, alertCount }: { c
         "relative flex items-center justify-center rounded-2xl transition-colors",
         card.size === "wide" ? "w-10 h-10" : "w-14 h-14",
         card.disabled 
-          ? "bg-zinc-200/50" 
+          ? "bg-muted/50" 
           : hasAlert
-          ? "bg-amber-100 group-hover:bg-amber-200/80"
-          : "bg-zinc-100 group-hover:bg-zinc-200/80"
+          ? "bg-amber-100 dark:bg-amber-900/30 group-hover:bg-amber-200/80 dark:group-hover:bg-amber-800/40"
+          : "bg-secondary group-hover:bg-muted"
       )}>
         <Icon 
           size={card.size === "wide" ? 20 : 26} 
           className={cn(
             "transition-colors",
-            card.disabled ? "text-zinc-400" : hasAlert ? "text-amber-700" : "text-zinc-700"
+            card.disabled ? "text-muted-foreground/50" : hasAlert ? "text-amber-700 dark:text-amber-400" : "text-foreground/70"
           )} 
           strokeWidth={1.5} 
         />
@@ -113,13 +114,13 @@ function DashboardCardComponent({ card, title, comingSoonText, alertCount }: { c
       <span className={cn(
         "font-medium tracking-tight",
         card.size === "wide" ? "text-sm" : "text-[13px]",
-        card.disabled ? "text-zinc-400" : hasAlert ? "text-amber-900" : "text-zinc-800"
+        card.disabled ? "text-muted-foreground/50" : hasAlert ? "text-amber-900 dark:text-amber-300" : "text-foreground/80"
       )}>
         {title}
       </span>
       {hasAlert && (
         <span className="text-[10px] font-medium text-amber-600">
-          Due soon
+          {dueSoonText}
         </span>
       )}
       {card.disabled && (
@@ -221,11 +222,14 @@ export default function ManagePage() {
   const cardConfigs = role === "owner" ? ownerCardConfigs : assistantCardConfigs;
 
   return (
-    <div className="min-h-screen bg-zinc-50">
+    <div className="min-h-screen bg-secondary">
       <div className="px-4 pt-14 pb-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-zinc-900">{t("dashboard")}</h1>
-          <LanguageSwitcher variant="full" />
+          <h1 className="font-display text-2xl font-bold text-foreground">{t("dashboard")}</h1>
+          <div className="flex items-center gap-1">
+            <ThemeToggle variant="icon" />
+            <LanguageSwitcher variant="full" />
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           {cardConfigs.map((card) => (
@@ -234,6 +238,7 @@ export default function ManagePage() {
               card={card} 
               title={t(card.titleKey)}
               comingSoonText={tCommon("comingSoon")}
+              dueSoonText={t("dueSoon")}
               alertCount={card.id === "register-items" ? dueSoonCount : undefined}
             />
           ))}
@@ -243,7 +248,7 @@ export default function ManagePage() {
         <button
           onClick={handleLogout}
           disabled={isLoggingOut}
-          className="w-full flex items-center justify-center gap-2 py-4 mt-6 rounded-2xl bg-white border border-zinc-200 text-rose-600 font-medium hover:bg-rose-50 hover:border-rose-200 transition-colors disabled:opacity-50"
+          className="w-full flex items-center justify-center gap-2 py-4 mt-6 rounded-2xl bg-card border border-border text-rose-600 dark:text-rose-400 font-medium hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:border-rose-200 dark:hover:border-rose-800 transition-colors disabled:opacity-50"
         >
           {isLoggingOut ? (
             <Loader2 size={18} className="animate-spin" />

@@ -11,6 +11,7 @@ import {
   Loader2,
   Trash2
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { BottomNav } from "@/components/navigation";
 import { EventCard } from "@/components/events";
 import { PageHeader } from "@/components/ui/page-header";
@@ -33,6 +34,8 @@ type EventFilter = "live" | "proposed";
 
 export default function EventsManagePage() {
   const router = useRouter();
+  const t = useTranslations("manage");
+  const tCommon = useTranslations("common");
   const [filter, setFilter] = useState<EventFilter>("live");
   const [events, setEvents] = useState<StoreEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -146,7 +149,7 @@ export default function EventsManagePage() {
 
   return (
     <div className="min-h-screen bg-white pb-32">
-      <PageHeader title="Manage Events" />
+      <PageHeader title={t("manageEvents")} />
 
       <div className="px-4 pt-6 space-y-6">
         <TabSwitcher
@@ -159,10 +162,10 @@ export default function EventsManagePage() {
           <div className="bg-zinc-50 rounded-2xl p-12 border border-zinc-100">
             <EmptyState
               icon={Calendar}
-              title={`No ${filter === "live" ? "live" : "proposed"} events`}
+              title={filter === "live" ? t("noLiveEvents") : t("noProposedEvents")}
               message={filter === "live" 
-                ? "Create an event or approve a proposed one"
-                : "No event proposals pending review"}
+                ? t("createOrApproveEvent")
+                : t("noEventProposals")}
             />
           </div>
         ) : (
@@ -188,7 +191,7 @@ export default function EventsManagePage() {
           className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-zinc-900 text-white font-medium shadow-lg shadow-zinc-900/20 hover:bg-zinc-800 transition-colors active:scale-[0.98]"
         >
           <Plus size={20} />
-          Create Event
+          {t("createEvent")}
         </button>
       </div>
 
@@ -201,35 +204,31 @@ export default function EventsManagePage() {
             <div className="mx-auto w-14 h-14 rounded-full bg-rose-100 flex items-center justify-center mb-3">
               <AlertTriangle size={28} className="text-rose-600" />
             </div>
-            <DrawerTitle className="text-xl text-zinc-900">
-              Delete Event?
+            <DrawerTitle className="text-xl text-zinc-900 font-display">
+              {t("deleteEventConfirm")}
             </DrawerTitle>
             <DrawerDescription className="text-zinc-500 mt-2">
-              Are you sure you want to delete{" "}
-              <span className="font-medium text-zinc-700">
-                &ldquo;{eventToDelete?.title}&rdquo;
-              </span>
-              ?
+              {t("confirmDeleteEvent", { title: eventToDelete?.title ?? "" })}
             </DrawerDescription>
           </DrawerHeader>
 
           <div className="px-4 pb-4">
             <div className="bg-rose-50 border border-rose-100 rounded-xl p-4 space-y-2">
               <p className="text-sm font-medium text-rose-800">
-                This action cannot be undone
+                {t("actionCannotBeUndone")}
               </p>
               <ul className="text-sm text-rose-700 space-y-1">
                 <li className="flex items-start gap-2">
                   <span className="text-rose-400 mt-0.5">•</span>
-                  All event details will be permanently removed
+                  {t("eventDetailsRemoved")}
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-rose-400 mt-0.5">•</span>
-                  {eventToDelete?.attendees?.length || 0} attendees will lose their registration
+                  {eventToDelete?.attendees?.length || 0} {t("attendeesLoseRegistration")}
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-rose-400 mt-0.5">•</span>
-                  Event history and data will be lost
+                  {t("eventHistoryLost")}
                 </li>
               </ul>
             </div>
@@ -244,12 +243,12 @@ export default function EventsManagePage() {
               {isDeleting ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  Deleting...
+                  {t("deleting")}
                 </>
               ) : (
                 <>
                   <Trash2 size={18} />
-                  Yes, Delete Event
+                  {t("yesDeleteEvent")}
                 </>
               )}
             </button>
@@ -258,7 +257,7 @@ export default function EventsManagePage() {
               disabled={isDeleting}
               className="w-full py-4 rounded-2xl bg-zinc-100 text-zinc-700 font-medium hover:bg-zinc-200 transition-colors active:scale-[0.98] disabled:opacity-50"
             >
-              Cancel
+              {tCommon("cancel")}
             </button>
           </DrawerFooter>
         </DrawerContent>

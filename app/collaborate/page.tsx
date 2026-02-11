@@ -68,7 +68,7 @@ export default function CollaboratePage() {
       {/* Header Section */}
       <div className="px-4 pt-12 pb-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-zinc-900">{t("title")}</h1>
+          <h1 className="text-2xl font-bold text-zinc-900 font-display">{t("title")}</h1>
           <button
             onClick={() => setIsCreateDrawerOpen(true)}
             className="p-2 bg-zinc-900 text-white rounded-full hover:bg-zinc-800 transition-colors"
@@ -76,7 +76,7 @@ export default function CollaboratePage() {
             <Plus size={20} />
           </button>
         </div>
-        <p className="text-sm text-zinc-500">{t("subtitle")}</p>
+        <p className="text-sm text-zinc-500 font-serif">{t("subtitle")}</p>
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}

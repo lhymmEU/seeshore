@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { BookOpen } from "lucide-react";
 
 interface LogoProps {
@@ -20,6 +21,7 @@ const iconSizeMap = {
 };
 
 export function Logo({ size = "md", showText = false }: LogoProps) {
+  const t = useTranslations("welcome");
   return (
     <div className="flex flex-col items-center gap-3">
       <div
@@ -32,8 +34,8 @@ export function Logo({ size = "md", showText = false }: LogoProps) {
         />
       </div>
       {showText && (
-        <span className="text-sm font-medium text-zinc-500 tracking-wide uppercase">
-          SeeShore Books
+        <span className="font-display text-sm font-medium text-zinc-500 tracking-wide uppercase">
+          {t("storeName")}
         </span>
       )}
     </div>

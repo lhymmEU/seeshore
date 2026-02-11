@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
@@ -25,6 +26,7 @@ export function TabSwitcher({
   onChange,
   className,
 }: TabSwitcherProps) {
+  const t = useTranslations("common");
   return (
     <div className={cn("flex bg-zinc-100 rounded-full p-1", className)}>
       {tabs.map((tab) => {
@@ -71,7 +73,7 @@ export function TabSwitcher({
             )}
             {isDisabled && (
               <span className="text-[10px] text-zinc-400 uppercase tracking-wide">
-                Soon
+                {t("soon")}
               </span>
             )}
           </button>

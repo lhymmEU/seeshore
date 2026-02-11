@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { BookOpen } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
 import { BookCard } from "@/components/books";
@@ -15,6 +16,7 @@ import { session } from "@/lib/session";
 
 export default function ItemsPage() {
   const router = useRouter();
+  const t = useTranslations("books");
   const [books, setBooks] = useState<Book[]>([]);
   const [featuredBookIds, setFeaturedBookIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,13 +107,13 @@ export default function ItemsPage() {
 
   return (
     <div className="min-h-screen bg-white pb-24">
-      <PageHeader title="Browse Books" showBack={false} />
+      <PageHeader title={t("browseBooks")} showBack={false} />
 
       <div className="px-4 pt-5 space-y-5">
         {/* This Week's Book - Horizontal Scroll */}
         <section>
-          <h2 className="text-sm font-semibold text-zinc-800 mb-3">
-            This Week&apos;s Book
+          <h2 className="font-display text-sm font-semibold text-zinc-800 mb-3">
+            {t("thisWeeksBook")}
           </h2>
           {isLoading ? (
             <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
@@ -142,7 +144,7 @@ export default function ItemsPage() {
             </div>
           ) : (
             <div className="flex items-center justify-center h-40 bg-zinc-50 rounded-xl text-zinc-400 text-sm">
-              No featured books available
+              {t("noFeaturedBooks")}
             </div>
           )}
         </section>
@@ -150,7 +152,7 @@ export default function ItemsPage() {
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search books..."
+          placeholder={t("searchBooks")}
         />
 
         {/* Category Tags */}
@@ -165,7 +167,7 @@ export default function ItemsPage() {
                   : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
               )}
             >
-              All
+              {t("all")}
             </button>
             {allCategories.map((category) => (
               <button
@@ -215,10 +217,10 @@ export default function ItemsPage() {
           ) : (
             <EmptyState
               icon={BookOpen}
-              title="No books found"
+              title={t("noBooksFound")}
               message={searchQuery || selectedCategory
-                ? "Try adjusting your filters"
-                : "Check back later for new additions"}
+                ? t("tryAdjusting")
+                : t("checkBackLater")}
             />
           )}
         </section>

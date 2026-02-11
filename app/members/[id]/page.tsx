@@ -11,6 +11,7 @@ import {
   MapPin,
   UserX,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
@@ -51,7 +52,7 @@ function DisplayEventCard({
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-zinc-900 text-sm truncate">
+        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">
           {event.title}
         </h4>
         <p className="text-xs text-zinc-500">{formatDate(event.startDate)}</p>
@@ -64,10 +65,12 @@ function DisplayBookCard({
   book,
   onClick,
   isFavorite = false,
+  unknownAuthorText = "Unknown Author",
 }: {
   book: Book;
   onClick: () => void;
   isFavorite?: boolean;
+  unknownAuthorText?: string;
 }) {
   return (
     <button
@@ -90,11 +93,11 @@ function DisplayBookCard({
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-zinc-900 text-sm truncate">
+        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">
           {book.title}
         </h4>
         <p className="text-xs text-zinc-500 truncate">
-          {book.author || "Unknown author"}
+          {book.author || unknownAuthorText}
         </p>
       </div>
       {isFavorite && (
@@ -111,6 +114,9 @@ export default function MemberDisplayPage() {
   const router = useRouter();
   const params = useParams();
   const memberId = params.id as string;
+  const t = useTranslations("members");
+  const tCommon = useTranslations("common");
+  const tProfile = useTranslations("profile");
 
   const [isLoading, setIsLoading] = useState(true);
   const [memberInfo, setMemberInfo] = useState<{
@@ -202,8 +208,8 @@ export default function MemberDisplayPage() {
             >
               <ArrowLeft size={20} className="text-zinc-800" />
             </button>
-            <h1 className="flex-1 text-center font-semibold text-zinc-900 pr-8">
-              Member Profile
+            <h1 className="font-display flex-1 text-center font-semibold text-zinc-900 pr-8">
+              {t("memberProfile")}
             </h1>
           </div>
         </div>
@@ -211,15 +217,15 @@ export default function MemberDisplayPage() {
         <div className="flex-1 flex items-center justify-center px-4">
           <EmptyState
             icon={UserX}
-            title="No display page set up"
-            message="This member hasn't set up their display page yet."
+            title={t("noDisplayPageSetUp")}
+            message={t("noDisplayPageMessage")}
             action={
               <Button
                 onClick={() => router.back()}
                 variant="outline"
                 className="rounded-xl mt-2"
               >
-                Go Back
+                {tCommon("goBack")}
               </Button>
             }
           />
@@ -247,8 +253,8 @@ export default function MemberDisplayPage() {
           >
             <ArrowLeft size={20} className="text-zinc-800" />
           </button>
-          <h1 className="flex-1 text-center font-semibold text-zinc-900 pr-8">
-            {memberInfo?.name || "Member"}
+          <h1 className="font-display flex-1 text-center font-semibold text-zinc-900 pr-8">
+            {memberInfo?.name || tCommon("member")}
           </h1>
         </div>
       </div>
@@ -266,7 +272,7 @@ export default function MemberDisplayPage() {
                 unoptimized
               />
             </div>
-            <h2 className="text-xl font-bold text-zinc-900">
+            <h2 className="font-display text-xl font-bold text-zinc-900">
               {memberInfo?.name}
             </h2>
             {memberInfo?.location && (
@@ -278,7 +284,7 @@ export default function MemberDisplayPage() {
               </div>
             )}
             {displayConfig.bio && (
-              <p className="text-sm text-zinc-600 mt-3 leading-relaxed max-w-sm">
+              <p className="font-serif text-sm text-zinc-600 mt-3 leading-relaxed max-w-sm">
                 {displayConfig.bio}
               </p>
             )}
@@ -291,7 +297,7 @@ export default function MemberDisplayPage() {
                     {events.length}
                   </p>
                   <p className="text-[10px] text-zinc-500 uppercase tracking-wide">
-                    Events
+                    {tCommon("events")}
                   </p>
                 </div>
               )}
@@ -303,7 +309,7 @@ export default function MemberDisplayPage() {
                       {borrowedBooks.length}
                     </p>
                     <p className="text-[10px] text-zinc-500 uppercase tracking-wide">
-                      Reading
+                      {tProfile("reading")}
                     </p>
                   </div>
                 </>
@@ -318,7 +324,7 @@ export default function MemberDisplayPage() {
                       {favoriteBooks.length}
                     </p>
                     <p className="text-[10px] text-zinc-500 uppercase tracking-wide">
-                      Favorites
+                      {tCommon("favorites")}
                     </p>
                   </div>
                 </>
@@ -332,7 +338,7 @@ export default function MemberDisplayPage() {
           <section>
             <div className="flex items-center gap-2 mb-3">
               <Calendar size={16} className="text-zinc-500" />
-              <h3 className="font-semibold text-zinc-900">Events</h3>
+              <h3 className="font-display font-semibold text-zinc-900">{tCommon("events")}</h3>
             </div>
             <div className="space-y-2">
               {events.map((event) => (
@@ -351,7 +357,7 @@ export default function MemberDisplayPage() {
           <section>
             <div className="flex items-center gap-2 mb-3">
               <BookOpen size={16} className="text-zinc-500" />
-              <h3 className="font-semibold text-zinc-900">Currently Reading</h3>
+              <h3 className="font-display font-semibold text-zinc-900">{t("currentlyReading")}</h3>
             </div>
             <div className="space-y-2">
               {borrowedBooks.map((book) => (
@@ -359,6 +365,7 @@ export default function MemberDisplayPage() {
                   key={book.id}
                   book={book}
                   onClick={() => router.push(`/items/${book.id}`)}
+                  unknownAuthorText={tCommon("unknownAuthor")}
                 />
               ))}
             </div>
@@ -370,7 +377,7 @@ export default function MemberDisplayPage() {
           <section>
             <div className="flex items-center gap-2 mb-3">
               <Heart size={16} className="text-zinc-500" />
-              <h3 className="font-semibold text-zinc-900">Favorites</h3>
+              <h3 className="font-display font-semibold text-zinc-900">{tCommon("favorites")}</h3>
             </div>
             <div className="space-y-2">
               {favoriteBooks.map((book) => (
@@ -379,6 +386,7 @@ export default function MemberDisplayPage() {
                   book={book}
                   onClick={() => router.push(`/items/${book.id}`)}
                   isFavorite
+                  unknownAuthorText={tCommon("unknownAuthor")}
                 />
               ))}
             </div>

@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import { BottomNav } from "@/components/navigation";
 import { PageHeader } from "@/components/ui/page-header";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { PageLoader } from "@/components/ui/loading-spinner";
 import { EmptyState } from "@/components/ui/empty-state";
 import { 
@@ -48,18 +49,18 @@ function calculateDaysRemaining(borrowedDate: string): number {
 }
 
 // Format the countdown display
-function formatCountdown(daysRemaining: number): string {
+function formatCountdown(daysRemaining: number, overdueText: string, oneDayText: string, daysText: string): string {
   if (daysRemaining <= 0) {
-    return "Overdue";
+    return overdueText;
   } else if (daysRemaining === 1) {
-    return "1 day left";
+    return oneDayText;
   } else {
-    return `${daysRemaining} days`;
+    return daysText;
   }
 }
 
 // Compact book card for profile with countdown
-function BorrowedBookCard({ book, onClick, unknownAuthorText }: { book: Book; onClick: () => void; unknownAuthorText: string }) {
+function BorrowedBookCard({ book, onClick, unknownAuthorText, overdueText, oneDayText, daysTextFn }: { book: Book; onClick: () => void; unknownAuthorText: string; overdueText: string; oneDayText: string; daysTextFn: (count: number) => string }) {
   const daysRemaining = book.borrowedDate ? calculateDaysRemaining(book.borrowedDate) : null;
   
   return (
@@ -77,7 +78,7 @@ function BorrowedBookCard({ book, onClick, unknownAuthorText }: { book: Book; on
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-zinc-900 text-sm truncate">{book.title}</h4>
+        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">{book.title}</h4>
         <p className="text-xs text-zinc-500 truncate">{book.author || unknownAuthorText}</p>
         {daysRemaining !== null && (
           <div
@@ -91,7 +92,7 @@ function BorrowedBookCard({ book, onClick, unknownAuthorText }: { book: Book; on
             )}
           >
             <Clock size={10} />
-            <span>{formatCountdown(daysRemaining)}</span>
+            <span>{formatCountdown(daysRemaining, overdueText, oneDayText, daysTextFn(daysRemaining))}</span>
           </div>
         )}
       </div>
@@ -117,7 +118,7 @@ function FavoriteBookCard({ book, onClick }: { book: Book; onClick: () => void }
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-zinc-900 text-sm truncate">{book.title}</h4>
+        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">{book.title}</h4>
         <p className="text-xs text-zinc-500 truncate">{book.author || ""}</p>
       </div>
       <Heart size={16} className="text-rose-500 fill-rose-500 flex-shrink-0" />
@@ -148,7 +149,7 @@ function AttendedEventCard({ event, onClick, upcomingText, completedText }: { ev
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-zinc-900 text-sm truncate">{event.title}</h4>
+        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">{event.title}</h4>
         <p className="text-xs text-zinc-500">{formatDate(event.startDate)}</p>
       </div>
       <span className={cn(
@@ -317,12 +318,12 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
-        <UserIcon size={48} className="text-zinc-300 mb-4" />
-        <p className="text-zinc-600 font-medium">{tCommon("notLoggedIn")}</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
+        <UserIcon size={48} className="text-muted-foreground/40 mb-4" />
+        <p className="text-foreground/70 font-medium">{tCommon("notLoggedIn")}</p>
         <button
           onClick={() => router.push("/")}
-          className="mt-4 text-zinc-500 underline"
+          className="mt-4 text-muted-foreground underline"
         >
           {tCommon("goToHome")}
         </button>
@@ -334,17 +335,18 @@ export default function ProfilePage() {
   const avatarUrl = user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.id)}`;
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-24">
+    <div className="min-h-screen bg-secondary pb-24">
       <div className="relative">
         <PageHeader title={t("title")} showBack={false} />
-        <div className="absolute right-4 top-3 z-50">
+        <div className="absolute right-4 top-3 z-50 flex items-center gap-0.5">
+          <ThemeToggle variant="icon" />
           <LanguageSwitcher variant="icon" />
         </div>
       </div>
 
       <div className="px-4 pt-6 space-y-6">
         {/* Profile Card */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-zinc-100">
+        <div className="bg-card rounded-3xl p-6 shadow-sm border border-border">
           <div className="flex items-start gap-4">
             {/* Avatar */}
             <div className="relative">
@@ -413,7 +415,7 @@ export default function ProfilePage() {
               ) : (
                 <>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-bold text-zinc-900 truncate">{user.name}</h2>
+                    <h2 className="font-display text-lg font-bold text-zinc-900 truncate">{user.name}</h2>
                     <button
                       onClick={() => setIsEditing(true)}
                       className="p-1.5 rounded-lg hover:bg-zinc-100 transition-colors"
@@ -464,31 +466,31 @@ export default function ProfilePage() {
         {/* Display Page Setup */}
         <button
           onClick={() => router.push("/profile/display")}
-          className="w-full bg-white rounded-2xl p-4 border border-zinc-100 flex items-center gap-3 hover:border-zinc-200 transition-all text-left"
+          className="w-full bg-card rounded-2xl p-4 border border-border flex items-center gap-3 hover:border-muted-foreground/30 transition-all text-left"
         >
-          <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center">
-            <LayoutGrid size={18} className="text-zinc-600" />
+          <div className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center">
+            <LayoutGrid size={18} className="text-muted-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-zinc-900 text-sm">Display Page</h3>
+            <h3 className="font-display font-medium text-zinc-900 text-sm">{t("displayPage")}</h3>
             <p className="text-xs text-zinc-500">
               {user.displayConfig?.enabled
-                ? "Your display page is live"
-                : "Set up your public profile display"}
+                ? t("displayPageLive")
+                : t("setupDisplayPage")}
             </p>
           </div>
           <ChevronRight size={16} className="text-zinc-400 flex-shrink-0" />
         </button>
 
         {/* Tab Navigation */}
-        <div className="bg-white rounded-2xl p-1.5 border border-zinc-100 flex">
+        <div className="bg-card rounded-2xl p-1.5 border border-border flex">
           <button
             onClick={() => handleTabChange("events")}
             className={cn(
               "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
               activeTab === "events"
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <Calendar size={16} />
@@ -499,8 +501,8 @@ export default function ProfilePage() {
             className={cn(
               "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
               activeTab === "borrowed"
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <BookOpen size={16} />
@@ -511,8 +513,8 @@ export default function ProfilePage() {
             className={cn(
               "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
               activeTab === "favorites"
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <Heart size={16} />
@@ -526,7 +528,7 @@ export default function ProfilePage() {
           {activeTab === "events" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-zinc-900">{t("myEvents")}</h3>
+                <h3 className="font-display font-semibold text-zinc-900">{t("myEvents")}</h3>
                 <span className="text-xs text-zinc-500">{attendedEvents.length} {tCommon("events")}</span>
               </div>
               {attendedEvents.length > 0 ? (
@@ -557,7 +559,7 @@ export default function ProfilePage() {
           {activeTab === "borrowed" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-zinc-900">{t("borrowedBooks")}</h3>
+                <h3 className="font-display font-semibold text-zinc-900">{t("borrowedBooks")}</h3>
                 <span className="text-xs text-zinc-500">{borrowedBooks.length} {tCommon("items")}</span>
               </div>
               {borrowedBooks.length > 0 ? (
@@ -568,6 +570,9 @@ export default function ProfilePage() {
                       book={book} 
                       onClick={() => handleViewBook(book.id)}
                       unknownAuthorText={t("unknownAuthor")}
+                      overdueText={tCommon("overdue")}
+                      oneDayText={tCommon("oneDayLeft")}
+                      daysTextFn={(count: number) => tCommon("daysLeft", { count })}
                     />
                   ))}
                 </div>
@@ -587,7 +592,7 @@ export default function ProfilePage() {
           {activeTab === "favorites" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-zinc-900">{t("favoriteBooks")}</h3>
+                <h3 className="font-display font-semibold text-zinc-900">{t("favoriteBooks")}</h3>
                 <span className="text-xs text-zinc-500">{favoriteBooks.length} {tCommon("items")}</span>
               </div>
               {favoriteBooks.length > 0 ? (

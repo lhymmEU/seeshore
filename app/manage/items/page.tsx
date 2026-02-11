@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/drawer";
 import type { Book, User } from "@/types/type";
 import { session } from "@/lib/session";
+import { useTranslations } from "next-intl";
 
 // Calculate days remaining for a borrowed book (30-day lending period)
 function calculateDaysRemaining(borrowedDate: string): number {
@@ -40,13 +41,16 @@ function calculateDaysRemaining(borrowedDate: string): number {
 }
 
 // Format the countdown display
-function formatCountdown(daysRemaining: number): string {
+function formatCountdown(
+  daysRemaining: number,
+  labels: { overdue: string; oneDayLeft: string; daysLeft: string }
+): string {
   if (daysRemaining <= 0) {
-    return "Overdue";
+    return labels.overdue;
   } else if (daysRemaining === 1) {
-    return "1 day left";
+    return labels.oneDayLeft;
   } else {
-    return `${daysRemaining} days`;
+    return labels.daysLeft;
   }
 }
 
@@ -57,6 +61,7 @@ function BorrowedBookCard({
   book: Book;
   onClick: () => void;
 }) {
+  const tCommon = useTranslations("common");
   const daysRemaining = book.borrowedDate
     ? calculateDaysRemaining(book.borrowedDate)
     : null;
@@ -96,7 +101,11 @@ function BorrowedBookCard({
             )}
           >
             <Clock size={10} />
-            <span>{formatCountdown(daysRemaining)}</span>
+            <span>{formatCountdown(daysRemaining, {
+              overdue: tCommon("overdue"),
+              oneDayLeft: tCommon("oneDayLeft"),
+              daysLeft: tCommon("daysLeft", { count: daysRemaining }),
+            })}</span>
           </div>
         )}
       </div>
@@ -117,11 +126,13 @@ function ItemCard({
   onStatusClick: () => void;
   onReturnBook: () => Promise<void>;
 }) {
+  const t = useTranslations("manage");
+  const tCommon = useTranslations("common");
   const [isDeleting, setIsDeleting] = useState(false);
   const [isReturning, setIsReturning] = useState(false);
 
   const handleDelete = async () => {
-    if (!confirm(`Are you sure you want to delete "${book.title}"?`)) {
+    if (!confirm(t("confirmDeleteBook", { title: book.title }))) {
       return;
     }
     setIsDeleting(true);
@@ -135,7 +146,7 @@ function ItemCard({
       onStatusClick();
     } else {
       // Return the book for borrowed books
-      if (!confirm(`Return "${book.title}"?`)) {
+      if (!confirm(t("confirmReturnBook", { title: book.title }))) {
         return;
       }
       setIsReturning(true);
@@ -202,7 +213,7 @@ function ItemCard({
               isBorrowed ? "text-zinc-400" : "text-zinc-500"
             )}
           >
-            {book.author || "Unknown Author"}
+            {book.author || tCommon("unknownAuthor")}
           </p>
           {book.location && (
             <div
@@ -225,17 +236,17 @@ function ItemCard({
                   ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
                   : "bg-zinc-300 text-zinc-600 hover:bg-zinc-400"
               )}
-              title={book.status === "available" ? "Click to lend" : "Click to return"}
+              title={book.status === "available" ? t("clickToLend") : t("clickToReturn")}
             >
               {isReturning ? (
                 <span className="flex items-center gap-1">
                   <Loader2 size={12} className="animate-spin" />
-                  Returning...
+                  {t("returning")}
                 </span>
               ) : book.status === "available" ? (
-                "Available"
+                tCommon("available")
               ) : (
-                "Borrowed"
+                tCommon("borrowed")
               )}
             </button>
             
@@ -252,7 +263,11 @@ function ItemCard({
                 )}
               >
                 <Clock size={12} />
-                <span>{formatCountdown(daysRemaining)}</span>
+                <span>{formatCountdown(daysRemaining, {
+                  overdue: tCommon("overdue"),
+                  oneDayLeft: tCommon("oneDayLeft"),
+                  daysLeft: tCommon("daysLeft", { count: daysRemaining }),
+                })}</span>
               </div>
             )}
           </div>
@@ -263,7 +278,7 @@ function ItemCard({
           <button
             onClick={onEdit}
             className="p-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 transition-colors active:scale-95"
-            title="Edit"
+            title={tCommon("edit")}
           >
             <Pencil size={16} className="text-zinc-600" />
           </button>
@@ -271,7 +286,7 @@ function ItemCard({
             onClick={handleDelete}
             disabled={isDeleting}
             className="p-2.5 rounded-xl bg-red-50 hover:bg-red-100 transition-colors active:scale-95 disabled:opacity-50"
-            title="Delete"
+            title={tCommon("delete")}
           >
             {isDeleting ? (
               <Loader2 size={16} className="text-red-500 animate-spin" />
@@ -287,6 +302,8 @@ function ItemCard({
 
 export default function ManageItemsPage() {
   const router = useRouter();
+  const t = useTranslations("manage");
+  const tCommon = useTranslations("common");
 
   const [books, setBooks] = useState<Book[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -475,21 +492,21 @@ export default function ManageItemsPage() {
 
   return (
     <div className="min-h-screen bg-zinc-50 pb-24">
-      <PageHeader title="Manage Items" />
+      <PageHeader title={t("manageItems")} />
 
       <div className="px-4 pt-5 space-y-4">
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search by title, author, or ISBN..."
+          placeholder={t("searchItemsPlaceholder")}
         />
 
         {/* Borrowed Books Section */}
         {!isLoading && borrowedBooks.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-zinc-700">
-                Borrowed
+              <h2 className="font-display text-sm font-semibold text-zinc-700">
+                {tCommon("borrowed")}
                 <span className="ml-1.5 text-xs font-normal text-zinc-400">
                   {borrowedBooks.length}
                 </span>
@@ -513,14 +530,14 @@ export default function ManageItemsPage() {
         <div className="flex items-center justify-between">
           <p className="text-sm text-zinc-500">
             {isLoading ? (
-              "Loading..."
+              tCommon("loading")
             ) : (
               <>
                 <span className="font-medium text-zinc-700">
                   {availableBooks.length}
                 </span>{" "}
-                {availableBooks.length === 1 ? "item" : "items"}
-                {searchQuery && ` found`}
+                {availableBooks.length === 1 ? tCommon("item") : tCommon("items")}
+                {searchQuery && ` ${tCommon("found")}`}
               </>
             )}
           </p>
@@ -559,11 +576,11 @@ export default function ManageItemsPage() {
         ) : (
           <EmptyState
             icon={BookOpen}
-            title={searchQuery ? "No items found" : "No Available Items"}
+            title={searchQuery ? t("noItemsFound") : t("noAvailableItems")}
             message={
               searchQuery
-                ? "Try adjusting your search"
-                : "Tap the + button to register an item"
+                ? tCommon("tryAdjustingSearch")
+                : t("registerItemHint")
             }
           />
         )}
@@ -596,7 +613,7 @@ export default function ManageItemsPage() {
       <Drawer open={returnDrawerOpen} onOpenChange={setReturnDrawerOpen}>
         <DrawerContent>
           <DrawerHeader className="text-center pt-6 pb-2">
-            <DrawerTitle className="text-lg font-semibold text-zinc-900">
+            <DrawerTitle className="font-display text-lg font-semibold text-zinc-900">
               {selectedBorrowedBook?.title}
             </DrawerTitle>
           </DrawerHeader>
@@ -604,15 +621,15 @@ export default function ManageItemsPage() {
           <div className="px-6 pb-2 space-y-4">
             {/* Borrower */}
             <div className="flex items-center justify-between py-3 border-b border-zinc-100">
-              <span className="text-sm text-zinc-500">Borrower</span>
+              <span className="text-sm text-zinc-500">{t("borrower")}</span>
               <span className="text-sm font-medium text-zinc-900">
-                {borrowerName ?? "Loading..."}
+                {borrowerName ?? tCommon("loading")}
               </span>
             </div>
 
             {/* Remaining Time */}
             <div className="flex items-center justify-between py-3 border-b border-zinc-100">
-              <span className="text-sm text-zinc-500">Remaining</span>
+              <span className="text-sm text-zinc-500">{t("remaining")}</span>
               {selectedBorrowedBook?.borrowedDate ? (
                 (() => {
                   const days = calculateDaysRemaining(selectedBorrowedBook.borrowedDate);
@@ -628,12 +645,16 @@ export default function ManageItemsPage() {
                       )}
                     >
                       <Clock size={14} />
-                      {formatCountdown(days)}
+                      {formatCountdown(days, {
+                        overdue: tCommon("overdue"),
+                        oneDayLeft: tCommon("oneDayLeft"),
+                        daysLeft: tCommon("daysLeft", { count: days }),
+                      })}
                     </span>
                   );
                 })()
               ) : (
-                <span className="text-sm text-zinc-400">Unknown</span>
+                <span className="text-sm text-zinc-400">{tCommon("unknown")}</span>
               )}
             </div>
           </div>
@@ -647,10 +668,10 @@ export default function ManageItemsPage() {
               {isReturningBook ? (
                 <>
                   <Loader2 size={18} className="animate-spin" />
-                  Returning...
+                  {t("returning")}
                 </>
               ) : (
-                "Return"
+                tCommon("return")
               )}
             </button>
             <button
@@ -658,7 +679,7 @@ export default function ManageItemsPage() {
               disabled={isReturningBook}
               className="flex-1 py-3 rounded-xl font-semibold text-base bg-zinc-100 text-zinc-700 hover:bg-zinc-200 active:scale-[0.98] transition-all disabled:opacity-50"
             >
-              Cancel
+              {tCommon("cancel")}
             </button>
           </DrawerFooter>
         </DrawerContent>

@@ -234,8 +234,8 @@ export default function PostDetailPage({
         </div>
 
         {/* Title & Description */}
-        <h1 className="text-xl font-bold text-zinc-900 mb-2">{post.title}</h1>
-        <p className="text-zinc-600 whitespace-pre-wrap">{post.description}</p>
+        <h1 className="text-xl font-bold text-zinc-900 mb-2 font-display">{post.title}</h1>
+        <p className="text-zinc-600 whitespace-pre-wrap font-serif">{post.description}</p>
 
         {/* Photos */}
         {post.photos && post.photos.length > 0 && (
@@ -261,7 +261,7 @@ export default function PostDetailPage({
 
       {/* Replies Section */}
       <div className="p-4">
-        <h2 className="font-semibold text-zinc-900 mb-4">
+        <h2 className="font-semibold text-zinc-900 mb-4 font-display">
           {t("replies")} ({replies.length})
         </h2>
 

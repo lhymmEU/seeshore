@@ -11,6 +11,7 @@ import {
   Building2,
   Loader2
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { 
   fetchUser, 
@@ -24,6 +25,8 @@ export default function ItemDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const bookId = params.id as string;
+  const t = useTranslations("books");
+  const tCommon = useTranslations("common");
 
   const [book, setBook] = useState<Book | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -118,12 +121,12 @@ export default function ItemDetailsPage() {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center">
         <BookOpen size={48} className="text-zinc-300 mb-4" />
-        <p className="text-zinc-600 font-medium">Book not found</p>
+        <p className="text-zinc-600 font-medium">{t("bookNotFound")}</p>
         <button
           onClick={() => router.back()}
           className="mt-4 text-zinc-500 underline"
         >
-          Go back
+          {tCommon("goBack")}
         </button>
       </div>
     );
@@ -177,11 +180,11 @@ export default function ItemDetailsPage() {
       {/* Book Info */}
       <div className="px-4 pt-5 pb-8">
         <div className="text-center space-y-1.5">
-          <h1 className="text-xl font-bold text-zinc-900 leading-tight">
+          <h1 className="font-display text-xl font-bold text-zinc-900 leading-tight">
             {book.title}
           </h1>
           <p className="text-zinc-500 font-medium">
-            {book.author || "Unknown Author"}
+            {book.author || tCommon("unknownAuthor")}
           </p>
         </div>
 
@@ -209,14 +212,14 @@ export default function ItemDetailsPage() {
 
         {book.description && (
           <div className="mt-6">
-            <p className="text-zinc-600 leading-relaxed text-[15px]">
+            <p className="font-serif text-zinc-600 leading-relaxed text-[15px]">
               {isDescriptionExpanded ? book.description : truncatedDescription}
               {shouldShowMore && !isDescriptionExpanded && (
                 <button
                   onClick={() => setIsDescriptionExpanded(true)}
                   className="text-zinc-900 font-semibold ml-1 hover:underline"
                 >
-                  More
+                  {t("more")}
                 </button>
               )}
               {shouldShowMore && isDescriptionExpanded && (
@@ -224,7 +227,7 @@ export default function ItemDetailsPage() {
                   onClick={() => setIsDescriptionExpanded(false)}
                   className="text-zinc-900 font-semibold ml-1 hover:underline"
                 >
-                  Less
+                  {t("less")}
                 </button>
               )}
             </p>
@@ -233,7 +236,7 @@ export default function ItemDetailsPage() {
 
         <div className="flex items-center justify-between mt-6">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-zinc-500 font-medium">Categories:</span>
+            <span className="text-sm text-zinc-500 font-medium">{t("categories")}</span>
             {book.categories && book.categories.length > 0 ? (
               book.categories.slice(0, 3).map((category) => (
                 <span
@@ -244,7 +247,7 @@ export default function ItemDetailsPage() {
                 </span>
               ))
             ) : (
-              <span className="text-sm text-zinc-400">None</span>
+              <span className="text-sm text-zinc-400">{t("none")}</span>
             )}
           </div>
           <button
@@ -254,7 +257,7 @@ export default function ItemDetailsPage() {
               "p-2.5 rounded-full transition-colors",
               userId ? "hover:bg-zinc-100" : "opacity-50 cursor-not-allowed"
             )}
-            title={userId ? (isLiked ? "Remove from favorites" : "Add to favorites") : "Login to favorite"}
+            title={userId ? (isLiked ? t("removeFromFavorites") : t("addToFavorites")) : t("loginToFavorite")}
           >
             {isTogglingLike ? (
               <Loader2 size={22} className="text-zinc-400 animate-spin" />
@@ -274,7 +277,7 @@ export default function ItemDetailsPage() {
 
         {book.status === "borrowed" && book.borrowedDate && (
           <p className="text-center text-sm text-zinc-400 mt-3">
-            Borrowed on {new Date(book.borrowedDate).toLocaleDateString()}
+            {t("borrowedOn")}{new Date(book.borrowedDate).toLocaleDateString()}
           </p>
         )}
       </div>

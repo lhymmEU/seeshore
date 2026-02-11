@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { formatDate, formatTime, formatDateShort, getNowInGMT8 } from "@/lib/date-utils";
 import type { StoreEvent } from "@/types/type";
 import { session } from "@/lib/session";
+import { useTranslations } from "next-intl";
 
 // Extract plain text from rich text JSON for preview
 function extractPlainText(content: string): string {
@@ -48,6 +49,8 @@ function EventScrollCard({
   event: StoreEvent;
   onClick: () => void;
 }) {
+  const t = useTranslations("events");
+  const tCommon = useTranslations("common");
   const attendeeCount = event.attendees?.length || 0;
 
   return (
@@ -67,12 +70,12 @@ function EventScrollCard({
         </div>
       ) : (
         <div className="h-28 w-full bg-gradient-to-br from-zinc-200 to-zinc-100 flex items-center justify-center">
-          <span className="text-zinc-400 text-sm">Event Picture</span>
+          <span className="text-zinc-400 text-sm">{t("eventPicture")}</span>
         </div>
       )}
 
       <div className="p-3 space-y-1.5">
-        <h3 className="font-semibold text-zinc-900 text-sm leading-tight line-clamp-1">
+        <h3 className="font-display font-semibold text-zinc-900 text-sm leading-tight line-clamp-1">
           {event.title}
         </h3>
         <p className="text-xs text-zinc-500">
@@ -93,7 +96,7 @@ function EventScrollCard({
               <span className="text-xs text-zinc-400 ml-1.5">+{attendeeCount}</span>
             )}
           </div>
-          <span className="text-xs font-medium text-zinc-600">View</span>
+          <span className="text-xs font-medium text-zinc-600">{tCommon("view")}</span>
         </div>
       </div>
     </button>
@@ -108,6 +111,7 @@ function FeaturedEventCard({
   event: StoreEvent;
   onClick: () => void;
 }) {
+  const t = useTranslations("events");
   const attendeeCount = event.attendees?.length || 0;
 
   return (
@@ -128,7 +132,7 @@ function FeaturedEventCard({
           <div className="w-full h-full bg-gradient-to-br from-orange-100 to-amber-50 flex items-center justify-center">
             <div className="text-center">
               <Sparkles size={32} className="text-orange-300 mx-auto mb-2" />
-              <span className="text-orange-400 text-sm font-medium">Featured Event</span>
+              <span className="text-orange-400 text-sm font-medium">{t("featuredEvent")}</span>
             </div>
           </div>
         )}
@@ -136,17 +140,17 @@ function FeaturedEventCard({
         
         <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1.5">
           <Sparkles size={12} className="text-orange-500" />
-          <span className="text-xs font-semibold text-zinc-800">Closest Event</span>
+          <span className="text-xs font-semibold text-zinc-800">{t("closestEvent")}</span>
         </div>
       </div>
 
       <div className="p-4 space-y-3">
         <div>
-          <h3 className="font-bold text-zinc-900 text-lg leading-tight line-clamp-2">
+          <h3 className="font-display font-bold text-zinc-900 text-lg leading-tight line-clamp-2">
             {event.title}
           </h3>
           {event.description && (
-            <p className="text-sm text-zinc-500 mt-1 line-clamp-2">
+            <p className="font-serif text-sm text-zinc-500 mt-1 line-clamp-2">
               {extractPlainText(event.description)}
             </p>
           )}
@@ -165,7 +169,7 @@ function FeaturedEventCard({
           )}
           <div className="flex items-center gap-1.5">
             <Users size={14} className="text-orange-400" />
-            <span>{attendeeCount} attending</span>
+            <span>{attendeeCount} {t("attending")}</span>
           </div>
         </div>
 
@@ -179,7 +183,7 @@ function FeaturedEventCard({
             ))}
           </div>
           <div className="px-4 py-2 bg-zinc-900 text-white rounded-xl text-sm font-medium">
-            View Event
+            {t("viewEvent")}
           </div>
         </div>
       </div>
@@ -189,6 +193,8 @@ function FeaturedEventCard({
 
 export default function EventsPage() {
   const router = useRouter();
+  const t = useTranslations("events");
+  const tCommon = useTranslations("common");
   const [events, setEvents] = useState<StoreEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -265,9 +271,9 @@ export default function EventsPage() {
 
       <div className="px-4 space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-zinc-800">Events</h2>
+          <h2 className="font-display text-base font-semibold text-zinc-800">{t("title")}</h2>
           <button className="text-sm text-zinc-500 hover:text-zinc-700 transition-colors">
-            See More
+            {tCommon("seeMore")}
           </button>
         </div>
 
@@ -293,14 +299,14 @@ export default function EventsPage() {
             </div>
           ) : (
             <div className="flex items-center justify-center h-40 bg-zinc-50 rounded-xl text-zinc-400 text-sm">
-              No upcoming events
+              {t("noUpcoming")}
             </div>
           )}
         </section>
 
         <section className="pt-2">
-          <h2 className="text-base font-semibold text-zinc-800 mb-3">
-            The Closest Event
+          <h2 className="font-display text-base font-semibold text-zinc-800 mb-3">
+            {t("closestEvent")}
           </h2>
           {isLoading ? (
             <div className="w-full h-80 bg-zinc-100 rounded-3xl animate-pulse" />
@@ -313,8 +319,8 @@ export default function EventsPage() {
             <div className="bg-zinc-50 rounded-3xl">
               <EmptyState
                 icon={Calendar}
-                title="No events scheduled"
-                message="Check back later for upcoming events"
+                title={t("noEventsScheduled")}
+                message={t("checkBackLater")}
               />
             </div>
           )}

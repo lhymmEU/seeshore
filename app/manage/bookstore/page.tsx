@@ -14,6 +14,7 @@ import { FormInput, FormTextarea } from "@/components/ui/form-input";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { Book } from "@/types/type";
 import { session } from "@/lib/session";
+import { useTranslations } from "next-intl";
 
 type Tab = "basic" | "items";
 
@@ -26,6 +27,7 @@ interface StoreFormData {
 
 // Compact book item for the list
 function BookListItem({ book }: { book: Book }) {
+  const tCommon = useTranslations("common");
   return (
     <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
       {/* Book Cover */}
@@ -51,7 +53,7 @@ function BookListItem({ book }: { book: Book }) {
           {book.title}
         </h4>
         <p className="text-xs text-zinc-500 truncate">
-          {book.author || "Unknown Author"}
+          {book.author || tCommon("unknownAuthor")}
         </p>
         <div className="flex items-center gap-2 mt-1">
           <span className={cn(
@@ -60,7 +62,7 @@ function BookListItem({ book }: { book: Book }) {
               ? "bg-emerald-100 text-emerald-700"
               : "bg-amber-100 text-amber-700"
           )}>
-            {book.status === "available" ? "Available" : "Borrowed"}
+            {book.status === "available" ? tCommon("available") : tCommon("borrowed")}
           </span>
           {book.location && (
             <span className="text-[10px] text-zinc-400 truncate">
@@ -75,6 +77,8 @@ function BookListItem({ book }: { book: Book }) {
 
 export default function BookstoreEditorPage() {
   const router = useRouter();
+  const t = useTranslations("manage");
+  const tCommon = useTranslations("common");
   
   const [activeTab, setActiveTab] = useState<Tab>("basic");
   const [isLoading, setIsLoading] = useState(true);
@@ -214,19 +218,19 @@ export default function BookstoreEditorPage() {
   }
 
   const tabs = [
-    { id: "basic", label: "Basic Info" },
-    { id: "items", label: "Registered Items" },
+    { id: "basic", label: t("basicInfo") },
+    { id: "items", label: t("registeredItems") },
   ];
 
   return (
     <div className="min-h-screen bg-white pb-24">
-      <PageHeader title="Edit Bookstore" />
+      <PageHeader title={t("editBookstore")} />
 
       <div className="px-4 pt-6 space-y-6">
         <ImageUpload
           preview={bannerPreview}
           onFileSelect={handleBannerSelect}
-          label="Upload Banner Photo"
+          label={t("uploadBannerPhoto")}
         />
 
         <TabSwitcher
@@ -238,29 +242,30 @@ export default function BookstoreEditorPage() {
         {activeTab === "basic" ? (
           <div className="space-y-4">
             <FormInput
-              label="Store Name"
+              label={t("storeName")}
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="Enter store name"
+              placeholder={t("enterStoreName")}
               required
             />
 
             <FormTextarea
-              label="Description"
+              label={tCommon("description")}
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Describe your bookstore..."
+              placeholder={t("describeBookstore")}
               rows={4}
+              className="font-serif"
             />
 
             <FormTextarea
-              label="Store Rules"
+              label={t("storeRules")}
               name="rules"
               value={formData.rules}
               onChange={handleInputChange}
-              placeholder="Borrowing policies, opening hours, etc."
+              placeholder={t("storeRulesPlaceholder")}
               rows={4}
             />
 
@@ -277,10 +282,10 @@ export default function BookstoreEditorPage() {
               {isSaving ? (
                 <span className="flex items-center justify-center gap-2">
                   <Loader2 size={18} className="animate-spin" />
-                  Saving...
+                  {tCommon("saving")}
                 </span>
               ) : (
-                "Save Changes"
+                tCommon("saveChanges")
               )}
             </button>
           </div>
@@ -289,16 +294,16 @@ export default function BookstoreEditorPage() {
             {/* Header with count and add button */}
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold text-zinc-900">Books</h3>
+                <h3 className="font-display font-semibold text-zinc-900">{t("books")}</h3>
                 <p className="text-xs text-zinc-500">
-                  {books.length} {books.length === 1 ? "item" : "items"} registered
+                  {books.length} {books.length === 1 ? tCommon("item") : tCommon("items")} {t("registered")}
                 </p>
               </div>
               <button
                 onClick={handleRegisterNewItem}
                 className="px-4 py-2 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors active:scale-[0.98]"
               >
-                + Add New
+                {t("addNew")}
               </button>
             </div>
 
@@ -327,14 +332,14 @@ export default function BookstoreEditorPage() {
             ) : (
               <EmptyState
                 icon={Package}
-                title="No Available Items"
-                message="Start by adding books to your bookstore"
+                title={t("noAvailableItems")}
+                message={t("startAddingBooks")}
                 action={
                   <button
                     onClick={handleRegisterNewItem}
                     className="mt-2 px-6 py-2.5 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors"
                   >
-                    Register First Item
+                    {t("registerFirstItem")}
                   </button>
                 }
               />

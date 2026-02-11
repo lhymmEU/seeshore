@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import {
   ArrowLeft,
@@ -61,7 +62,7 @@ function EditableTitle({
         onBlur={() => setIsFocused(false)}
         placeholder={placeholder}
         className={cn(
-          "w-full text-xl font-bold text-zinc-900 bg-transparent border-none outline-none",
+          "w-full font-display text-xl font-bold text-zinc-900 bg-transparent border-none outline-none",
           "placeholder:text-zinc-400",
           !value && !isFocused && "text-zinc-400"
         )}
@@ -176,6 +177,7 @@ function CoverImageUpload({
   preview: string | null;
   onFileSelect: (file: File) => void;
 }) {
+  const t = useTranslations("events");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleClick = () => {
@@ -206,7 +208,7 @@ function CoverImageUpload({
         <>
           <Image
             src={preview}
-            alt="Event cover"
+            alt={t("eventCover")}
             fill
             className="object-cover"
             unoptimized
@@ -220,8 +222,8 @@ function CoverImageUpload({
       ) : (
         <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400 group-hover:text-zinc-600 transition-colors">
           <ImagePlus size={48} strokeWidth={1.5} />
-          <p className="mt-3 text-sm font-medium">Upload Event Cover</p>
-          <p className="mt-1 text-xs">Click to add an image</p>
+          <p className="mt-3 text-sm font-medium">{t("uploadEventCover")}</p>
+          <p className="mt-1 text-xs">{t("clickToAddImage")}</p>
         </div>
       )}
     </div>
@@ -230,6 +232,7 @@ function CoverImageUpload({
 
 // Mock participant avatars for preview
 function PreviewParticipants() {
+  const t = useTranslations("events");
   return (
     <div className="flex items-center gap-3">
       <div className="flex -space-x-2">
@@ -237,7 +240,7 @@ function PreviewParticipants() {
           <Users size={14} className="text-zinc-400" />
         </div>
       </div>
-      <span className="text-sm text-zinc-400">No participants yet</span>
+      <span className="text-sm text-zinc-400">{t("noParticipantsYet")}</span>
     </div>
   );
 }
@@ -249,6 +252,9 @@ export function EventPreviewEditor({
   isLoading = false,
 }: EventPreviewEditorProps) {
   const router = useRouter();
+  const t = useTranslations("events");
+  const tManage = useTranslations("manage");
+  const tCommon = useTranslations("common");
 
   const [isSaving, setIsSaving] = useState(false);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
@@ -358,13 +364,13 @@ export function EventPreviewEditor({
 
   const handleSubmit = async () => {
     if (!formData.title.trim()) {
-      alert("Please enter an event title");
+      alert(t("enterEventTitle"));
       return;
     }
 
     // Validate dates
     if (dateErrors.start || dateErrors.end) {
-      alert("Please fix the date/time errors before submitting");
+      alert(t("fixDateTimeErrors"));
       return;
     }
 
@@ -445,15 +451,15 @@ export function EventPreviewEditor({
   // Format date range for preview
   const dateRangePreview = useMemo(() => {
     if (!formData.startDate && !formData.endDate) {
-      return "Select event dates";
+      return t("selectEventDates");
     }
     const startISO = combineDateTime(formData.startDate, formData.startTime);
     const endISO = combineDateTime(formData.endDate, formData.endTime);
     if (!startISO && !endISO) {
-      return "Select event dates";
+      return t("selectEventDates");
     }
     return formatDateRange(startISO || "", endISO || "");
-  }, [formData.startDate, formData.startTime, formData.endDate, formData.endTime]);
+  }, [formData.startDate, formData.startTime, formData.endDate, formData.endTime, t]);
 
   if (isLoading) {
     return (
@@ -489,7 +495,7 @@ export function EventPreviewEditor({
             <EditableTitle
               value={formData.title}
               onChange={(value) => updateField("title", value)}
-              placeholder="Enter event title"
+              placeholder={t("enterEventTitlePlaceholder")}
             />
 
             {/* Date preview */}
@@ -502,7 +508,7 @@ export function EventPreviewEditor({
           {/* Date & Time Pickers */}
           <div className="mb-4 p-4 bg-zinc-50 rounded-2xl space-y-3">
             <EditableDateTime
-              label="Start"
+              label={tCommon("start")}
               dateValue={formData.startDate}
               timeValue={formData.startTime}
               onDateChange={(value) => updateField("startDate", value)}
@@ -512,7 +518,7 @@ export function EventPreviewEditor({
               error={dateErrors.start}
             />
             <EditableDateTime
-              label="End"
+              label={tCommon("end")}
               dateValue={formData.endDate}
               timeValue={formData.endTime}
               onDateChange={(value) => updateField("endDate", value)}
@@ -531,20 +537,20 @@ export function EventPreviewEditor({
               <EditableLocation
                 value={formData.location}
                 onChange={(value) => updateField("location", value)}
-                placeholder="Add location"
+                placeholder={t("addLocation")}
               />
             </div>
           </div>
 
           {/* Description */}
           <div className="flex-1 mb-6">
-            <h2 className="text-base font-semibold text-zinc-900 mb-3">
-              About Event
+            <h2 className="font-display text-base font-semibold text-zinc-900 mb-3">
+              {t("aboutEvent")}
             </h2>
             <RichTextEditor
               content={formData.description}
               onChange={(content) => updateField("description", content)}
-              placeholder="Describe your event... Use the toolbar to add headings, lists, tables, and more."
+              placeholder={t("describeEventPlaceholder")}
               className="min-h-[200px]"
             />
           </div>
@@ -564,14 +570,14 @@ export function EventPreviewEditor({
               {isSaving ? (
                 <span className="flex items-center justify-center gap-2">
                   <Loader2 size={18} className="animate-spin" />
-                  {mode === "create" ? "Creating..." : "Saving..."}
+                  {mode === "create" ? tCommon("creating") : tCommon("saving")}
                 </span>
               ) : mode === "edit" && !hasChanges ? (
-                "No Changes"
+                tCommon("noChanges")
               ) : mode === "create" ? (
-                "Create Event"
+                tManage("createEvent")
               ) : (
-                "Confirm Edit"
+                tCommon("confirmEdit")
               )}
             </button>
           </div>

@@ -32,12 +32,12 @@ export function LanguageSwitcher({ variant = "icon", className }: LanguageSwitch
         onClick={toggleLocale}
         disabled={isPending}
         className={cn(
-          "p-2 rounded-full hover:bg-zinc-100 transition-colors disabled:opacity-50",
+          "p-2 rounded-full hover:bg-secondary transition-colors disabled:opacity-50",
           className
         )}
         aria-label={t("switchTo", { language: nextLanguage })}
       >
-        <Globe size={20} className="text-zinc-600" />
+        <Globe size={20} className="text-muted-foreground" />
       </button>
     );
   }
@@ -48,7 +48,7 @@ export function LanguageSwitcher({ variant = "icon", className }: LanguageSwitch
         onClick={toggleLocale}
         disabled={isPending}
         className={cn(
-          "text-sm text-zinc-500 hover:text-zinc-700 transition-colors disabled:opacity-50",
+          "text-sm text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50",
           className
         )}
       >
@@ -63,12 +63,12 @@ export function LanguageSwitcher({ variant = "icon", className }: LanguageSwitch
       onClick={toggleLocale}
       disabled={isPending}
       className={cn(
-        "flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-zinc-100 transition-colors disabled:opacity-50",
+        "flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-secondary transition-colors disabled:opacity-50",
         className
       )}
     >
-      <Globe size={18} className="text-zinc-600" />
-      <span className="text-sm text-zinc-600">
+      <Globe size={18} className="text-muted-foreground" />
+      <span className="text-sm text-muted-foreground">
         {locale === "en" ? "中文" : "English"}
       </span>
     </button>

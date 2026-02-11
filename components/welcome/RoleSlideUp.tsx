@@ -283,7 +283,7 @@ export function RoleSlideUp({
             <Loader2 size={40} className="text-zinc-400 animate-spin" />
           </div>
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold text-zinc-900">
+            <h2 className="font-display text-xl font-semibold text-zinc-900">
               {tAuth("verifying")}
             </h2>
             <p className="text-sm text-zinc-500">
@@ -299,7 +299,7 @@ export function RoleSlideUp({
             <CheckCircle size={40} className="text-emerald-600" />
           </div>
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold text-zinc-900">
+            <h2 className="font-display text-xl font-semibold text-zinc-900">
               {tAuth("welcomeBack")}
             </h2>
             <p className="text-sm text-zinc-500">
@@ -315,7 +315,7 @@ export function RoleSlideUp({
             <XCircle size={40} className="text-red-600" />
           </div>
           <div className="text-center space-y-2">
-            <h2 className="text-xl font-semibold text-zinc-900">
+            <h2 className="font-display text-xl font-semibold text-zinc-900">
               {authMode === "login" ? tAuth("loginFailed") : tAuth("registerFailed")}
             </h2>
             <p className="text-sm text-zinc-500">
@@ -343,7 +343,7 @@ export function RoleSlideUp({
           <Store size={32} className="text-zinc-600" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-zinc-900">
+          <h2 className="font-display text-xl font-semibold text-zinc-900">
             {tStores("selectStore")}
           </h2>
           <p className="text-sm text-zinc-500">
@@ -376,7 +376,7 @@ export function RoleSlideUp({
                   className={selectedStore === store.id ? "text-zinc-400" : "text-zinc-400"}
                 />
               </div>
-              <h3 className="font-semibold text-sm mb-1 truncate">{store.name}</h3>
+              <h3 className="font-display font-semibold text-sm mb-1 truncate">{store.name}</h3>
               <p
                 className={`text-xs mb-2 line-clamp-2 ${
                   selectedStore === store.id ? "text-zinc-300" : "text-zinc-500"
@@ -428,7 +428,7 @@ export function RoleSlideUp({
           <CheckCircle size={40} className="text-emerald-600" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-zinc-900">
+          <h2 className="font-display text-xl font-semibold text-zinc-900">
             {tMemberWelcome("title")}
           </h2>
           <p className="text-sm text-zinc-500">
@@ -491,7 +491,7 @@ export function RoleSlideUp({
           <Store size={32} className="text-zinc-600" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-zinc-900">
+          <h2 className="font-display text-xl font-semibold text-zinc-900">
             {tStores("selectStore")}
           </h2>
           <p className="text-sm text-zinc-500">
@@ -539,7 +539,7 @@ export function RoleSlideUp({
                   className={selectedStore === store.id ? "text-zinc-400" : "text-zinc-400"}
                 />
               </div>
-              <h3 className="font-semibold text-sm mb-1 truncate">{store.name}</h3>
+              <h3 className="font-display font-semibold text-sm mb-1 truncate">{store.name}</h3>
               <p
                 className={`text-xs mb-2 line-clamp-2 ${
                   selectedStore === store.id ? "text-zinc-300" : "text-zinc-500"
@@ -591,10 +591,10 @@ export function RoleSlideUp({
           <Icon size={32} className="text-white" strokeWidth={1.5} />
         </div>
         <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-zinc-900">
+          <h2 className="font-display text-xl font-semibold text-zinc-900">
             {roleTitle}
           </h2>
-          <p className="text-sm text-zinc-500">{roleSubtitle}</p>
+          <p className="font-serif text-sm text-zinc-500">{roleSubtitle}</p>
         </div>
       </div>
 
