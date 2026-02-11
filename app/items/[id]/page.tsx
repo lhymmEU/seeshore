@@ -178,7 +178,7 @@ export default function ItemDetailsPage() {
       </div>
 
       {/* Book Info */}
-      <div className="px-4 pt-5 pb-8">
+      <div className="px-4 pt-5 pb-8 max-w-3xl mx-auto lg:px-8">
         <div className="text-center space-y-1.5">
           <h1 className="font-display text-xl font-bold text-foreground leading-tight">
             {book.title}

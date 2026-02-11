@@ -56,7 +56,7 @@ function EventScrollCard({
   return (
     <button
       onClick={onClick}
-      className="flex-shrink-0 w-44 bg-secondary rounded-2xl overflow-hidden border border-border hover:border-border transition-all active:scale-[0.98] text-left"
+      className="flex-shrink-0 w-44 lg:w-full bg-secondary rounded-2xl overflow-hidden border border-border hover:border-border transition-all active:scale-[0.98] text-left"
     >
       {event.cover ? (
         <div className="h-28 w-full relative">
@@ -259,9 +259,9 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 lg:pb-6">
       {/* Search Bar Section */}
-      <div className="px-4 pt-12 pb-4 space-y-4">
+      <div className="px-4 pt-12 pb-4 space-y-4 max-w-5xl mx-auto lg:px-8">
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
@@ -269,7 +269,7 @@ export default function EventsPage() {
         />
       </div>
 
-      <div className="px-4 space-y-6">
+      <div className="px-4 space-y-6 max-w-5xl mx-auto lg:px-8">
         <div className="flex items-center justify-between">
           <h2 className="font-display text-base font-semibold text-foreground">{t("title")}</h2>
           <button className="text-sm text-muted-foreground hover:text-foreground/70 transition-colors">
@@ -288,7 +288,7 @@ export default function EventsPage() {
               ))}
             </div>
           ) : scrollEvents.length > 0 ? (
-            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-3 lg:overflow-x-visible">
               {scrollEvents.map((event) => (
                 <EventScrollCard
                   key={event.id}
@@ -304,7 +304,7 @@ export default function EventsPage() {
           )}
         </section>
 
-        <section className="pt-2">
+        <section className="pt-2 lg:max-w-2xl">
           <h2 className="font-display text-base font-semibold text-foreground mb-3">
             {t("closestEvent")}
           </h2>

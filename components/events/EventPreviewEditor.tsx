@@ -470,9 +470,9 @@ export function EventPreviewEditor({
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col lg:flex-row">
       {/* Cover Image Area */}
-      <div className="relative w-full flex-shrink-0">
+      <div className="relative w-full lg:w-1/2 lg:h-screen lg:sticky lg:top-0 flex-shrink-0">
         <button
           onClick={() => router.back()}
           className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center shadow-sm border border-border/50"
@@ -484,7 +484,7 @@ export function EventPreviewEditor({
       </div>
 
       {/* Content Sheet */}
-      <div className="relative -mt-6 bg-background rounded-t-3xl flex-1 flex flex-col">
+      <div className="relative -mt-6 lg:mt-0 bg-background rounded-t-3xl lg:rounded-none flex-1 flex flex-col lg:overflow-y-auto">
         <div className="flex justify-center pt-3 pb-4">
           <div className="w-12 h-1.5 rounded-full bg-muted" />
         </div>

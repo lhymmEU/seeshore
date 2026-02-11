@@ -186,7 +186,7 @@ export default function PostDetailPage({
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="sticky top-0 bg-background/80 backdrop-blur-sm border-b border-border z-10">
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-4 py-3 max-w-3xl mx-auto">
           <button
             onClick={() => router.back()}
             className="p-2 -ml-2 hover:bg-muted rounded-full transition-colors"
@@ -205,7 +205,7 @@ export default function PostDetailPage({
       </div>
 
       {/* Post Content */}
-      <div className="p-4 border-b border-border">
+      <div className="p-4 border-b border-border max-w-3xl mx-auto lg:px-8">
         {/* Author Info */}
         <div className="flex items-center gap-3 mb-4">
           {post.author.avatar ? (
@@ -260,7 +260,7 @@ export default function PostDetailPage({
       </div>
 
       {/* Replies Section */}
-      <div className="p-4">
+      <div className="p-4 max-w-3xl mx-auto lg:px-8">
         <h2 className="font-semibold text-foreground mb-4 font-display">
           {t("replies")} ({replies.length})
         </h2>
@@ -326,8 +326,8 @@ export default function PostDetailPage({
       </div>
 
       {/* Reply Input */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 pb-safe">
-        <div className="flex gap-2 max-w-md mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 pb-safe lg:left-64">
+        <div className="flex gap-2 max-w-3xl mx-auto">
           <input
             type="text"
             value={newReply}

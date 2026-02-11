@@ -259,7 +259,7 @@ export default function MemberDisplayPage() {
         </div>
       </div>
 
-      <div className="px-4 pt-6 space-y-6">
+      <div className="px-4 pt-6 space-y-6 max-w-3xl mx-auto lg:px-8">
         {/* Profile Header */}
         <div className="bg-background rounded-3xl p-6 shadow-sm border border-border">
           <div className="flex flex-col items-center text-center">

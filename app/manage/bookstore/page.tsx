@@ -223,10 +223,10 @@ export default function BookstoreEditorPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 lg:pb-6">
       <PageHeader title={t("editBookstore")} />
 
-      <div className="px-4 pt-6 space-y-6">
+      <div className="px-4 pt-6 space-y-6 max-w-3xl mx-auto lg:px-8">
         <ImageUpload
           preview={bannerPreview}
           onFileSelect={handleBannerSelect}

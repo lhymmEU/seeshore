@@ -491,10 +491,10 @@ export default function ManageItemsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-secondary pb-24">
+    <div className="min-h-screen bg-secondary pb-24 lg:pb-6">
       <PageHeader title={t("manageItems")} />
 
-      <div className="px-4 pt-5 space-y-4">
+      <div className="px-4 pt-5 space-y-4 max-w-5xl mx-auto lg:px-8">
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
@@ -589,7 +589,7 @@ export default function ManageItemsPage() {
       {/* Floating Action Button */}
       <button
         onClick={handleAddNew}
-        className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center"
+        className="fixed bottom-24 lg:bottom-8 right-4 lg:right-8 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center"
         aria-label="Add new item"
       >
         <Plus size={24} strokeWidth={2.5} />

@@ -1,23 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Newsreader } from "next/font/google";
+import localFont from "next/font/local";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { Sidebar } from "@/components/navigation";
 import "lxgw-wenkai-webfont/style.css";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const newsreader = Newsreader({
+const newsreader = localFont({
+  src: [
+    {
+      path: "./fonts/Newsreader-latin.woff2",
+      style: "normal",
+    },
+    {
+      path: "./fonts/Newsreader-italic-latin.woff2",
+      style: "italic",
+    },
+  ],
   variable: "--font-newsreader",
-  subsets: ["latin"],
+  display: "swap",
+  weight: "200 800",
 });
 
 export const metadata: Metadata = {
@@ -65,10 +69,15 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${newsreader.variable} antialiased font-sans`}
+        className={`${GeistSans.variable} ${GeistMono.variable} ${newsreader.variable} antialiased font-sans`}
       >
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <div className="lg:flex lg:min-h-screen">
+            <Sidebar />
+            <div className="flex-1 min-w-0">
+              {children}
+            </div>
+          </div>
         </NextIntlClientProvider>
       </body>
     </html>

@@ -335,16 +335,16 @@ export default function ProfilePage() {
   const avatarUrl = user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.id)}`;
 
   return (
-    <div className="min-h-screen bg-secondary pb-24">
+    <div className="min-h-screen bg-secondary pb-24 lg:pb-6">
       <div className="relative">
         <PageHeader title={t("title")} showBack={false} />
-        <div className="absolute right-4 top-3 z-50 flex items-center gap-0.5">
+        <div className="absolute right-4 top-3 z-50 flex items-center gap-0.5 lg:hidden">
           <ThemeToggle variant="icon" />
           <LanguageSwitcher variant="icon" />
         </div>
       </div>
 
-      <div className="px-4 pt-6 space-y-6">
+      <div className="px-4 pt-6 space-y-6 max-w-3xl mx-auto lg:px-8">
         {/* Profile Card */}
         <div className="bg-card rounded-3xl p-6 shadow-sm border border-border">
           <div className="flex items-start gap-4">

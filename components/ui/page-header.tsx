@@ -22,7 +22,7 @@ export function PageHeader({ title, showBack = true, onBack }: PageHeaderProps) 
 
   return (
     <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="flex items-center h-14 px-4">
+      <div className="flex items-center h-14 px-4 max-w-5xl mx-auto">
         {showBack ? (
           <button
             onClick={handleBack}
@@ -31,9 +31,9 @@ export function PageHeader({ title, showBack = true, onBack }: PageHeaderProps) 
             <ArrowLeft size={20} className="text-foreground/80" />
           </button>
         ) : (
-          <div className="w-8" />
+          <div className="w-8 lg:w-0" />
         )}
-        <h1 className="font-display flex-1 text-center font-semibold text-foreground pr-8">
+        <h1 className="font-display flex-1 text-center font-semibold text-foreground pr-8 lg:text-left lg:pr-0">
           {title}
         </h1>
       </div>

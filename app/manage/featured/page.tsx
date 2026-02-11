@@ -205,10 +205,10 @@ export default function ManageFeaturedBooksPage() {
   }, [store, selectedBookIds]);
 
   return (
-    <div className="min-h-screen bg-secondary pb-32">
+    <div className="min-h-screen bg-secondary pb-32 lg:pb-12">
       <PageHeader title={t("thisWeeksBooks")} />
 
-      <div className="px-4 pt-5 space-y-4">
+      <div className="px-4 pt-5 space-y-4 max-w-5xl mx-auto lg:px-8">
         {/* Info Banner */}
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
           <Star size={20} className="text-amber-500 flex-shrink-0 mt-0.5" />
@@ -246,7 +246,7 @@ export default function ManageFeaturedBooksPage() {
 
         {/* Books Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
@@ -261,7 +261,7 @@ export default function ManageFeaturedBooksPage() {
             ))}
           </div>
         ) : filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filteredBooks.map((book) => (
               <BookSelectionCard
                 key={book.id}
@@ -285,7 +285,7 @@ export default function ManageFeaturedBooksPage() {
       </div>
 
       {/* Sticky Save Button */}
-      <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 bg-gradient-to-t from-secondary via-secondary to-transparent pt-6">
+      <div className="fixed bottom-20 lg:bottom-0 left-0 right-0 lg:left-64 px-4 pb-4 lg:pb-6 bg-gradient-to-t from-secondary via-secondary to-transparent pt-6 max-w-5xl lg:mx-auto">
         <button
           onClick={handleSave}
           disabled={isSaving || isSuccess || !hasChanges}

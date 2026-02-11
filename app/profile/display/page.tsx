@@ -330,10 +330,10 @@ export default function DisplaySetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-secondary pb-32">
+    <div className="min-h-screen bg-secondary pb-32 lg:pb-12">
       <PageHeader title={t("displayPageSetup")} />
 
-      <div className="px-4 pt-6 space-y-6">
+      <div className="px-4 pt-6 space-y-6 max-w-3xl mx-auto lg:px-8">
         {/* Enable/Disable Toggle */}
         <div className="bg-background rounded-2xl p-5 border border-border">
           <div className="flex items-center justify-between">
@@ -578,7 +578,7 @@ export default function DisplaySetupPage() {
       </div>
 
       {/* Sticky Bottom Save Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-md border-t border-border p-4 z-40">
+      <div className="fixed bottom-0 left-0 right-0 lg:left-64 bg-background/90 backdrop-blur-md border-t border-border p-4 z-40">
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <p className="text-sm font-medium text-foreground">

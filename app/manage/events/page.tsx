@@ -148,10 +148,10 @@ export default function EventsManagePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-32">
+    <div className="min-h-screen bg-background pb-32 lg:pb-12">
       <PageHeader title={t("manageEvents")} />
 
-      <div className="px-4 pt-6 space-y-6">
+      <div className="px-4 pt-6 space-y-6 max-w-5xl mx-auto lg:px-8">
         <TabSwitcher
           tabs={tabs}
           activeTab={filter}
@@ -185,7 +185,7 @@ export default function EventsManagePage() {
       </div>
 
       {/* Floating Create Button */}
-      <div className="fixed bottom-24 left-0 right-0 px-4 z-30">
+      <div className="fixed bottom-24 lg:bottom-8 left-0 right-0 lg:left-64 px-4 z-30 max-w-5xl lg:mx-auto">
         <button
           onClick={handleCreateEvent}
           className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-primary text-primary-foreground font-medium shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors active:scale-[0.98]"

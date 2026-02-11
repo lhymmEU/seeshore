@@ -106,10 +106,10 @@ export default function ItemsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24 lg:pb-6">
       <PageHeader title={t("browseBooks")} showBack={false} />
 
-      <div className="px-4 pt-5 space-y-5">
+      <div className="px-4 pt-5 space-y-5 max-w-5xl mx-auto lg:px-8">
         {/* This Week's Book - Horizontal Scroll */}
         <section>
           <h2 className="font-display text-sm font-semibold text-foreground mb-3">
@@ -125,7 +125,7 @@ export default function ItemsPage() {
               ))}
             </div>
           ) : featuredBooks.length > 0 ? (
-            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4">
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 -mx-4 px-4 lg:-mx-8 lg:px-8">
               {featuredBooks.map((book) => (
                 <button
                   key={book.id}
@@ -157,7 +157,7 @@ export default function ItemsPage() {
 
         {/* Category Tags */}
         {allCategories.length > 0 && (
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4 lg:-mx-8 lg:px-8 lg:flex-wrap">
             <button
               onClick={() => setSelectedCategory(null)}
               className={cn(
@@ -205,7 +205,7 @@ export default function ItemsPage() {
               ))}
             </div>
           ) : filteredBooks.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredBooks.map((book) => (
                 <BookCard
                   key={book.id}

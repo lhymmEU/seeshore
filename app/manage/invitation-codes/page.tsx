@@ -179,10 +179,10 @@ export default function InvitationCodesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-secondary pb-24">
+    <div className="min-h-screen bg-secondary pb-24 lg:pb-6">
       <PageHeader title={t("title")} />
 
-      <div className="px-4 pt-5 space-y-4">
+      <div className="px-4 pt-5 space-y-4 max-w-3xl mx-auto lg:px-8">
         <p className="text-sm text-muted-foreground">{t("description")}</p>
 
         <button

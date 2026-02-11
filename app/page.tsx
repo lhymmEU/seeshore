@@ -64,28 +64,31 @@ export default function WelcomePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Main content area */}
-      <main className="flex-1 flex flex-col justify-center px-6 py-6 gap-6">
-        {/* Steps animation banner */}
-        <StepsBanner />
+      <main className="flex-1 flex flex-col justify-center px-6 py-6 gap-6 lg:flex-row lg:items-center lg:gap-16 lg:px-16 lg:py-12 max-w-7xl mx-auto w-full">
+        {/* Left column: Text content */}
+        <div className="flex flex-col gap-6 lg:flex-1 lg:max-w-lg">
+          {/* Steps animation banner */}
+          <StepsBanner />
 
-        {/* Title row with language switcher and theme toggle */}
-        <div className="flex items-center justify-between mt-10">
-          <h1 className="text-2xl font-semibold text-foreground tracking-tight font-display">
-            {t("storeName")}
-          </h1>
-          <div className="flex items-center gap-1">
-            <ThemeToggle variant="icon" />
-            <LanguageSwitcher variant="full" />
+          {/* Title row with language switcher and theme toggle */}
+          <div className="flex items-center justify-between mt-10 lg:mt-4">
+            <h1 className="text-2xl lg:text-4xl font-semibold text-foreground tracking-tight font-display">
+              {t("storeName")}
+            </h1>
+            <div className="flex items-center gap-1">
+              <ThemeToggle variant="icon" />
+              <LanguageSwitcher variant="full" />
+            </div>
           </div>
+
+          {/* Description */}
+          <p className="text-muted-foreground text-sm lg:text-base leading-relaxed font-serif">
+            {t("storeDescription")}
+          </p>
         </div>
 
-        {/* Description */}
-        <p className="text-muted-foreground text-sm leading-relaxed font-serif">
-          {t("storeDescription")}
-        </p>
-
-        {/* Hero image carousel */}
-        <div className="flex flex-col items-center gap-3">
+        {/* Right column: Hero image carousel */}
+        <div className="flex flex-col items-center gap-3 lg:flex-1 lg:max-w-xl">
           <Carousel opts={{ loop: true }} setApi={setCarouselApi} className="w-full">
             <CarouselContent>
               {[1, 2, 3].map((i) => (
@@ -120,24 +123,23 @@ export default function WelcomePage() {
             ))}
           </div>
         </div>
-
         {/* CTA Button with Drawer */}
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerTrigger asChild>
-            <Button
-              size="lg"
-              className="w-full rounded-full h-12 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/10"
-            >
-              {t("getStarted")}
-              <ArrowRight size={18} className="ml-1" />
-            </Button>
-          </DrawerTrigger>
-          <DrawerContent className="pb-6">
-            <div className="pt-4">
-              <RoleSelector onContinue={handleRoleSelected} />
-            </div>
-          </DrawerContent>
-        </Drawer>
+            <DrawerTrigger asChild>
+              <Button
+                size="lg"
+                className="w-full lg:w-auto lg:px-12 rounded-full h-12 text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/10"
+              >
+                {t("getStarted")}
+                <ArrowRight size={18} className="ml-1" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent className="pb-6">
+              <div className="pt-4">
+                <RoleSelector onContinue={handleRoleSelected} />
+              </div>
+            </DrawerContent>
+          </Drawer>
       </main>
     </div>
   );

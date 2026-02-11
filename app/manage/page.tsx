@@ -223,15 +223,15 @@ export default function ManagePage() {
 
   return (
     <div className="min-h-screen bg-secondary">
-      <div className="px-4 pt-14 pb-8">
+      <div className="px-4 pt-14 pb-8 max-w-5xl mx-auto lg:px-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="font-display text-2xl font-bold text-foreground">{t("dashboard")}</h1>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 lg:hidden">
             <ThemeToggle variant="icon" />
             <LanguageSwitcher variant="full" />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 lg:gap-4">
           {cardConfigs.map((card) => (
             <DashboardCardComponent 
               key={card.id} 
