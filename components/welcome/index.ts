@@ -5,4 +5,6 @@ export { RoleCard, type RoleType } from "./RoleCard";
 export { RoleSelector } from "./RoleSelector";
 export { RoleSlideUp } from "./RoleSlideUp";
 export { StepsBanner } from "./StepsBanner";
+export { MobileWelcome } from "./MobileWelcome";
+export { DesktopWelcome } from "./DesktopWelcome";
 
