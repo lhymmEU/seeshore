@@ -143,9 +143,50 @@ const ICON_CANVAS_SIZE = 128;
 const LOOP_DURATION = 5; // seconds per full loop
 const STEP_COUNT = STEPS.length;
 
+/** Read a CSS custom property's computed colour and return a hex-ish string
+ *  the canvas API can consume. Falls back to the provided default. */
+function getCSSColor(prop: string, fallback: string): string {
+  if (typeof document === "undefined") return fallback;
+  const raw = getComputedStyle(document.documentElement)
+    .getPropertyValue(prop)
+    .trim();
+  return raw || fallback;
+}
+
+/** Convert an oklch() CSS string to an approximate hex colour via an offscreen canvas. */
+function cssColorToHex(cssColor: string, fallback: string): string {
+  if (typeof document === "undefined") return fallback;
+  try {
+    const c = document.createElement("canvas");
+    c.width = c.height = 1;
+    const ctx = c.getContext("2d")!;
+    ctx.fillStyle = cssColor;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+    return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
+  } catch {
+    return fallback;
+  }
+}
+
+/** Resolve brand colours from CSS variables for canvas / Three.js usage. */
+function resolveBrandColors() {
+  const accent = getCSSColor("--brand-accent", "oklch(0.32 0.06 150)");
+  const muted = getCSSColor("--brand-muted", "oklch(0.55 0.03 150)");
+  const border = getCSSColor("--brand-border", "oklch(0.90 0.015 150)");
+
+  return {
+    active: cssColorToHex(accent, "#3a6b50"),
+    inactive: cssColorToHex(muted, "#788a80"),
+    label: cssColorToHex(muted, "#788a80"),
+    dot: cssColorToHex(border, "#dce5df"),
+  };
+}
+
 function createIconTexture(
   step: (typeof STEPS)[number],
-  isActive: boolean
+  isActive: boolean,
+  colors: { active: string; inactive: string }
 ): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = ICON_CANVAS_SIZE;
@@ -158,7 +199,7 @@ function createIconTexture(
   const cy = ICON_CANVAS_SIZE / 2;
   const r = ICON_CANVAS_SIZE * 0.38;
 
-  ctx.fillStyle = isActive ? "#18181b" : "#a1a1aa";
+  ctx.fillStyle = isActive ? colors.active : colors.inactive;
   step.draw(ctx, cx, cy, r);
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -206,9 +247,12 @@ export function StepsBanner() {
     // Spacing between step centers
     const spacing = Math.max(iconSize * 2.2, width * 0.22);
 
+    // Resolve brand palette from CSS custom properties
+    const colors = resolveBrandColors();
+
     // Pre-generate textures for active/inactive states
-    const activeTextures = STEPS.map((s) => createIconTexture(s, true));
-    const inactiveTextures = STEPS.map((s) => createIconTexture(s, false));
+    const activeTextures = STEPS.map((s) => createIconTexture(s, true, colors));
+    const inactiveTextures = STEPS.map((s) => createIconTexture(s, false, colors));
 
     // Create meshes
     const meshes: THREE.Mesh[] = [];
@@ -237,7 +281,7 @@ export function StepsBanner() {
       lCtx.font = "600 24px system-ui, -apple-system, sans-serif";
       lCtx.textAlign = "center";
       lCtx.textBaseline = "middle";
-      lCtx.fillStyle = "#71717a";
+      lCtx.fillStyle = colors.label;
       lCtx.fillText(STEPS[i].label, 128, 24);
       const labelTex = new THREE.CanvasTexture(labelCanvas);
       const spriteMat = new THREE.SpriteMaterial({
@@ -257,7 +301,7 @@ export function StepsBanner() {
     // Connector dots between icons
     const dotGeom = new THREE.CircleGeometry(2, 16);
     const dotMat = new THREE.MeshBasicMaterial({
-      color: 0xd4d4d8,
+      color: new THREE.Color(colors.dot),
       transparent: true,
       depthTest: false,
     });
