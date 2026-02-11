@@ -106,13 +106,13 @@ export default function ItemsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-background pb-24">
       <PageHeader title={t("browseBooks")} showBack={false} />
 
       <div className="px-4 pt-5 space-y-5">
         {/* This Week's Book - Horizontal Scroll */}
         <section>
-          <h2 className="font-display text-sm font-semibold text-zinc-800 mb-3">
+          <h2 className="font-display text-sm font-semibold text-foreground mb-3">
             {t("thisWeeksBook")}
           </h2>
           {isLoading ? (
@@ -120,7 +120,7 @@ export default function ItemsPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="flex-shrink-0 w-28 h-40 bg-zinc-100 rounded-xl animate-pulse"
+                  className="flex-shrink-0 w-28 h-40 bg-muted rounded-xl animate-pulse"
                 />
               ))}
             </div>
@@ -143,7 +143,7 @@ export default function ItemsPage() {
               ))}
             </div>
           ) : (
-            <div className="flex items-center justify-center h-40 bg-zinc-50 rounded-xl text-zinc-400 text-sm">
+            <div className="flex items-center justify-center h-40 bg-secondary rounded-xl text-muted-foreground/70 text-sm">
               {t("noFeaturedBooks")}
             </div>
           )}
@@ -163,8 +163,8 @@ export default function ItemsPage() {
               className={cn(
                 "flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
                 selectedCategory === null
-                  ? "bg-zinc-900 text-white"
-                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted"
               )}
             >
               {t("all")}
@@ -176,8 +176,8 @@ export default function ItemsPage() {
                 className={cn(
                   "flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
                   selectedCategory === category
-                    ? "bg-zinc-900 text-white"
-                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground hover:bg-muted"
                 )}
               >
                 {category}
@@ -193,13 +193,13 @@ export default function ItemsPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="flex gap-4 p-4 bg-zinc-50 rounded-2xl animate-pulse"
+                  className="flex gap-4 p-4 bg-secondary rounded-2xl animate-pulse"
                 >
-                  <div className="w-20 h-28 bg-zinc-200 rounded-xl" />
+                  <div className="w-20 h-28 bg-muted rounded-xl" />
                   <div className="flex-1 space-y-3">
-                    <div className="h-5 bg-zinc-200 rounded w-3/4" />
-                    <div className="h-4 bg-zinc-200 rounded w-1/2" />
-                    <div className="h-4 bg-zinc-200 rounded w-1/3" />
+                    <div className="h-5 bg-muted rounded w-3/4" />
+                    <div className="h-4 bg-muted rounded w-1/2" />
+                    <div className="h-4 bg-muted rounded w-1/3" />
                   </div>
                 </div>
               ))}

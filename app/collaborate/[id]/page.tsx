@@ -154,21 +154,21 @@ export default function PostDetailPage({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 size={32} className="animate-spin text-zinc-400" />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 size={32} className="animate-spin text-muted-foreground/70" />
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background">
         <div className="p-4">
           <button
             onClick={() => router.back()}
-            className="p-2 hover:bg-zinc-100 rounded-full transition-colors"
+            className="p-2 hover:bg-muted rounded-full transition-colors"
           >
-            <ArrowLeft size={24} className="text-zinc-600" />
+            <ArrowLeft size={24} className="text-muted-foreground" />
           </button>
         </div>
         <EmptyState
@@ -183,15 +183,15 @@ export default function PostDetailPage({
   const isAuthor = currentUserId === post.author.id;
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <div className="sticky top-0 bg-white/80 backdrop-blur-sm border-b border-zinc-100 z-10">
+      <div className="sticky top-0 bg-background/80 backdrop-blur-sm border-b border-border z-10">
         <div className="flex items-center justify-between px-4 py-3">
           <button
             onClick={() => router.back()}
-            className="p-2 -ml-2 hover:bg-zinc-100 rounded-full transition-colors"
+            className="p-2 -ml-2 hover:bg-muted rounded-full transition-colors"
           >
-            <ArrowLeft size={24} className="text-zinc-600" />
+            <ArrowLeft size={24} className="text-muted-foreground" />
           </button>
           {isAuthor && (
             <button
@@ -205,7 +205,7 @@ export default function PostDetailPage({
       </div>
 
       {/* Post Content */}
-      <div className="p-4 border-b border-zinc-100">
+      <div className="p-4 border-b border-border">
         {/* Author Info */}
         <div className="flex items-center gap-3 mb-4">
           {post.author.avatar ? (
@@ -219,23 +219,23 @@ export default function PostDetailPage({
               />
             </div>
           ) : (
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-zinc-200 to-zinc-100 flex items-center justify-center">
-              <span className="text-zinc-500 font-semibold text-lg">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-muted to-secondary flex items-center justify-center">
+              <span className="text-muted-foreground font-semibold text-lg">
                 {post.author.name.charAt(0).toUpperCase()}
               </span>
             </div>
           )}
           <div>
-            <p className="font-semibold text-zinc-900">{post.author.name}</p>
-            <p className="text-sm text-zinc-500">
+            <p className="font-semibold text-foreground">{post.author.name}</p>
+            <p className="text-sm text-muted-foreground">
               {formatRelativeTime(post.createdAt)}
             </p>
           </div>
         </div>
 
         {/* Title & Description */}
-        <h1 className="text-xl font-bold text-zinc-900 mb-2 font-display">{post.title}</h1>
-        <p className="text-zinc-600 whitespace-pre-wrap font-serif">{post.description}</p>
+        <h1 className="text-xl font-bold text-foreground mb-2 font-display">{post.title}</h1>
+        <p className="text-muted-foreground whitespace-pre-wrap font-serif">{post.description}</p>
 
         {/* Photos */}
         {post.photos && post.photos.length > 0 && (
@@ -244,7 +244,7 @@ export default function PostDetailPage({
               <button
                 key={index}
                 onClick={() => setSelectedImage(photo)}
-                className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100"
+                className="relative aspect-square rounded-xl overflow-hidden bg-muted"
               >
                 <Image
                   src={photo}
@@ -261,12 +261,12 @@ export default function PostDetailPage({
 
       {/* Replies Section */}
       <div className="p-4">
-        <h2 className="font-semibold text-zinc-900 mb-4 font-display">
+        <h2 className="font-semibold text-foreground mb-4 font-display">
           {t("replies")} ({replies.length})
         </h2>
 
         {replies.length === 0 ? (
-          <div className="py-8 text-center text-zinc-400">
+          <div className="py-8 text-center text-muted-foreground/70">
             <MessageCircle size={32} className="mx-auto mb-2 opacity-50" />
             <p className="text-sm">{t("noRepliesYet")}</p>
           </div>
@@ -275,7 +275,7 @@ export default function PostDetailPage({
             {replies.map((reply) => (
               <div
                 key={reply.id}
-                className="flex gap-3 p-3 bg-zinc-50 rounded-xl"
+                className="flex gap-3 p-3 bg-secondary rounded-xl"
               >
                 {/* Reply Author Avatar */}
                 {reply.author.avatar ? (
@@ -289,8 +289,8 @@ export default function PostDetailPage({
                     />
                   </div>
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-200 to-zinc-100 flex items-center justify-center flex-shrink-0">
-                    <span className="text-zinc-500 font-medium text-xs">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-muted to-secondary flex items-center justify-center flex-shrink-0">
+                    <span className="text-muted-foreground font-medium text-xs">
                       {reply.author.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -299,23 +299,23 @@ export default function PostDetailPage({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
                     <p className="text-sm">
-                      <span className="font-semibold text-zinc-900">
+                      <span className="font-semibold text-foreground">
                         {reply.author.name}
                       </span>
-                      <span className="text-zinc-400 ml-2">
+                      <span className="text-muted-foreground/70 ml-2">
                         {formatRelativeTime(reply.createdAt)}
                       </span>
                     </p>
                     {currentUserId === reply.author.id && (
                       <button
                         onClick={() => handleDeleteReply(reply.id)}
-                        className="p-1 hover:bg-zinc-200 rounded-full transition-colors text-zinc-400 hover:text-red-500"
+                        className="p-1 hover:bg-muted rounded-full transition-colors text-muted-foreground/70 hover:text-red-500"
                       >
                         <Trash2 size={14} />
                       </button>
                     )}
                   </div>
-                  <p className="text-zinc-600 text-sm mt-1 whitespace-pre-wrap">
+                  <p className="text-muted-foreground text-sm mt-1 whitespace-pre-wrap">
                     {reply.content}
                   </p>
                 </div>
@@ -326,14 +326,14 @@ export default function PostDetailPage({
       </div>
 
       {/* Reply Input */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-zinc-100 p-4 pb-safe">
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border p-4 pb-safe">
         <div className="flex gap-2 max-w-md mx-auto">
           <input
             type="text"
             value={newReply}
             onChange={(e) => setNewReply(e.target.value)}
             placeholder={t("writeReply")}
-            className="flex-1 px-4 py-3 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
+            className="flex-1 px-4 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -344,7 +344,7 @@ export default function PostDetailPage({
           <button
             onClick={handleSubmitReply}
             disabled={!newReply.trim() || isSubmitting}
-            className="px-4 bg-zinc-900 text-white rounded-xl hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isSubmitting ? (
               <Loader2 size={20} className="animate-spin" />
@@ -363,7 +363,7 @@ export default function PostDetailPage({
         >
           <button
             onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+            className="absolute top-4 right-4 p-2 text-white hover:bg-background/10 rounded-full transition-colors"
           >
             <ArrowLeft size={24} />
           </button>

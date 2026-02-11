@@ -32,17 +32,17 @@ function BookSelectionCard({
     <button
       onClick={onToggle}
       className={cn(
-        "relative bg-white rounded-2xl border overflow-hidden shadow-sm transition-all active:scale-[0.98]",
+        "relative bg-background rounded-2xl border overflow-hidden shadow-sm transition-all active:scale-[0.98]",
         isSelected
           ? "border-emerald-500 ring-2 ring-emerald-500/20"
-          : "border-zinc-100 hover:border-zinc-200 hover:shadow-md"
+          : "border-border hover:border-border hover:shadow-md"
       )}
     >
       {/* Selection indicator */}
       <div
         className={cn(
           "absolute top-3 right-3 z-10 w-6 h-6 rounded-full flex items-center justify-center transition-all",
-          isSelected ? "bg-emerald-500" : "bg-white/80 backdrop-blur-sm border border-zinc-200"
+          isSelected ? "bg-emerald-500" : "bg-background/80 backdrop-blur-sm border border-border"
         )}
       >
         {isSelected && <Check size={14} className="text-white" strokeWidth={3} />}
@@ -59,18 +59,18 @@ function BookSelectionCard({
             unoptimized
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-zinc-200 to-zinc-100 flex items-center justify-center">
-            <BookOpen size={32} className="text-zinc-400" />
+          <div className="w-full h-full bg-gradient-to-br from-muted to-secondary flex items-center justify-center">
+            <BookOpen size={32} className="text-muted-foreground/70" />
           </div>
         )}
       </div>
 
       {/* Book Info */}
       <div className="p-3 text-left">
-        <h3 className="font-display font-medium text-zinc-900 text-sm leading-tight line-clamp-2">
+        <h3 className="font-display font-medium text-foreground text-sm leading-tight line-clamp-2">
           {book.title}
         </h3>
-        <p className="text-xs text-zinc-500 mt-1 line-clamp-1">
+        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
           {book.author || tCommon("unknownAuthor")}
         </p>
       </div>
@@ -205,7 +205,7 @@ export default function ManageFeaturedBooksPage() {
   }, [store, selectedBookIds]);
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-32">
+    <div className="min-h-screen bg-secondary pb-32">
       <PageHeader title={t("thisWeeksBooks")} />
 
       <div className="px-4 pt-5 space-y-4">
@@ -230,14 +230,14 @@ export default function ManageFeaturedBooksPage() {
 
         {/* Selection Count */}
         <div className="flex items-center justify-between">
-          <p className="text-sm text-zinc-500">
-            <span className="font-medium text-zinc-700">{selectedBookIds.length}</span>
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium text-foreground/70">{selectedBookIds.length}</span>
             {t("selectedOutOfTen")}
           </p>
           {selectedBookIds.length > 0 && (
             <button
               onClick={() => setSelectedBookIds([])}
-              className="text-sm text-zinc-500 hover:text-zinc-700 underline"
+              className="text-sm text-muted-foreground hover:text-foreground/70 underline"
             >
               {tCommon("clearAll")}
             </button>
@@ -250,12 +250,12 @@ export default function ManageFeaturedBooksPage() {
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className="bg-white rounded-2xl border border-zinc-100 overflow-hidden animate-pulse"
+                className="bg-background rounded-2xl border border-border overflow-hidden animate-pulse"
               >
-                <div className="h-36 bg-zinc-200" />
+                <div className="h-36 bg-muted" />
                 <div className="p-3 space-y-2">
-                  <div className="h-4 bg-zinc-200 rounded w-3/4" />
-                  <div className="h-3 bg-zinc-200 rounded w-1/2" />
+                  <div className="h-4 bg-muted rounded w-3/4" />
+                  <div className="h-3 bg-muted rounded w-1/2" />
                 </div>
               </div>
             ))}
@@ -285,7 +285,7 @@ export default function ManageFeaturedBooksPage() {
       </div>
 
       {/* Sticky Save Button */}
-      <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 bg-gradient-to-t from-zinc-50 via-zinc-50 to-transparent pt-6">
+      <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 bg-gradient-to-t from-secondary via-secondary to-transparent pt-6">
         <button
           onClick={handleSave}
           disabled={isSaving || isSuccess || !hasChanges}
@@ -294,8 +294,8 @@ export default function ManageFeaturedBooksPage() {
             isSuccess
               ? "bg-emerald-500 text-white"
               : hasChanges
-              ? "bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]"
-              : "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]"
+              : "bg-muted text-muted-foreground/70 cursor-not-allowed"
           )}
         >
           {isSuccess ? (

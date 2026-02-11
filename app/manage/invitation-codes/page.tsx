@@ -163,10 +163,10 @@ export default function InvitationCodesPage() {
 
   if (!storeId && !isLoading) {
     return (
-      <div className="min-h-screen bg-zinc-50 pb-24">
+      <div className="min-h-screen bg-secondary pb-24">
         <PageHeader title={t("title")} />
         <div className="px-4 pt-6">
-          <p className="text-zinc-600 text-sm">{t("onlyOwnerStore")}</p>
+          <p className="text-muted-foreground text-sm">{t("onlyOwnerStore")}</p>
           <a
             href="/manage"
             className="mt-4 inline-block text-emerald-600 font-medium"
@@ -179,11 +179,11 @@ export default function InvitationCodesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-24">
+    <div className="min-h-screen bg-secondary pb-24">
       <PageHeader title={t("title")} />
 
       <div className="px-4 pt-5 space-y-4">
-        <p className="text-sm text-zinc-600">{t("description")}</p>
+        <p className="text-sm text-muted-foreground">{t("description")}</p>
 
         <button
           type="button"
@@ -191,8 +191,8 @@ export default function InvitationCodesPage() {
           disabled={isGenerating || !storeId}
           className={cn(
             "w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-medium transition-colors",
-            "bg-white border border-zinc-200 text-zinc-800",
-            "hover:bg-zinc-50 hover:border-zinc-300",
+            "bg-background border border-border text-foreground",
+            "hover:bg-secondary hover:border-border",
             "disabled:opacity-50 disabled:pointer-events-none"
           )}
         >
@@ -206,13 +206,13 @@ export default function InvitationCodesPage() {
 
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <Loader2 size={28} className="animate-spin text-zinc-400" />
+            <Loader2 size={28} className="animate-spin text-muted-foreground/70" />
           </div>
         ) : codes.length === 0 ? (
-          <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center">
-            <Ticket size={40} className="mx-auto text-zinc-300 mb-3" />
-            <p className="font-medium text-zinc-700">{t("noCodes")}</p>
-            <p className="text-sm text-zinc-500 mt-1">{t("generateFirst")}</p>
+          <div className="rounded-2xl border border-border bg-background p-8 text-center">
+            <Ticket size={40} className="mx-auto text-muted-foreground/50 mb-3" />
+            <p className="font-medium text-foreground/70">{t("noCodes")}</p>
+            <p className="text-sm text-muted-foreground mt-1">{t("generateFirst")}</p>
           </div>
         ) : (
           <ul className="space-y-3">
@@ -220,10 +220,10 @@ export default function InvitationCodesPage() {
               <li
                 key={row.id}
                 className={cn(
-                  "rounded-2xl border bg-white overflow-hidden",
+                  "rounded-2xl border bg-background overflow-hidden",
                   row.is_used
-                    ? "border-zinc-100 bg-zinc-50/50"
-                    : "border-zinc-200 shadow-sm"
+                    ? "border-border bg-secondary/50"
+                    : "border-border shadow-sm"
                 )}
               >
                 <div className="p-4 flex flex-wrap items-center gap-3">
@@ -232,7 +232,7 @@ export default function InvitationCodesPage() {
                       <span
                         className={cn(
                           "font-mono font-semibold text-base tracking-wide",
-                          row.is_used ? "text-zinc-400" : "text-zinc-900"
+                          row.is_used ? "text-muted-foreground/70" : "text-foreground"
                         )}
                       >
                         {row.code}
@@ -241,7 +241,7 @@ export default function InvitationCodesPage() {
                         <button
                           type="button"
                           onClick={() => handleCopy(row.code)}
-                          className="p-1.5 rounded-lg hover:bg-zinc-100 text-zinc-500 hover:text-zinc-700 transition-colors"
+                          className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground/70 transition-colors"
                           title={t("copyCode")}
                         >
                           {copiedCode === row.code ? (
@@ -252,7 +252,7 @@ export default function InvitationCodesPage() {
                         </button>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-500">
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                       <span>
                         {t("createdAt")}: {formatDate(row.created_at)}
                       </span>
@@ -268,7 +268,7 @@ export default function InvitationCodesPage() {
                       className={cn(
                         "px-2.5 py-1 rounded-full text-xs font-medium",
                         row.is_used
-                          ? "bg-zinc-200 text-zinc-600"
+                          ? "bg-muted text-muted-foreground"
                           : "bg-emerald-100 text-emerald-700"
                       )}
                     >

@@ -148,7 +148,7 @@ export default function EventsManagePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white pb-32">
+    <div className="min-h-screen bg-background pb-32">
       <PageHeader title={t("manageEvents")} />
 
       <div className="px-4 pt-6 space-y-6">
@@ -159,7 +159,7 @@ export default function EventsManagePage() {
         />
 
         {filteredEvents.length === 0 ? (
-          <div className="bg-zinc-50 rounded-2xl p-12 border border-zinc-100">
+          <div className="bg-secondary rounded-2xl p-12 border border-border">
             <EmptyState
               icon={Calendar}
               title={filter === "live" ? t("noLiveEvents") : t("noProposedEvents")}
@@ -188,7 +188,7 @@ export default function EventsManagePage() {
       <div className="fixed bottom-24 left-0 right-0 px-4 z-30">
         <button
           onClick={handleCreateEvent}
-          className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-zinc-900 text-white font-medium shadow-lg shadow-zinc-900/20 hover:bg-zinc-800 transition-colors active:scale-[0.98]"
+          className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-primary text-primary-foreground font-medium shadow-lg shadow-primary/20 hover:bg-primary/90 transition-colors active:scale-[0.98]"
         >
           <Plus size={20} />
           {t("createEvent")}
@@ -199,15 +199,15 @@ export default function EventsManagePage() {
 
       {/* Delete Confirmation Drawer */}
       <Drawer open={deleteDrawerOpen} onOpenChange={setDeleteDrawerOpen}>
-        <DrawerContent className="bg-white">
+        <DrawerContent className="bg-background">
           <DrawerHeader className="text-center pb-2">
             <div className="mx-auto w-14 h-14 rounded-full bg-rose-100 flex items-center justify-center mb-3">
               <AlertTriangle size={28} className="text-rose-600" />
             </div>
-            <DrawerTitle className="text-xl text-zinc-900 font-display">
+            <DrawerTitle className="text-xl text-foreground font-display">
               {t("deleteEventConfirm")}
             </DrawerTitle>
-            <DrawerDescription className="text-zinc-500 mt-2">
+            <DrawerDescription className="text-muted-foreground mt-2">
               {t("confirmDeleteEvent", { title: eventToDelete?.title ?? "" })}
             </DrawerDescription>
           </DrawerHeader>
@@ -255,7 +255,7 @@ export default function EventsManagePage() {
             <button
               onClick={cancelDelete}
               disabled={isDeleting}
-              className="w-full py-4 rounded-2xl bg-zinc-100 text-zinc-700 font-medium hover:bg-zinc-200 transition-colors active:scale-[0.98] disabled:opacity-50"
+              className="w-full py-4 rounded-2xl bg-muted text-foreground/70 font-medium hover:bg-muted transition-colors active:scale-[0.98] disabled:opacity-50"
             >
               {tCommon("cancel")}
             </button>

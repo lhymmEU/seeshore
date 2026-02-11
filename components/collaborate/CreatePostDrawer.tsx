@@ -134,14 +134,14 @@ export function CreatePostDrawer({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader className="flex flex-row items-center justify-between border-b border-zinc-100 pb-4">
+        <DrawerHeader className="flex flex-row items-center justify-between border-b border-border pb-4">
           <DrawerTitle className="text-lg">{t("createPost")}</DrawerTitle>
           <DrawerClose asChild>
             <button
               onClick={handleClose}
-              className="p-2 rounded-full hover:bg-zinc-100 transition-colors"
+              className="p-2 rounded-full hover:bg-muted transition-colors"
             >
-              <X size={20} className="text-zinc-500" />
+              <X size={20} className="text-muted-foreground" />
             </button>
           </DrawerClose>
         </DrawerHeader>
@@ -149,7 +149,7 @@ export function CreatePostDrawer({
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Title Input */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">
+            <label className="text-sm font-medium text-foreground/70">
               {t("postTitle")}
             </label>
             <input
@@ -157,13 +157,13 @@ export function CreatePostDrawer({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t("enterTitle")}
-              className="w-full px-4 py-3 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             />
           </div>
 
           {/* Description Input */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">
+            <label className="text-sm font-medium text-foreground/70">
               {t("postDescription")}
             </label>
             <textarea
@@ -171,13 +171,13 @@ export function CreatePostDrawer({
               onChange={(e) => setDescription(e.target.value)}
               placeholder={t("enterDescription")}
               rows={5}
-              className="w-full px-4 py-3 rounded-xl border border-zinc-200 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none"
             />
           </div>
 
           {/* Photo Upload */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">
+            <label className="text-sm font-medium text-foreground/70">
               {t("photos")} ({photoPreviews.length}/5)
             </label>
             <div className="flex flex-wrap gap-2">
@@ -207,12 +207,12 @@ export function CreatePostDrawer({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-20 h-20 rounded-xl border-2 border-dashed border-zinc-300 flex flex-col items-center justify-center gap-1 hover:border-zinc-400 transition-colors"
+                  className="w-20 h-20 rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-1 hover:border-muted-foreground transition-colors"
                 >
                   {photoFiles.length === 0 ? (
-                    <Camera size={20} className="text-zinc-400" />
+                    <Camera size={20} className="text-muted-foreground/70" />
                   ) : (
-                    <Plus size={20} className="text-zinc-400" />
+                    <Plus size={20} className="text-muted-foreground/70" />
                   )}
                 </button>
               )}
@@ -229,7 +229,7 @@ export function CreatePostDrawer({
         </div>
 
         {/* Submit Button */}
-        <div className="p-4 border-t border-zinc-100">
+        <div className="p-4 border-t border-border">
           <Button
             onClick={handleSubmit}
             disabled={!title.trim() || !description.trim() || isSubmitting}

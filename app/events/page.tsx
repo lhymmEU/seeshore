@@ -56,7 +56,7 @@ function EventScrollCard({
   return (
     <button
       onClick={onClick}
-      className="flex-shrink-0 w-44 bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 hover:border-zinc-200 transition-all active:scale-[0.98] text-left"
+      className="flex-shrink-0 w-44 bg-secondary rounded-2xl overflow-hidden border border-border hover:border-border transition-all active:scale-[0.98] text-left"
     >
       {event.cover ? (
         <div className="h-28 w-full relative">
@@ -69,16 +69,16 @@ function EventScrollCard({
           />
         </div>
       ) : (
-        <div className="h-28 w-full bg-gradient-to-br from-zinc-200 to-zinc-100 flex items-center justify-center">
-          <span className="text-zinc-400 text-sm">{t("eventPicture")}</span>
+        <div className="h-28 w-full bg-gradient-to-br from-muted to-secondary flex items-center justify-center">
+          <span className="text-muted-foreground/70 text-sm">{t("eventPicture")}</span>
         </div>
       )}
 
       <div className="p-3 space-y-1.5">
-        <h3 className="font-display font-semibold text-zinc-900 text-sm leading-tight line-clamp-1">
+        <h3 className="font-display font-semibold text-foreground text-sm leading-tight line-clamp-1">
           {event.title}
         </h3>
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-muted-foreground">
           {formatDateShort(event.startDate)} {formatTime(event.startDate)} – {formatTime(event.endDate)}
         </p>
         
@@ -88,15 +88,15 @@ function EventScrollCard({
               {[...Array(Math.min(1, attendeeCount))].map((_, i) => (
                 <div
                   key={i}
-                  className="w-5 h-5 rounded-full bg-zinc-300 border border-white"
+                  className="w-5 h-5 rounded-full bg-muted border border-background"
                 />
               ))}
             </div>
             {attendeeCount > 0 && (
-              <span className="text-xs text-zinc-400 ml-1.5">+{attendeeCount}</span>
+              <span className="text-xs text-muted-foreground/70 ml-1.5">+{attendeeCount}</span>
             )}
           </div>
-          <span className="text-xs font-medium text-zinc-600">{tCommon("view")}</span>
+          <span className="text-xs font-medium text-muted-foreground">{tCommon("view")}</span>
         </div>
       </div>
     </button>
@@ -138,25 +138,25 @@ function FeaturedEventCard({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         
-        <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 backdrop-blur-sm rounded-full flex items-center gap-1.5">
+        <div className="absolute top-3 left-3 px-2.5 py-1 bg-background/90 backdrop-blur-sm rounded-full flex items-center gap-1.5">
           <Sparkles size={12} className="text-orange-500" />
-          <span className="text-xs font-semibold text-zinc-800">{t("closestEvent")}</span>
+          <span className="text-xs font-semibold text-foreground">{t("closestEvent")}</span>
         </div>
       </div>
 
       <div className="p-4 space-y-3">
         <div>
-          <h3 className="font-display font-bold text-zinc-900 text-lg leading-tight line-clamp-2">
+          <h3 className="font-display font-bold text-foreground text-lg leading-tight line-clamp-2">
             {event.title}
           </h3>
           {event.description && (
-            <p className="font-serif text-sm text-zinc-500 mt-1 line-clamp-2">
+            <p className="font-serif text-sm text-muted-foreground mt-1 line-clamp-2">
               {extractPlainText(event.description)}
             </p>
           )}
         </div>
 
-        <div className="flex flex-wrap gap-3 text-sm text-zinc-600">
+        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">
             <Calendar size={14} className="text-orange-400" />
             <span>{formatDate(event.startDate)}</span>
@@ -178,11 +178,11 @@ function FeaturedEventCard({
             {[...Array(Math.min(1, attendeeCount))].map((_, i) => (
               <div
                 key={i}
-                className="w-7 h-7 rounded-full bg-gradient-to-br from-orange-200 to-amber-100 border-2 border-white"
+                className="w-7 h-7 rounded-full bg-gradient-to-br from-orange-200 to-amber-100 border-2 border-background"
               />
             ))}
           </div>
-          <div className="px-4 py-2 bg-zinc-900 text-white rounded-xl text-sm font-medium">
+          <div className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium">
             {t("viewEvent")}
           </div>
         </div>
@@ -259,7 +259,7 @@ export default function EventsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Search Bar Section */}
       <div className="px-4 pt-12 pb-4 space-y-4">
         <SearchInput
@@ -271,8 +271,8 @@ export default function EventsPage() {
 
       <div className="px-4 space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold text-zinc-800">{t("title")}</h2>
-          <button className="text-sm text-zinc-500 hover:text-zinc-700 transition-colors">
+          <h2 className="font-display text-base font-semibold text-foreground">{t("title")}</h2>
+          <button className="text-sm text-muted-foreground hover:text-foreground/70 transition-colors">
             {tCommon("seeMore")}
           </button>
         </div>
@@ -283,7 +283,7 @@ export default function EventsPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="flex-shrink-0 w-44 h-52 bg-zinc-100 rounded-2xl animate-pulse"
+                  className="flex-shrink-0 w-44 h-52 bg-muted rounded-2xl animate-pulse"
                 />
               ))}
             </div>
@@ -298,25 +298,25 @@ export default function EventsPage() {
               ))}
             </div>
           ) : (
-            <div className="flex items-center justify-center h-40 bg-zinc-50 rounded-xl text-zinc-400 text-sm">
+            <div className="flex items-center justify-center h-40 bg-secondary rounded-xl text-muted-foreground/70 text-sm">
               {t("noUpcoming")}
             </div>
           )}
         </section>
 
         <section className="pt-2">
-          <h2 className="font-display text-base font-semibold text-zinc-800 mb-3">
+          <h2 className="font-display text-base font-semibold text-foreground mb-3">
             {t("closestEvent")}
           </h2>
           {isLoading ? (
-            <div className="w-full h-80 bg-zinc-100 rounded-3xl animate-pulse" />
+            <div className="w-full h-80 bg-muted rounded-3xl animate-pulse" />
           ) : closestEvent ? (
             <FeaturedEventCard
               event={closestEvent}
               onClick={() => handleViewEvent(closestEvent.id)}
             />
           ) : (
-            <div className="bg-zinc-50 rounded-3xl">
+            <div className="bg-secondary rounded-3xl">
               <EmptyState
                 icon={Calendar}
                 title={t("noEventsScheduled")}

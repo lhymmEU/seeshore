@@ -125,7 +125,7 @@ function DashboardCardComponent({ card, title, comingSoonText, dueSoonText, aler
       )}
       {card.disabled && (
         <span className={cn(
-          "absolute text-[10px] font-medium text-zinc-400 uppercase tracking-wide",
+          "absolute text-[10px] font-medium text-muted-foreground/70 uppercase tracking-wide",
           card.size === "wide" ? "right-4" : "bottom-3"
         )}>
           {comingSoonText}

@@ -190,7 +190,7 @@ export function EventForm({ mode, eventId, initialData, isLoading = false }: Eve
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-background pb-24">
       <PageHeader title={mode === "create" ? tManage("createEvent") : tManage("editEvent")} />
 
       <div className="px-4 pt-6 space-y-5">
@@ -257,8 +257,8 @@ export function EventForm({ mode, eventId, initialData, isLoading = false }: Eve
           className={cn(
             "w-full py-4 rounded-2xl font-medium text-base transition-all mt-4",
             canSubmit
-              ? "bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]"
-              : "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]"
+              : "bg-muted text-muted-foreground/70 cursor-not-allowed"
           )}
         >
           {isSaving ? (

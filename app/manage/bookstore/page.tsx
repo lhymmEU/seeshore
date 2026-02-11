@@ -29,9 +29,9 @@ interface StoreFormData {
 function BookListItem({ book }: { book: Book }) {
   const tCommon = useTranslations("common");
   return (
-    <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+    <div className="flex items-center gap-3 p-3 bg-secondary rounded-xl border border-border">
       {/* Book Cover */}
-      <div className="w-12 h-16 rounded-lg overflow-hidden bg-zinc-200 flex-shrink-0 relative">
+      <div className="w-12 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0 relative">
         {book.cover ? (
           <Image
             src={book.cover}
@@ -42,17 +42,17 @@ function BookListItem({ book }: { book: Book }) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <BookOpen size={16} className="text-zinc-400" />
+            <BookOpen size={16} className="text-muted-foreground/70" />
           </div>
         )}
       </div>
 
       {/* Book Info */}
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-zinc-900 text-sm truncate">
+        <h4 className="font-medium text-foreground text-sm truncate">
           {book.title}
         </h4>
-        <p className="text-xs text-zinc-500 truncate">
+        <p className="text-xs text-muted-foreground truncate">
           {book.author || tCommon("unknownAuthor")}
         </p>
         <div className="flex items-center gap-2 mt-1">
@@ -65,7 +65,7 @@ function BookListItem({ book }: { book: Book }) {
             {book.status === "available" ? tCommon("available") : tCommon("borrowed")}
           </span>
           {book.location && (
-            <span className="text-[10px] text-zinc-400 truncate">
+            <span className="text-[10px] text-muted-foreground/70 truncate">
               {book.location}
             </span>
           )}
@@ -223,7 +223,7 @@ export default function BookstoreEditorPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-background pb-24">
       <PageHeader title={t("editBookstore")} />
 
       <div className="px-4 pt-6 space-y-6">
@@ -275,8 +275,8 @@ export default function BookstoreEditorPage() {
               className={cn(
                 "w-full py-4 rounded-2xl font-medium text-base transition-all",
                 formData.name.trim()
-                  ? "bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]"
-                  : "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]"
+                  : "bg-muted text-muted-foreground/70 cursor-not-allowed"
               )}
             >
               {isSaving ? (
@@ -294,14 +294,14 @@ export default function BookstoreEditorPage() {
             {/* Header with count and add button */}
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-display font-semibold text-zinc-900">{t("books")}</h3>
-                <p className="text-xs text-zinc-500">
+                <h3 className="font-display font-semibold text-foreground">{t("books")}</h3>
+                <p className="text-xs text-muted-foreground">
                   {books.length} {books.length === 1 ? tCommon("item") : tCommon("items")} {t("registered")}
                 </p>
               </div>
               <button
                 onClick={handleRegisterNewItem}
-                className="px-4 py-2 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors active:scale-[0.98]"
+                className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded-xl hover:bg-primary/90 transition-colors active:scale-[0.98]"
               >
                 {t("addNew")}
               </button>
@@ -313,12 +313,12 @@ export default function BookstoreEditorPage() {
                 {[1, 2, 3].map((i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl animate-pulse"
+                    className="flex items-center gap-3 p-3 bg-secondary rounded-xl animate-pulse"
                   >
-                    <div className="w-12 h-16 bg-zinc-200 rounded-lg" />
+                    <div className="w-12 h-16 bg-muted rounded-lg" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-zinc-200 rounded w-3/4" />
-                      <div className="h-3 bg-zinc-200 rounded w-1/2" />
+                      <div className="h-4 bg-muted rounded w-3/4" />
+                      <div className="h-3 bg-muted rounded w-1/2" />
                     </div>
                   </div>
                 ))}
@@ -337,7 +337,7 @@ export default function BookstoreEditorPage() {
                 action={
                   <button
                     onClick={handleRegisterNewItem}
-                    className="mt-2 px-6 py-2.5 bg-zinc-900 text-white text-sm font-medium rounded-xl hover:bg-zinc-800 transition-colors"
+                    className="mt-2 px-6 py-2.5 bg-primary text-primary-foreground text-sm font-medium rounded-xl hover:bg-primary/90 transition-colors"
                   >
                     {t("registerFirstItem")}
                   </button>

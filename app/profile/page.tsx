@@ -66,20 +66,20 @@ function BorrowedBookCard({ book, onClick, unknownAuthorText, overdueText, oneDa
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 p-3 bg-white rounded-xl border border-zinc-100 hover:border-zinc-200 transition-all text-left w-full"
+      className="flex items-center gap-3 p-3 bg-background rounded-xl border border-border hover:border-border transition-all text-left w-full"
     >
-      <div className="w-12 h-16 rounded-lg overflow-hidden bg-zinc-100 flex-shrink-0 relative">
+      <div className="w-12 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0 relative">
         {book.cover ? (
           <Image src={book.cover} alt={book.title} fill className="object-cover" unoptimized />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <BookOpen size={16} className="text-zinc-400" />
+            <BookOpen size={16} className="text-muted-foreground/70" />
           </div>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">{book.title}</h4>
-        <p className="text-xs text-zinc-500 truncate">{book.author || unknownAuthorText}</p>
+        <h4 className="font-display font-medium text-foreground text-sm truncate">{book.title}</h4>
+        <p className="text-xs text-muted-foreground truncate">{book.author || unknownAuthorText}</p>
         {daysRemaining !== null && (
           <div
             className={cn(
@@ -96,7 +96,7 @@ function BorrowedBookCard({ book, onClick, unknownAuthorText, overdueText, oneDa
           </div>
         )}
       </div>
-      <ChevronRight size={16} className="text-zinc-400 flex-shrink-0" />
+      <ChevronRight size={16} className="text-muted-foreground/70 flex-shrink-0" />
     </button>
   );
 }
@@ -106,23 +106,23 @@ function FavoriteBookCard({ book, onClick }: { book: Book; onClick: () => void }
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 p-3 bg-white rounded-xl border border-zinc-100 hover:border-zinc-200 transition-all text-left w-full"
+      className="flex items-center gap-3 p-3 bg-background rounded-xl border border-border hover:border-border transition-all text-left w-full"
     >
-      <div className="w-12 h-16 rounded-lg overflow-hidden bg-zinc-100 flex-shrink-0 relative">
+      <div className="w-12 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0 relative">
         {book.cover ? (
           <Image src={book.cover} alt={book.title} fill className="object-cover" unoptimized />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <BookOpen size={16} className="text-zinc-400" />
+            <BookOpen size={16} className="text-muted-foreground/70" />
           </div>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">{book.title}</h4>
-        <p className="text-xs text-zinc-500 truncate">{book.author || ""}</p>
+        <h4 className="font-display font-medium text-foreground text-sm truncate">{book.title}</h4>
+        <p className="text-xs text-muted-foreground truncate">{book.author || ""}</p>
       </div>
       <Heart size={16} className="text-rose-500 fill-rose-500 flex-shrink-0" />
-      <ChevronRight size={16} className="text-zinc-400 flex-shrink-0" />
+      <ChevronRight size={16} className="text-muted-foreground/70 flex-shrink-0" />
     </button>
   );
 }
@@ -137,25 +137,25 @@ function AttendedEventCard({ event, onClick, upcomingText, completedText }: { ev
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 p-3 bg-white rounded-xl border border-zinc-100 hover:border-zinc-200 transition-all text-left w-full"
+      className="flex items-center gap-3 p-3 bg-background rounded-xl border border-border hover:border-border transition-all text-left w-full"
     >
-      <div className="w-12 h-12 rounded-xl overflow-hidden bg-zinc-100 flex-shrink-0 relative">
+      <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted flex-shrink-0 relative">
         {event.cover ? (
           <Image src={event.cover} alt={event.title} fill className="object-cover" unoptimized />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Calendar size={16} className="text-zinc-400" />
+            <Calendar size={16} className="text-muted-foreground/70" />
           </div>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">{event.title}</h4>
-        <p className="text-xs text-zinc-500">{formatDate(event.startDate)}</p>
+        <h4 className="font-display font-medium text-foreground text-sm truncate">{event.title}</h4>
+        <p className="text-xs text-muted-foreground">{formatDate(event.startDate)}</p>
       </div>
       <span className={cn(
         "px-2 py-1 rounded-full text-[10px] font-medium flex-shrink-0",
         isUpcoming ? "bg-emerald-100 text-emerald-700" :
-        isFinished ? "bg-zinc-100 text-zinc-600" :
+        isFinished ? "bg-muted text-muted-foreground" :
         "bg-amber-100 text-amber-700"
       )}>
         {isUpcoming ? upcomingText : isFinished ? completedText : event.status}
@@ -350,7 +350,7 @@ export default function ProfilePage() {
           <div className="flex items-start gap-4">
             {/* Avatar */}
             <div className="relative">
-              <div className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-100 relative">
+              <div className="w-20 h-20 rounded-2xl overflow-hidden bg-muted relative">
                 <Image 
                   src={avatarUrl} 
                   alt={user.name}
@@ -359,8 +359,8 @@ export default function ProfilePage() {
                   unoptimized
                 />
               </div>
-              <label className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-zinc-900 flex items-center justify-center cursor-pointer hover:bg-zinc-800 transition-colors">
-                <Camera size={14} className="text-white" />
+              <label className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-primary flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
+                <Camera size={14} className="text-primary-foreground" />
                 <input
                   type="file"
                   accept="image/*"
@@ -380,23 +380,23 @@ export default function ProfilePage() {
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
                     placeholder={t("yourName")}
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-100 text-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                    className="w-full px-3 py-2 rounded-xl bg-muted text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                   />
                   <div className="flex items-center gap-2">
-                    <MapPin size={14} className="text-zinc-400" />
+                    <MapPin size={14} className="text-muted-foreground/70" />
                     <input
                       type="text"
                       value={editLocation}
                       onChange={(e) => setEditLocation(e.target.value)}
                       placeholder={t("location")}
-                      className="flex-1 px-3 py-2 rounded-xl bg-zinc-100 text-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-300"
+                      className="flex-1 px-3 py-2 rounded-xl bg-muted text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     />
                   </div>
                   <div className="flex gap-2 pt-1">
                     <button
                       onClick={handleSaveProfile}
                       disabled={isSaving || !editName.trim()}
-                      className="flex-1 py-2 rounded-xl bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-800 disabled:opacity-50 transition-colors"
+                      className="flex-1 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
                     >
                       {isSaving ? tCommon("saving") : tCommon("save")}
                     </button>
@@ -406,7 +406,7 @@ export default function ProfilePage() {
                         setEditName(user.name);
                         setEditLocation(user.location || "");
                       }}
-                      className="px-4 py-2 rounded-xl bg-zinc-100 text-zinc-700 text-sm font-medium hover:bg-zinc-200 transition-colors"
+                      className="px-4 py-2 rounded-xl bg-muted text-foreground/70 text-sm font-medium hover:bg-muted transition-colors"
                     >
                       {tCommon("cancel")}
                     </button>
@@ -415,12 +415,12 @@ export default function ProfilePage() {
               ) : (
                 <>
                   <div className="flex items-center gap-2">
-                    <h2 className="font-display text-lg font-bold text-zinc-900 truncate">{user.name}</h2>
+                    <h2 className="font-display text-lg font-bold text-foreground truncate">{user.name}</h2>
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="p-1.5 rounded-lg hover:bg-zinc-100 transition-colors"
+                      className="p-1.5 rounded-lg hover:bg-muted transition-colors"
                     >
-                      <Edit3 size={14} className="text-zinc-400" />
+                      <Edit3 size={14} className="text-muted-foreground/70" />
                     </button>
                     <button
                       onClick={handleLogout}
@@ -437,24 +437,24 @@ export default function ProfilePage() {
                   </div>
                   {user.location && (
                     <div className="flex items-center gap-1.5 mt-1">
-                      <MapPin size={12} className="text-zinc-400" />
-                      <span className="text-sm text-zinc-500">{user.location}</span>
+                      <MapPin size={12} className="text-muted-foreground/70" />
+                      <span className="text-sm text-muted-foreground">{user.location}</span>
                     </div>
                   )}
                   <div className="flex items-center gap-3 mt-3">
                     <div className="text-center">
-                      <p className="text-lg font-bold text-zinc-900">{borrowedBooks.length}</p>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wide">{t("borrowed")}</p>
+                      <p className="text-lg font-bold text-foreground">{borrowedBooks.length}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{t("borrowed")}</p>
                     </div>
-                    <div className="w-px h-8 bg-zinc-200" />
+                    <div className="w-px h-8 bg-muted" />
                     <div className="text-center">
-                      <p className="text-lg font-bold text-zinc-900">{favoriteBooks.length}</p>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wide">{t("favorites")}</p>
+                      <p className="text-lg font-bold text-foreground">{favoriteBooks.length}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{t("favorites")}</p>
                     </div>
-                    <div className="w-px h-8 bg-zinc-200" />
+                    <div className="w-px h-8 bg-muted" />
                     <div className="text-center">
-                      <p className="text-lg font-bold text-zinc-900">{attendedEvents.length}</p>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wide">{tCommon("events")}</p>
+                      <p className="text-lg font-bold text-foreground">{attendedEvents.length}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wide">{tCommon("events")}</p>
                     </div>
                   </div>
                 </>
@@ -472,14 +472,14 @@ export default function ProfilePage() {
             <LayoutGrid size={18} className="text-muted-foreground" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-display font-medium text-zinc-900 text-sm">{t("displayPage")}</h3>
-            <p className="text-xs text-zinc-500">
+            <h3 className="font-display font-medium text-foreground text-sm">{t("displayPage")}</h3>
+            <p className="text-xs text-muted-foreground">
               {user.displayConfig?.enabled
                 ? t("displayPageLive")
                 : t("setupDisplayPage")}
             </p>
           </div>
-          <ChevronRight size={16} className="text-zinc-400 flex-shrink-0" />
+          <ChevronRight size={16} className="text-muted-foreground/70 flex-shrink-0" />
         </button>
 
         {/* Tab Navigation */}
@@ -528,8 +528,8 @@ export default function ProfilePage() {
           {activeTab === "events" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-display font-semibold text-zinc-900">{t("myEvents")}</h3>
-                <span className="text-xs text-zinc-500">{attendedEvents.length} {tCommon("events")}</span>
+                <h3 className="font-display font-semibold text-foreground">{t("myEvents")}</h3>
+                <span className="text-xs text-muted-foreground">{attendedEvents.length} {tCommon("events")}</span>
               </div>
               {attendedEvents.length > 0 ? (
                 <div className="space-y-2">
@@ -544,7 +544,7 @@ export default function ProfilePage() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl p-6 border border-zinc-100">
+                <div className="bg-background rounded-2xl p-6 border border-border">
                   <EmptyState
                     icon={Calendar}
                     title={t("noEvents")}
@@ -559,8 +559,8 @@ export default function ProfilePage() {
           {activeTab === "borrowed" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-display font-semibold text-zinc-900">{t("borrowedBooks")}</h3>
-                <span className="text-xs text-zinc-500">{borrowedBooks.length} {tCommon("items")}</span>
+                <h3 className="font-display font-semibold text-foreground">{t("borrowedBooks")}</h3>
+                <span className="text-xs text-muted-foreground">{borrowedBooks.length} {tCommon("items")}</span>
               </div>
               {borrowedBooks.length > 0 ? (
                 <div className="space-y-2">
@@ -577,7 +577,7 @@ export default function ProfilePage() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl p-6 border border-zinc-100">
+                <div className="bg-background rounded-2xl p-6 border border-border">
                   <EmptyState
                     icon={BookOpen}
                     title={t("noBorrowedBooks")}
@@ -592,8 +592,8 @@ export default function ProfilePage() {
           {activeTab === "favorites" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-display font-semibold text-zinc-900">{t("favoriteBooks")}</h3>
-                <span className="text-xs text-zinc-500">{favoriteBooks.length} {tCommon("items")}</span>
+                <h3 className="font-display font-semibold text-foreground">{t("favoriteBooks")}</h3>
+                <span className="text-xs text-muted-foreground">{favoriteBooks.length} {tCommon("items")}</span>
               </div>
               {favoriteBooks.length > 0 ? (
                 <div className="space-y-2">
@@ -606,7 +606,7 @@ export default function ProfilePage() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl p-6 border border-zinc-100">
+                <div className="bg-background rounded-2xl p-6 border border-border">
                   <EmptyState
                     icon={Heart}
                     title={t("noFavorites")}

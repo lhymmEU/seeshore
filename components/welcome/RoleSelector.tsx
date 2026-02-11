@@ -37,8 +37,8 @@ export function RoleSelector({ onContinue }: RoleSelectorProps) {
       <div className="flex flex-col gap-6">
         {/* Header */}
         <div className="text-center px-4">
-          <h2 className="font-display text-lg font-semibold text-zinc-900">{t("chooseRole")}</h2>
-          <p className="text-sm text-zinc-500 mt-1">
+          <h2 className="font-display text-lg font-semibold text-foreground">{t("chooseRole")}</h2>
+          <p className="text-sm text-muted-foreground mt-1">
             {t("selectRoleDescription")}
           </p>
         </div>

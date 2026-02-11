@@ -33,7 +33,7 @@ export function PostCard({ post, onClick }: PostCardProps) {
   return (
     <button
       onClick={onClick}
-      className="w-full bg-white rounded-2xl border border-zinc-100 p-4 text-left hover:border-zinc-200 hover:shadow-sm transition-all active:scale-[0.99]"
+      className="w-full bg-background rounded-2xl border border-border p-4 text-left hover:border-border hover:shadow-sm transition-all active:scale-[0.99]"
     >
       <div className="flex gap-3">
         {/* Author Avatar */}
@@ -49,8 +49,8 @@ export function PostCard({ post, onClick }: PostCardProps) {
               />
             </div>
           ) : (
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-200 to-zinc-100 flex items-center justify-center">
-              <span className="text-zinc-500 font-medium text-sm">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-muted to-secondary flex items-center justify-center">
+              <span className="text-muted-foreground font-medium text-sm">
                 {post.author.name.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -61,17 +61,17 @@ export function PostCard({ post, onClick }: PostCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <h3 className="font-display font-semibold text-zinc-900 line-clamp-1">
+              <h3 className="font-display font-semibold text-foreground line-clamp-1">
                 {post.title}
               </h3>
-              <p className="text-sm text-zinc-500 mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {post.author.name} · {formatRelativeTime(post.createdAt)}
               </p>
             </div>
-            <ChevronRight size={18} className="text-zinc-400 flex-shrink-0 mt-1" />
+            <ChevronRight size={18} className="text-muted-foreground/70 flex-shrink-0 mt-1" />
           </div>
 
-          <p className="font-serif text-sm text-zinc-600 mt-2 line-clamp-2">
+          <p className="font-serif text-sm text-muted-foreground mt-2 line-clamp-2">
             {post.description}
           </p>
 
@@ -81,7 +81,7 @@ export function PostCard({ post, onClick }: PostCardProps) {
               {post.photos.slice(0, 3).map((photo, index) => (
                 <div
                   key={index}
-                  className="relative w-16 h-16 rounded-lg overflow-hidden bg-zinc-100"
+                  className="relative w-16 h-16 rounded-lg overflow-hidden bg-muted"
                 >
                   <Image
                     src={photo}
@@ -103,7 +103,7 @@ export function PostCard({ post, onClick }: PostCardProps) {
           )}
 
           {/* Reply Count */}
-          <div className="flex items-center gap-1.5 mt-3 text-zinc-400">
+          <div className="flex items-center gap-1.5 mt-3 text-muted-foreground/70">
             <MessageCircle size={14} />
             <span className="text-xs">
               {post.replyCount} {t("replies")}

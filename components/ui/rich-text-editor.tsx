@@ -48,8 +48,8 @@ function MenuButton({
       className={cn(
         "p-1.5 rounded-md transition-colors",
         isActive
-          ? "bg-zinc-200 text-zinc-900"
-          : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
+          ? "bg-muted text-foreground"
+          : "text-muted-foreground hover:bg-muted hover:text-foreground",
         disabled && "opacity-50 cursor-not-allowed"
       )}
     >
@@ -190,7 +190,7 @@ export function RichTextEditor({
       <style dangerouslySetInnerHTML={{ __html: editorStyles }} />
       
       {editable && (
-        <div className="flex flex-wrap items-center gap-0.5 mb-3 p-2 bg-zinc-50 rounded-xl border border-zinc-200">
+        <div className="flex flex-wrap items-center gap-0.5 mb-3 p-2 bg-secondary rounded-xl border border-border">
           <MenuButton
             onClick={() => editor.chain().focus().setParagraph().run()}
             isActive={editor.isActive("paragraph") && !editor.isActive("heading")}
@@ -220,7 +220,7 @@ export function RichTextEditor({
             <Heading3 size={18} />
           </MenuButton>
           
-          <div className="w-px h-5 bg-zinc-300 mx-1" />
+          <div className="w-px h-5 bg-muted mx-1" />
           
           <MenuButton
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -244,7 +244,7 @@ export function RichTextEditor({
             <Strikethrough size={18} />
           </MenuButton>
           
-          <div className="w-px h-5 bg-zinc-300 mx-1" />
+          <div className="w-px h-5 bg-muted mx-1" />
           
           <MenuButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -261,7 +261,7 @@ export function RichTextEditor({
             <ListOrdered size={18} />
           </MenuButton>
           
-          <div className="w-px h-5 bg-zinc-300 mx-1" />
+          <div className="w-px h-5 bg-muted mx-1" />
           
           <MenuButton
             onClick={() => editor.chain().focus().setHorizontalRule().run()}

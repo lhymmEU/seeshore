@@ -34,9 +34,9 @@ function DisplayEventCard({
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 p-3 bg-white rounded-xl border border-zinc-100 hover:border-zinc-200 transition-all text-left w-full"
+      className="flex items-center gap-3 p-3 bg-background rounded-xl border border-border hover:border-border transition-all text-left w-full"
     >
-      <div className="w-12 h-12 rounded-xl overflow-hidden bg-zinc-100 flex-shrink-0 relative">
+      <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted flex-shrink-0 relative">
         {event.cover ? (
           <Image
             src={event.cover}
@@ -47,15 +47,15 @@ function DisplayEventCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Calendar size={16} className="text-zinc-400" />
+            <Calendar size={16} className="text-muted-foreground/70" />
           </div>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">
+        <h4 className="font-display font-medium text-foreground text-sm truncate">
           {event.title}
         </h4>
-        <p className="text-xs text-zinc-500">{formatDate(event.startDate)}</p>
+        <p className="text-xs text-muted-foreground">{formatDate(event.startDate)}</p>
       </div>
     </button>
   );
@@ -75,9 +75,9 @@ function DisplayBookCard({
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-3 p-3 bg-white rounded-xl border border-zinc-100 hover:border-zinc-200 transition-all text-left w-full"
+      className="flex items-center gap-3 p-3 bg-background rounded-xl border border-border hover:border-border transition-all text-left w-full"
     >
-      <div className="w-12 h-16 rounded-lg overflow-hidden bg-zinc-100 flex-shrink-0 relative">
+      <div className="w-12 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0 relative">
         {book.cover ? (
           <Image
             src={book.cover}
@@ -88,15 +88,15 @@ function DisplayBookCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <BookOpen size={16} className="text-zinc-400" />
+            <BookOpen size={16} className="text-muted-foreground/70" />
           </div>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">
+        <h4 className="font-display font-medium text-foreground text-sm truncate">
           {book.title}
         </h4>
-        <p className="text-xs text-zinc-500 truncate">
+        <p className="text-xs text-muted-foreground truncate">
           {book.author || unknownAuthorText}
         </p>
       </div>
@@ -198,17 +198,17 @@ export default function MemberDisplayPage() {
   // Empty state: no display config or not enabled
   if (!displayConfig || !displayConfig.enabled) {
     return (
-      <div className="min-h-screen bg-white flex flex-col">
+      <div className="min-h-screen bg-background flex flex-col">
         {/* Back button */}
-        <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-zinc-100">
+        <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
           <div className="flex items-center h-14 px-4">
             <button
               onClick={() => router.back()}
-              className="p-2 -ml-2 rounded-full hover:bg-zinc-100 transition-colors"
+              className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
             >
-              <ArrowLeft size={20} className="text-zinc-800" />
+              <ArrowLeft size={20} className="text-foreground" />
             </button>
-            <h1 className="font-display flex-1 text-center font-semibold text-zinc-900 pr-8">
+            <h1 className="font-display flex-1 text-center font-semibold text-foreground pr-8">
               {t("memberProfile")}
             </h1>
           </div>
@@ -243,17 +243,17 @@ export default function MemberDisplayPage() {
   const hasFavoriteBooks = favoriteBooks.length > 0;
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-8">
+    <div className="min-h-screen bg-secondary pb-8">
       {/* Header with back button */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-zinc-100">
+      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="flex items-center h-14 px-4">
           <button
             onClick={() => router.back()}
-            className="p-2 -ml-2 rounded-full hover:bg-zinc-100 transition-colors"
+            className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"
           >
-            <ArrowLeft size={20} className="text-zinc-800" />
+            <ArrowLeft size={20} className="text-foreground" />
           </button>
-          <h1 className="font-display flex-1 text-center font-semibold text-zinc-900 pr-8">
+          <h1 className="font-display flex-1 text-center font-semibold text-foreground pr-8">
             {memberInfo?.name || tCommon("member")}
           </h1>
         </div>
@@ -261,9 +261,9 @@ export default function MemberDisplayPage() {
 
       <div className="px-4 pt-6 space-y-6">
         {/* Profile Header */}
-        <div className="bg-white rounded-3xl p-6 shadow-sm border border-zinc-100">
+        <div className="bg-background rounded-3xl p-6 shadow-sm border border-border">
           <div className="flex flex-col items-center text-center">
-            <div className="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-100 relative mb-4">
+            <div className="w-20 h-20 rounded-2xl overflow-hidden bg-muted relative mb-4">
               <Image
                 src={avatarUrl}
                 alt={memberInfo?.name || "Member"}
@@ -272,19 +272,19 @@ export default function MemberDisplayPage() {
                 unoptimized
               />
             </div>
-            <h2 className="font-display text-xl font-bold text-zinc-900">
+            <h2 className="font-display text-xl font-bold text-foreground">
               {memberInfo?.name}
             </h2>
             {memberInfo?.location && (
               <div className="flex items-center gap-1.5 mt-1.5">
-                <MapPin size={12} className="text-zinc-400" />
-                <span className="text-sm text-zinc-500">
+                <MapPin size={12} className="text-muted-foreground/70" />
+                <span className="text-sm text-muted-foreground">
                   {memberInfo.location}
                 </span>
               </div>
             )}
             {displayConfig.bio && (
-              <p className="font-serif text-sm text-zinc-600 mt-3 leading-relaxed max-w-sm">
+              <p className="font-serif text-sm text-muted-foreground mt-3 leading-relaxed max-w-sm">
                 {displayConfig.bio}
               </p>
             )}
@@ -293,22 +293,22 @@ export default function MemberDisplayPage() {
             <div className="flex items-center gap-6 mt-4">
               {hasEvents && (
                 <div className="text-center">
-                  <p className="text-lg font-bold text-zinc-900">
+                  <p className="text-lg font-bold text-foreground">
                     {events.length}
                   </p>
-                  <p className="text-[10px] text-zinc-500 uppercase tracking-wide">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
                     {tCommon("events")}
                   </p>
                 </div>
               )}
               {hasBorrowedBooks && (
                 <>
-                  {hasEvents && <div className="w-px h-8 bg-zinc-200" />}
+                  {hasEvents && <div className="w-px h-8 bg-muted" />}
                   <div className="text-center">
-                    <p className="text-lg font-bold text-zinc-900">
+                    <p className="text-lg font-bold text-foreground">
                       {borrowedBooks.length}
                     </p>
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-wide">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
                       {tProfile("reading")}
                     </p>
                   </div>
@@ -317,13 +317,13 @@ export default function MemberDisplayPage() {
               {hasFavoriteBooks && (
                 <>
                   {(hasEvents || hasBorrowedBooks) && (
-                    <div className="w-px h-8 bg-zinc-200" />
+                    <div className="w-px h-8 bg-muted" />
                   )}
                   <div className="text-center">
-                    <p className="text-lg font-bold text-zinc-900">
+                    <p className="text-lg font-bold text-foreground">
                       {favoriteBooks.length}
                     </p>
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-wide">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
                       {tCommon("favorites")}
                     </p>
                   </div>
@@ -337,8 +337,8 @@ export default function MemberDisplayPage() {
         {hasEvents && (
           <section>
             <div className="flex items-center gap-2 mb-3">
-              <Calendar size={16} className="text-zinc-500" />
-              <h3 className="font-display font-semibold text-zinc-900">{tCommon("events")}</h3>
+              <Calendar size={16} className="text-muted-foreground" />
+              <h3 className="font-display font-semibold text-foreground">{tCommon("events")}</h3>
             </div>
             <div className="space-y-2">
               {events.map((event) => (
@@ -356,8 +356,8 @@ export default function MemberDisplayPage() {
         {hasBorrowedBooks && (
           <section>
             <div className="flex items-center gap-2 mb-3">
-              <BookOpen size={16} className="text-zinc-500" />
-              <h3 className="font-display font-semibold text-zinc-900">{t("currentlyReading")}</h3>
+              <BookOpen size={16} className="text-muted-foreground" />
+              <h3 className="font-display font-semibold text-foreground">{t("currentlyReading")}</h3>
             </div>
             <div className="space-y-2">
               {borrowedBooks.map((book) => (
@@ -376,8 +376,8 @@ export default function MemberDisplayPage() {
         {hasFavoriteBooks && (
           <section>
             <div className="flex items-center gap-2 mb-3">
-              <Heart size={16} className="text-zinc-500" />
-              <h3 className="font-display font-semibold text-zinc-900">{tCommon("favorites")}</h3>
+              <Heart size={16} className="text-muted-foreground" />
+              <h3 className="font-display font-semibold text-foreground">{tCommon("favorites")}</h3>
             </div>
             <div className="space-y-2">
               {favoriteBooks.map((book) => (

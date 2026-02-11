@@ -12,7 +12,7 @@ function getStatusBadge(status: Book["status"], t: (key: string) => string) {
     borrowed: { label: t("borrowed"), className: "bg-amber-100 text-amber-700" },
   };
   
-  return statusConfig[status] || { label: status, className: "bg-zinc-100 text-zinc-600" };
+  return statusConfig[status] || { label: status, className: "bg-muted text-muted-foreground" };
 }
 
 export interface BookCardProps {
@@ -25,7 +25,7 @@ export function BookCard({ book, onView }: BookCardProps) {
   const statusBadge = getStatusBadge(book.status, t);
   
   return (
-    <div className="bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100 transition-colors hover:border-zinc-200">
+    <div className="bg-secondary rounded-2xl overflow-hidden border border-border transition-colors hover:border-border">
       {/* Book Cover */}
       <div className="relative">
         {book.cover ? (
@@ -40,8 +40,8 @@ export function BookCard({ book, onView }: BookCardProps) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
           </div>
         ) : (
-          <div className="h-32 w-full bg-gradient-to-br from-zinc-200 to-zinc-100 flex items-center justify-center">
-            <BookOpen size={36} className="text-zinc-400" />
+          <div className="h-32 w-full bg-gradient-to-br from-muted to-secondary flex items-center justify-center">
+            <BookOpen size={36} className="text-muted-foreground/70" />
           </div>
         )}
         {/* Status Badge */}
@@ -56,10 +56,10 @@ export function BookCard({ book, onView }: BookCardProps) {
       {/* Book Info */}
       <div className="p-4 space-y-3">
         <div>
-          <h3 className="font-display font-semibold text-zinc-900 text-base leading-tight line-clamp-2">
+          <h3 className="font-display font-semibold text-foreground text-base leading-tight line-clamp-2">
             {book.title}
           </h3>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             {book.author}
           </p>
         </div>
@@ -67,7 +67,7 @@ export function BookCard({ book, onView }: BookCardProps) {
         {/* View Button */}
         <button
           onClick={onView}
-          className="w-full flex items-center justify-center py-2.5 px-4 rounded-xl bg-zinc-900 text-white font-medium text-sm hover:bg-zinc-800 transition-colors active:scale-[0.98]"
+          className="w-full flex items-center justify-center py-2.5 px-4 rounded-xl bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors active:scale-[0.98]"
         >
           {t("viewDetails")}
         </button>

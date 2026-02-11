@@ -28,7 +28,7 @@ export function TabSwitcher({
 }: TabSwitcherProps) {
   const t = useTranslations("common");
   return (
-    <div className={cn("flex bg-zinc-100 rounded-full p-1", className)}>
+    <div className={cn("flex bg-muted rounded-full p-1", className)}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id;
         const isDisabled = tab.disabled;
@@ -42,10 +42,10 @@ export function TabSwitcher({
             className={cn(
               "flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-full text-sm font-medium transition-all",
               isDisabled
-                ? "text-zinc-400 cursor-not-allowed"
+                ? "text-muted-foreground/70 cursor-not-allowed"
                 : isActive
-                  ? "bg-zinc-900 text-white shadow-sm"
-                  : "text-zinc-600 hover:text-zinc-800"
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
             )}
           >
             {Icon && (
@@ -53,7 +53,7 @@ export function TabSwitcher({
                 size={14}
                 className={cn(
                   isDisabled 
-                    ? "text-zinc-400" 
+                    ? "text-muted-foreground/70" 
                     : isActive 
                       ? tab.iconActiveClassName 
                       : undefined
@@ -65,14 +65,14 @@ export function TabSwitcher({
               <span
                 className={cn(
                   "px-1.5 py-0.5 rounded-full text-xs",
-                  isActive ? "bg-white/20" : "bg-zinc-200"
+                  isActive ? "bg-background/20" : "bg-muted"
                 )}
               >
                 {tab.count}
               </span>
             )}
             {isDisabled && (
-              <span className="text-[10px] text-zinc-400 uppercase tracking-wide">
+              <span className="text-[10px] text-muted-foreground/70 uppercase tracking-wide">
                 {t("soon")}
               </span>
             )}

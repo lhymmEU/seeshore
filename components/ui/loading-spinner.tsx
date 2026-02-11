@@ -15,7 +15,7 @@ export function LoadingSpinner({ size = "md", className }: LoadingSpinnerProps) 
   return (
     <div
       className={cn(
-        "border-zinc-300 border-t-zinc-900 rounded-full animate-spin",
+        "border-border border-t-foreground rounded-full animate-spin",
         sizeClasses[size],
         className
       )}
@@ -29,7 +29,7 @@ interface PageLoaderProps {
 
 export function PageLoader({ className }: PageLoaderProps) {
   return (
-    <div className={cn("min-h-screen flex items-center justify-center bg-white", className)}>
+    <div className={cn("min-h-screen flex items-center justify-center bg-background", className)}>
       <LoadingSpinner size="md" />
     </div>
   );

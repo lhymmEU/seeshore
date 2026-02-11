@@ -64,19 +64,19 @@ export default function CollaboratePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-24">
+    <div className="min-h-screen bg-background pb-24">
       {/* Header Section */}
       <div className="px-4 pt-12 pb-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-zinc-900 font-display">{t("title")}</h1>
+          <h1 className="text-2xl font-bold text-foreground font-display">{t("title")}</h1>
           <button
             onClick={() => setIsCreateDrawerOpen(true)}
-            className="p-2 bg-zinc-900 text-white rounded-full hover:bg-zinc-800 transition-colors"
+            className="p-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors"
           >
             <Plus size={20} />
           </button>
         </div>
-        <p className="text-sm text-zinc-500 font-serif">{t("subtitle")}</p>
+        <p className="text-sm text-muted-foreground font-serif">{t("subtitle")}</p>
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
@@ -92,7 +92,7 @@ export default function CollaboratePage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-32 bg-zinc-100 rounded-2xl animate-pulse"
+                className="h-32 bg-muted rounded-2xl animate-pulse"
               />
             ))}
           </div>

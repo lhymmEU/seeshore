@@ -25,16 +25,16 @@ export function Logo({ size = "md", showText = false }: LogoProps) {
   return (
     <div className="flex flex-col items-center gap-3">
       <div
-        className={`${sizeMap[size]} rounded-full bg-zinc-100 flex items-center justify-center border border-zinc-200`}
+        className={`${sizeMap[size]} rounded-full bg-muted flex items-center justify-center border border-border`}
       >
         <BookOpen
           size={iconSizeMap[size]}
-          className="text-zinc-800"
+          className="text-foreground"
           strokeWidth={1.5}
         />
       </div>
       {showText && (
-        <span className="font-display text-sm font-medium text-zinc-500 tracking-wide uppercase">
+        <span className="font-display text-sm font-medium text-muted-foreground tracking-wide uppercase">
           {t("storeName")}
         </span>
       )}

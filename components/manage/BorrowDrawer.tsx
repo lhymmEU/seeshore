@@ -174,13 +174,13 @@ export function BorrowDrawer({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[85vh]">
-        <DrawerHeader className="border-b border-zinc-100">
+        <DrawerHeader className="border-b border-border">
           <div className="flex items-center justify-between">
             <DrawerTitle className="font-display text-lg font-semibold">
               {tManage("lendBook")}
             </DrawerTitle>
-            <DrawerClose className="p-2 rounded-full hover:bg-zinc-100 transition-colors">
-              <X size={20} className="text-zinc-500" />
+            <DrawerClose className="p-2 rounded-full hover:bg-muted transition-colors">
+              <X size={20} className="text-muted-foreground" />
             </DrawerClose>
           </div>
         </DrawerHeader>
@@ -188,8 +188,8 @@ export function BorrowDrawer({
         <div className="p-4 space-y-6 overflow-y-auto">
           {/* Book Info */}
           {book && (
-            <div className="flex gap-4 p-4 bg-zinc-50 rounded-2xl">
-              <div className="w-16 h-22 rounded-xl overflow-hidden bg-zinc-100 flex-shrink-0 relative">
+            <div className="flex gap-4 p-4 bg-secondary rounded-2xl">
+              <div className="w-16 h-22 rounded-xl overflow-hidden bg-muted flex-shrink-0 relative">
                 {book.cover ? (
                   <Image
                     src={book.cover}
@@ -200,15 +200,15 @@ export function BorrowDrawer({
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <BookOpen size={20} className="text-zinc-400" />
+                    <BookOpen size={20} className="text-muted-foreground/70" />
                   </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-display font-semibold text-zinc-900 line-clamp-2">
+                <h3 className="font-display font-semibold text-foreground line-clamp-2">
                   {book.title}
                 </h3>
-                <p className="text-sm text-zinc-500 mt-1">
+                <p className="text-sm text-muted-foreground mt-1">
                   {book.author || tCommon("unknownAuthor")}
                 </p>
               </div>
@@ -217,17 +217,17 @@ export function BorrowDrawer({
 
           {/* Member Search Input */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-zinc-700">
+            <label className="text-sm font-medium text-foreground/70">
               {tManage("selectMember")}
             </label>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-muted-foreground">
               {tManage("typeToSearchMember")}
             </p>
             <div className="relative">
               <div className="relative">
                 <Search
                   size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/70"
                 />
                 <input
                   ref={inputRef}
@@ -235,12 +235,12 @@ export function BorrowDrawer({
                   value={inputValue}
                   onChange={handleInputChange}
                   placeholder={tManage("searchMembersPlaceholder")}
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-zinc-100 text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 transition-all"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-muted text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
                 />
                 {isSearching && (
                   <Loader2
                     size={18}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 animate-spin"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/70 animate-spin"
                   />
                 )}
               </div>
@@ -249,16 +249,16 @@ export function BorrowDrawer({
               {showDropdown && (
                 <div
                   ref={dropdownRef}
-                  className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-zinc-200 shadow-lg max-h-64 overflow-y-auto z-50"
+                  className="absolute top-full left-0 right-0 mt-2 bg-background rounded-xl border border-border shadow-lg max-h-64 overflow-y-auto z-50"
                 >
                   {members.length > 0 ? (
                     members.map((member) => (
                       <button
                         key={member.id}
                         onClick={() => handleSelectMember(member)}
-                        className="w-full flex items-center gap-3 p-3 hover:bg-zinc-50 transition-colors text-left"
+                        className="w-full flex items-center gap-3 p-3 hover:bg-secondary transition-colors text-left"
                       >
-                        <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-100 flex-shrink-0 relative">
+                        <div className="w-10 h-10 rounded-full overflow-hidden bg-muted flex-shrink-0 relative">
                           <Image
                             src={getAvatarUrl(member)}
                             alt={member.name}
@@ -268,11 +268,11 @@ export function BorrowDrawer({
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-zinc-900 truncate">
+                          <p className="font-medium text-foreground truncate">
                             {member.name}
                           </p>
                           {member.location && (
-                            <p className="text-xs text-zinc-500 truncate">
+                            <p className="text-xs text-muted-foreground truncate">
                               {member.location}
                             </p>
                           )}
@@ -280,13 +280,13 @@ export function BorrowDrawer({
                       </button>
                     ))
                   ) : isSearching ? (
-                    <div className="p-4 text-center text-zinc-500">
+                    <div className="p-4 text-center text-muted-foreground">
                       <Loader2 size={20} className="animate-spin mx-auto mb-2" />
                       <p className="text-sm">{tCommon("searching")}</p>
                     </div>
                   ) : (
-                    <div className="p-4 text-center text-zinc-500">
-                      <UserIcon size={20} className="mx-auto mb-2 text-zinc-400" />
+                    <div className="p-4 text-center text-muted-foreground">
+                      <UserIcon size={20} className="mx-auto mb-2 text-muted-foreground/70" />
                       <p className="text-sm">{tManage("noMembersFound")}</p>
                     </div>
                   )}
@@ -297,7 +297,7 @@ export function BorrowDrawer({
             {/* Selected Member Display */}
             {selectedMember && (
               <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-200">
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-zinc-100 flex-shrink-0 relative">
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-muted flex-shrink-0 relative">
                   <Image
                     src={getAvatarUrl(selectedMember)}
                     alt={selectedMember.name}
@@ -320,15 +320,15 @@ export function BorrowDrawer({
           </div>
         </div>
 
-        <DrawerFooter className="border-t border-zinc-100">
+        <DrawerFooter className="border-t border-border">
           <button
             onClick={handleLend}
             disabled={!selectedMember || isLending || isSuccess}
             className={cn(
               "w-full py-3.5 rounded-xl font-semibold text-base transition-all flex items-center justify-center gap-2",
               selectedMember && !isLending && !isSuccess
-                ? "bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]"
-                : "bg-zinc-100 text-zinc-400 cursor-not-allowed"
+                ? "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]"
+                : "bg-muted text-muted-foreground/70 cursor-not-allowed"
             )}
           >
             {isSuccess ? (

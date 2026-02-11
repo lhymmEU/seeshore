@@ -43,11 +43,11 @@ function SelectableEventCard({
       className={cn(
         "flex items-center gap-3 p-3 rounded-xl border transition-all text-left w-full",
         isSelected
-          ? "border-zinc-900 bg-zinc-50"
-          : "border-zinc-100 bg-white hover:border-zinc-200"
+          ? "border-primary bg-secondary"
+          : "border-border bg-background hover:border-border"
       )}
     >
-      <div className="w-12 h-12 rounded-xl overflow-hidden bg-zinc-100 flex-shrink-0 relative">
+      <div className="w-12 h-12 rounded-xl overflow-hidden bg-muted flex-shrink-0 relative">
         {event.cover ? (
           <Image
             src={event.cover}
@@ -58,25 +58,25 @@ function SelectableEventCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Calendar size={16} className="text-zinc-400" />
+            <Calendar size={16} className="text-muted-foreground/70" />
           </div>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">
+        <h4 className="font-display font-medium text-foreground text-sm truncate">
           {event.title}
         </h4>
-        <p className="text-xs text-zinc-500">{formatDate(event.startDate)}</p>
+        <p className="text-xs text-muted-foreground">{formatDate(event.startDate)}</p>
       </div>
       <div
         className={cn(
           "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
           isSelected
-            ? "bg-zinc-900 border-zinc-900"
-            : "border-zinc-300 bg-white"
+            ? "bg-primary border-primary"
+            : "border-border bg-background"
         )}
       >
-        {isSelected && <Check size={14} className="text-white" />}
+        {isSelected && <Check size={14} className="text-primary-foreground" />}
       </div>
     </button>
   );
@@ -101,11 +101,11 @@ function SelectableBookCard({
       className={cn(
         "flex items-center gap-3 p-3 rounded-xl border transition-all text-left w-full",
         isSelected
-          ? "border-zinc-900 bg-zinc-50"
-          : "border-zinc-100 bg-white hover:border-zinc-200"
+          ? "border-primary bg-secondary"
+          : "border-border bg-background hover:border-border"
       )}
     >
-      <div className="w-12 h-16 rounded-lg overflow-hidden bg-zinc-100 flex-shrink-0 relative">
+      <div className="w-12 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0 relative">
         {book.cover ? (
           <Image
             src={book.cover}
@@ -116,15 +116,15 @@ function SelectableBookCard({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <BookOpen size={16} className="text-zinc-400" />
+            <BookOpen size={16} className="text-muted-foreground/70" />
           </div>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <h4 className="font-display font-medium text-zinc-900 text-sm truncate">
+        <h4 className="font-display font-medium text-foreground text-sm truncate">
           {book.title}
         </h4>
-        <p className="text-xs text-zinc-500 truncate">
+        <p className="text-xs text-muted-foreground truncate">
           {book.author || unknownAuthorText}
         </p>
       </div>
@@ -135,11 +135,11 @@ function SelectableBookCard({
         className={cn(
           "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
           isSelected
-            ? "bg-zinc-900 border-zinc-900"
-            : "border-zinc-300 bg-white"
+            ? "bg-primary border-primary"
+            : "border-border bg-background"
         )}
       >
-        {isSelected && <Check size={14} className="text-white" />}
+        {isSelected && <Check size={14} className="text-primary-foreground" />}
       </div>
     </button>
   );
@@ -330,18 +330,18 @@ export default function DisplaySetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-32">
+    <div className="min-h-screen bg-secondary pb-32">
       <PageHeader title={t("displayPageSetup")} />
 
       <div className="px-4 pt-6 space-y-6">
         {/* Enable/Disable Toggle */}
-        <div className="bg-white rounded-2xl p-5 border border-zinc-100">
+        <div className="bg-background rounded-2xl p-5 border border-border">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-display font-semibold text-zinc-900">
+              <h3 className="font-display font-semibold text-foreground">
                 {t("enableDisplayPage")}
               </h3>
-              <p className="text-sm text-zinc-500 mt-0.5">
+              <p className="text-sm text-muted-foreground mt-0.5">
                 {t("displayPageDescription")}
               </p>
             </div>
@@ -349,11 +349,11 @@ export default function DisplaySetupPage() {
               onClick={() => setDisplayEnabled(!displayEnabled)}
               className={cn(
                 "relative w-12 h-7 rounded-full transition-colors",
-                displayEnabled ? "bg-zinc-900" : "bg-zinc-300"
+                displayEnabled ? "bg-primary" : "bg-muted"
               )}
             >
               <div
-                className="absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm transition-transform"
+                className="absolute top-0.5 w-6 h-6 rounded-full bg-background shadow-sm transition-transform"
                 style={{
                   transform: displayEnabled ? "translateX(22px)" : "translateX(2px)",
                 }}
@@ -363,29 +363,29 @@ export default function DisplaySetupPage() {
         </div>
 
         {/* Bio */}
-        <div className="bg-white rounded-2xl p-5 border border-zinc-100">
+        <div className="bg-background rounded-2xl p-5 border border-border">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="font-display font-semibold text-zinc-900">{t("aboutMe")}</h3>
-            <span className="text-xs text-zinc-400">{t("alwaysSaved")}</span>
+            <h3 className="font-display font-semibold text-foreground">{t("aboutMe")}</h3>
+            <span className="text-xs text-muted-foreground/70">{t("alwaysSaved")}</span>
           </div>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder={t("bioPlaceholder")}
             rows={3}
-            className="w-full px-4 py-3 rounded-xl bg-zinc-50 text-zinc-900 text-sm font-serif focus:outline-none focus:ring-2 focus:ring-zinc-300 resize-none placeholder:text-zinc-400"
+            className="w-full px-4 py-3 rounded-xl bg-secondary text-foreground text-sm font-serif focus:outline-none focus:ring-2 focus:ring-ring resize-none placeholder:text-muted-foreground"
           />
         </div>
 
         {/* Tab Navigation */}
-        <div className="bg-white rounded-2xl p-1.5 border border-zinc-100 flex overflow-hidden">
+        <div className="bg-background rounded-2xl p-1.5 border border-border flex overflow-hidden">
           <button
             onClick={() => setActiveTab("events")}
             className={cn(
               "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-sm font-medium transition-all",
               activeTab === "events"
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <Calendar size={16} className="flex-shrink-0" />
@@ -393,7 +393,7 @@ export default function DisplaySetupPage() {
             {selectedEvents.size > 0 && (
               <span className={cn(
                 "px-1.5 py-0.5 rounded-full text-xs flex-shrink-0",
-                activeTab === "events" ? "bg-white/20" : "bg-zinc-200"
+                activeTab === "events" ? "bg-background/20" : "bg-muted"
               )}>
                 {selectedEvents.size}
               </span>
@@ -404,8 +404,8 @@ export default function DisplaySetupPage() {
             className={cn(
               "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-sm font-medium transition-all",
               activeTab === "borrowed"
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <BookOpen size={16} className="flex-shrink-0" />
@@ -413,7 +413,7 @@ export default function DisplaySetupPage() {
             {selectedBooks.size > 0 && (
               <span className={cn(
                 "px-1.5 py-0.5 rounded-full text-xs flex-shrink-0",
-                activeTab === "borrowed" ? "bg-white/20" : "bg-zinc-200"
+                activeTab === "borrowed" ? "bg-background/20" : "bg-muted"
               )}>
                 {selectedBooks.size}
               </span>
@@ -424,8 +424,8 @@ export default function DisplaySetupPage() {
             className={cn(
               "flex-1 min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl text-sm font-medium transition-all",
               activeTab === "favorites"
-                ? "bg-zinc-900 text-white shadow-sm"
-                : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary"
             )}
           >
             <Heart size={16} className="flex-shrink-0" />
@@ -433,7 +433,7 @@ export default function DisplaySetupPage() {
             {selectedFavorites.size > 0 && (
               <span className={cn(
                 "px-1.5 py-0.5 rounded-full text-xs flex-shrink-0",
-                activeTab === "favorites" ? "bg-white/20" : "bg-zinc-200"
+                activeTab === "favorites" ? "bg-background/20" : "bg-muted"
               )}>
                 {selectedFavorites.size}
               </span>
@@ -446,19 +446,19 @@ export default function DisplaySetupPage() {
           {activeTab === "events" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-display font-semibold text-zinc-900">
+                <h3 className="font-display font-semibold text-foreground">
                   {t("selectEventsToDisplay")}
                 </h3>
                 <div className="flex items-center gap-2">
                   {allEvents.length > 0 && (
                     <button
                       onClick={toggleAllEvents}
-                      className="text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                      className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {selectedEvents.size === allEvents.length ? tCommon("deselectAll") : tCommon("selectAll")}
                     </button>
                   )}
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-muted-foreground">
                     {allEvents.length} {tCommon("available").toLowerCase()}
                   </span>
                 </div>
@@ -475,7 +475,7 @@ export default function DisplaySetupPage() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl p-6 border border-zinc-100">
+                <div className="bg-background rounded-2xl p-6 border border-border">
                   <EmptyState
                     icon={Calendar}
                     title={t("noEventsYet")}
@@ -489,19 +489,19 @@ export default function DisplaySetupPage() {
           {activeTab === "borrowed" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-display font-semibold text-zinc-900">
+                <h3 className="font-display font-semibold text-foreground">
                   {t("selectBooksToDisplay")}
                 </h3>
                 <div className="flex items-center gap-2">
                   {borrowedBooks.length > 0 && (
                     <button
                       onClick={toggleAllBooks}
-                      className="text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                      className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {selectedBooks.size === borrowedBooks.length ? tCommon("deselectAll") : tCommon("selectAll")}
                     </button>
                   )}
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-muted-foreground">
                     {borrowedBooks.length} {tCommon("available").toLowerCase()}
                   </span>
                 </div>
@@ -519,7 +519,7 @@ export default function DisplaySetupPage() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl p-6 border border-zinc-100">
+                <div className="bg-background rounded-2xl p-6 border border-border">
                   <EmptyState
                     icon={BookOpen}
                     title={t("noBorrowedBooks")}
@@ -533,19 +533,19 @@ export default function DisplaySetupPage() {
           {activeTab === "favorites" && (
             <section>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-display font-semibold text-zinc-900">
+                <h3 className="font-display font-semibold text-foreground">
                   {t("selectFavoritesToDisplay")}
                 </h3>
                 <div className="flex items-center gap-2">
                   {favoriteBooks.length > 0 && (
                     <button
                       onClick={toggleAllFavorites}
-                      className="text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                      className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {selectedFavorites.size === favoriteBooks.length ? tCommon("deselectAll") : tCommon("selectAll")}
                     </button>
                   )}
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-muted-foreground">
                     {favoriteBooks.length} {tCommon("available").toLowerCase()}
                   </span>
                 </div>
@@ -564,7 +564,7 @@ export default function DisplaySetupPage() {
                   ))}
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl p-6 border border-zinc-100">
+                <div className="bg-background rounded-2xl p-6 border border-border">
                   <EmptyState
                     icon={Heart}
                     title={t("noFavoriteBooks")}
@@ -578,13 +578,13 @@ export default function DisplaySetupPage() {
       </div>
 
       {/* Sticky Bottom Save Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-zinc-100 p-4 z-40">
+      <div className="fixed bottom-0 left-0 right-0 bg-background/90 backdrop-blur-md border-t border-border p-4 z-40">
         <div className="flex items-center gap-3">
           <div className="flex-1">
-            <p className="text-sm font-medium text-zinc-900">
+            <p className="text-sm font-medium text-foreground">
               {tCommon("itemsSelected", { count: totalSelected })}
             </p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-muted-foreground">
               {displayEnabled ? t("displayPageOn") : t("displayPageOff")}
             </p>
           </div>
@@ -602,7 +602,7 @@ export default function DisplaySetupPage() {
           <Button
             onClick={handleSave}
             disabled={isSaving}
-            className="rounded-xl bg-zinc-900 text-white hover:bg-zinc-800 px-6"
+            className="rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 px-6"
           >
             {isSaving ? (
               <Loader2 size={16} className="animate-spin" />

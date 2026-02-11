@@ -206,12 +206,12 @@ export function ItemRegistrationDrawer({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="max-h-[90vh]">
-        <DrawerHeader className="relative border-b border-zinc-100 pb-4">
-          <DrawerTitle className="font-display text-lg font-semibold text-zinc-900">
+        <DrawerHeader className="relative border-b border-border pb-4">
+          <DrawerTitle className="font-display text-lg font-semibold text-foreground">
             {isEditMode ? tManage("editItem") : tManage("registerItem")}
           </DrawerTitle>
-          <DrawerClose className="absolute right-4 top-4 p-1 rounded-full hover:bg-zinc-100 transition-colors">
-            <X size={20} className="text-zinc-500" />
+          <DrawerClose className="absolute right-4 top-4 p-1 rounded-full hover:bg-muted transition-colors">
+            <X size={20} className="text-muted-foreground" />
           </DrawerClose>
         </DrawerHeader>
 
@@ -261,17 +261,17 @@ export function ItemRegistrationDrawer({
               />
 
               <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-                  <Calendar size={14} className="text-zinc-400" />
+                <label className="flex items-center gap-2 text-sm font-medium text-foreground/70 px-1">
+                  <Calendar size={14} className="text-muted-foreground/70" />
                   {tBooks("publicationDate")}
                 </label>
-                <div className="bg-zinc-100 rounded-2xl overflow-hidden">
+                <div className="bg-muted rounded-2xl overflow-hidden">
                   <input
                     type="date"
                     name="publicationDate"
                     value={formData.publicationDate}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-4 bg-transparent text-zinc-900 focus:outline-none text-base [color-scheme:light]"
+                    className="w-full px-4 py-4 bg-transparent text-foreground focus:outline-none text-base dark:[color-scheme:dark] [color-scheme:light]"
                   />
                 </div>
               </div>
@@ -322,8 +322,8 @@ export function ItemRegistrationDrawer({
                   isSuccess
                     ? "bg-emerald-500 text-white"
                     : isFormValid
-                    ? "bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]"
-                    : "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]"
+                    : "bg-muted text-muted-foreground/70 cursor-not-allowed"
                 )}
               >
                 {isSuccess ? (
@@ -344,13 +344,13 @@ export function ItemRegistrationDrawer({
               </button>
             </>
           ) : (
-            <div className="bg-zinc-100 rounded-2xl p-12 flex flex-col items-center justify-center gap-4 min-h-[300px]">
-              <div className="w-20 h-20 rounded-full bg-zinc-200 flex items-center justify-center">
-                <Scan size={36} className="text-zinc-400" />
+            <div className="bg-muted rounded-2xl p-12 flex flex-col items-center justify-center gap-4 min-h-[300px]">
+              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                <Scan size={36} className="text-muted-foreground/70" />
               </div>
               <div className="text-center">
-                <p className="text-zinc-600 font-medium">{tManage("isbnScanning")}</p>
-                <p className="text-zinc-400 text-sm mt-1">
+                <p className="text-muted-foreground font-medium">{tManage("isbnScanning")}</p>
+                <p className="text-muted-foreground/70 text-sm mt-1">
                   {tManage("isbnScanningComingSoon")}
                 </p>
               </div>

@@ -62,15 +62,15 @@ function EditableTitle({
         onBlur={() => setIsFocused(false)}
         placeholder={placeholder}
         className={cn(
-          "w-full font-display text-xl font-bold text-zinc-900 bg-transparent border-none outline-none",
-          "placeholder:text-zinc-400",
-          !value && !isFocused && "text-zinc-400"
+          "w-full font-display text-xl font-bold text-foreground bg-transparent border-none outline-none",
+          "placeholder:text-muted-foreground",
+          !value && !isFocused && "text-muted-foreground/70"
         )}
       />
       {!isFocused && (
         <Pencil
           size={14}
-          className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity"
         />
       )}
     </div>
@@ -91,7 +91,7 @@ function EditableLocation({
 
   return (
     <div className="flex items-center gap-2 group">
-      <MapPin size={16} className="text-zinc-400 flex-shrink-0" />
+      <MapPin size={16} className="text-muted-foreground/70 flex-shrink-0" />
       <input
         type="text"
         value={value}
@@ -100,14 +100,14 @@ function EditableLocation({
         onBlur={() => setIsFocused(false)}
         placeholder={placeholder}
         className={cn(
-          "flex-1 text-sm text-zinc-600 bg-transparent border-none outline-none",
-          "placeholder:text-zinc-400"
+          "flex-1 text-sm text-muted-foreground bg-transparent border-none outline-none",
+          "placeholder:text-muted-foreground"
         )}
       />
       {!isFocused && value && (
         <Pencil
           size={12}
-          className="text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+          className="text-muted-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
         />
       )}
     </div>
@@ -138,8 +138,8 @@ function EditableDateTime({
     <div className="space-y-1">
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <Calendar size={14} className={error ? "text-rose-400" : "text-zinc-400"} />
-          <span className={cn("text-xs", error ? "text-rose-500" : "text-zinc-500")}>{label}:</span>
+          <Calendar size={14} className={error ? "text-rose-400" : "text-muted-foreground/70"} />
+          <span className={cn("text-xs", error ? "text-rose-500" : "text-muted-foreground")}>{label}:</span>
         </div>
         <input
           type="date"
@@ -148,7 +148,7 @@ function EditableDateTime({
           onChange={(e) => onDateChange(e.target.value)}
           className={cn(
             "text-sm bg-transparent border-none outline-none cursor-pointer",
-            error ? "text-rose-600" : "text-zinc-700"
+            error ? "text-rose-600" : "text-foreground/70"
           )}
         />
         <input
@@ -158,7 +158,7 @@ function EditableDateTime({
           onChange={(e) => onTimeChange(e.target.value)}
           className={cn(
             "text-sm bg-transparent border-none outline-none cursor-pointer",
-            error ? "text-rose-600" : "text-zinc-700"
+            error ? "text-rose-600" : "text-foreground/70"
           )}
         />
       </div>
@@ -194,7 +194,7 @@ function CoverImageUpload({
   return (
     <div
       onClick={handleClick}
-      className="relative w-full aspect-[4/5] bg-zinc-100 cursor-pointer group overflow-hidden"
+      className="relative w-full aspect-[4/5] bg-muted cursor-pointer group overflow-hidden"
     >
       <input
         ref={inputRef}
@@ -214,13 +214,13 @@ function CoverImageUpload({
             unoptimized
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 rounded-full p-3">
-              <ImagePlus size={24} className="text-zinc-700" />
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/90 rounded-full p-3">
+              <ImagePlus size={24} className="text-foreground/70" />
             </div>
           </div>
         </>
       ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400 group-hover:text-zinc-600 transition-colors">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground/70 group-hover:text-muted-foreground transition-colors">
           <ImagePlus size={48} strokeWidth={1.5} />
           <p className="mt-3 text-sm font-medium">{t("uploadEventCover")}</p>
           <p className="mt-1 text-xs">{t("clickToAddImage")}</p>
@@ -236,11 +236,11 @@ function PreviewParticipants() {
   return (
     <div className="flex items-center gap-3">
       <div className="flex -space-x-2">
-        <div className="w-9 h-9 rounded-full bg-zinc-200 border-2 border-white flex items-center justify-center">
-          <Users size={14} className="text-zinc-400" />
+        <div className="w-9 h-9 rounded-full bg-muted border-2 border-background flex items-center justify-center">
+          <Users size={14} className="text-muted-foreground/70" />
         </div>
       </div>
-      <span className="text-sm text-zinc-400">{t("noParticipantsYet")}</span>
+      <span className="text-sm text-muted-foreground/70">{t("noParticipantsYet")}</span>
     </div>
   );
 }
@@ -463,30 +463,30 @@ export function EventPreviewEditor({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <Loader2 className="animate-spin text-zinc-400" size={32} />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="animate-spin text-muted-foreground/70" size={32} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Cover Image Area */}
       <div className="relative w-full flex-shrink-0">
         <button
           onClick={() => router.back()}
-          className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-sm border border-zinc-200/50"
+          className="absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center shadow-sm border border-border/50"
         >
-          <ArrowLeft size={20} className="text-zinc-800" />
+          <ArrowLeft size={20} className="text-foreground" />
         </button>
 
         <CoverImageUpload preview={coverPreview} onFileSelect={handleFileSelect} />
       </div>
 
       {/* Content Sheet */}
-      <div className="relative -mt-6 bg-white rounded-t-3xl flex-1 flex flex-col">
+      <div className="relative -mt-6 bg-background rounded-t-3xl flex-1 flex flex-col">
         <div className="flex justify-center pt-3 pb-4">
-          <div className="w-12 h-1.5 rounded-full bg-zinc-200" />
+          <div className="w-12 h-1.5 rounded-full bg-muted" />
         </div>
 
         <div className="px-5 pb-6 flex-1 flex flex-col">
@@ -499,14 +499,14 @@ export function EventPreviewEditor({
             />
 
             {/* Date preview */}
-            <div className="flex items-center gap-2 mt-2 text-sm text-zinc-500">
+            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
               <Clock size={14} />
               <span>{dateRangePreview}</span>
             </div>
           </div>
 
           {/* Date & Time Pickers */}
-          <div className="mb-4 p-4 bg-zinc-50 rounded-2xl space-y-3">
+          <div className="mb-4 p-4 bg-secondary rounded-2xl space-y-3">
             <EditableDateTime
               label={tCommon("start")}
               dateValue={formData.startDate}
@@ -544,7 +544,7 @@ export function EventPreviewEditor({
 
           {/* Description */}
           <div className="flex-1 mb-6">
-            <h2 className="font-display text-base font-semibold text-zinc-900 mb-3">
+            <h2 className="font-display text-base font-semibold text-foreground mb-3">
               {t("aboutEvent")}
             </h2>
             <RichTextEditor
@@ -563,8 +563,8 @@ export function EventPreviewEditor({
               className={cn(
                 "w-full py-4 rounded-2xl font-medium text-base transition-all",
                 canSubmit
-                  ? "bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]"
-                  : "bg-zinc-200 text-zinc-400 cursor-not-allowed"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]"
+                  : "bg-muted text-muted-foreground/70 cursor-not-allowed"
               )}
             >
               {isSaving ? (

@@ -72,7 +72,7 @@ function BorrowedBookCard({
       className="flex-shrink-0 w-28 group cursor-pointer"
     >
       {/* Book Cover */}
-      <div className="relative w-28 h-40 rounded-2xl overflow-hidden bg-zinc-200 shadow-sm group-hover:shadow-md transition-shadow">
+      <div className="relative w-28 h-40 rounded-2xl overflow-hidden bg-muted shadow-sm group-hover:shadow-md transition-shadow">
         {book.cover ? (
           <Image
             src={book.cover}
@@ -82,8 +82,8 @@ function BorrowedBookCard({
             unoptimized
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-300 to-zinc-200">
-            <BookOpen size={24} className="text-zinc-400" />
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-secondary">
+            <BookOpen size={24} className="text-muted-foreground/70" />
           </div>
         )}
         {/* Gradient overlay at bottom */}
@@ -97,7 +97,7 @@ function BorrowedBookCard({
                 ? "bg-red-500/90 text-white"
                 : daysRemaining <= 7
                 ? "bg-amber-400/90 text-amber-950"
-                : "bg-white/90 text-zinc-700"
+                : "bg-background/90 text-foreground/70"
             )}
           >
             <Clock size={10} />
@@ -170,15 +170,15 @@ function ItemCard({
       className={cn(
         "rounded-2xl border overflow-hidden shadow-sm hover:shadow-md transition-all",
         isBorrowed
-          ? "bg-zinc-100 border-zinc-200"
-          : "bg-white border-zinc-100"
+          ? "bg-muted border-border"
+          : "bg-background border-border"
       )}
     >
       <div className="flex gap-4 p-4">
         {/* Book Cover */}
         <div
           className={cn(
-            "flex-shrink-0 w-20 h-28 rounded-xl overflow-hidden bg-zinc-100 relative",
+            "flex-shrink-0 w-20 h-28 rounded-xl overflow-hidden bg-muted relative",
             isBorrowed && "opacity-60"
           )}
         >
@@ -191,8 +191,8 @@ function ItemCard({
               unoptimized
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-200 to-zinc-100">
-              <BookOpen size={24} className="text-zinc-400" />
+            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-secondary">
+              <BookOpen size={24} className="text-muted-foreground/70" />
             </div>
           )}
         </div>
@@ -202,7 +202,7 @@ function ItemCard({
           <h3
             className={cn(
               "font-semibold text-base leading-tight line-clamp-2",
-              isBorrowed ? "text-zinc-500" : "text-zinc-900"
+              isBorrowed ? "text-muted-foreground" : "text-foreground"
             )}
           >
             {book.title}
@@ -210,7 +210,7 @@ function ItemCard({
           <p
             className={cn(
               "text-sm mt-1 line-clamp-1",
-              isBorrowed ? "text-zinc-400" : "text-zinc-500"
+              isBorrowed ? "text-muted-foreground/70" : "text-muted-foreground"
             )}
           >
             {book.author || tCommon("unknownAuthor")}
@@ -219,7 +219,7 @@ function ItemCard({
             <div
               className={cn(
                 "flex items-center gap-1.5 mt-2 text-xs",
-                isBorrowed ? "text-zinc-400" : "text-zinc-400"
+                isBorrowed ? "text-muted-foreground/70" : "text-muted-foreground/70"
               )}
             >
               <MapPin size={12} />
@@ -234,7 +234,7 @@ function ItemCard({
                 "px-2.5 py-1 rounded-full text-xs font-medium transition-all cursor-pointer hover:scale-105 active:scale-95 disabled:opacity-50",
                 book.status === "available"
                   ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                  : "bg-zinc-300 text-zinc-600 hover:bg-zinc-400"
+                  : "bg-muted text-muted-foreground hover:bg-muted-foreground/50"
               )}
               title={book.status === "available" ? t("clickToLend") : t("clickToReturn")}
             >
@@ -277,10 +277,10 @@ function ItemCard({
         <div className="flex flex-col gap-2">
           <button
             onClick={onEdit}
-            className="p-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 transition-colors active:scale-95"
+            className="p-2.5 rounded-xl bg-muted hover:bg-muted transition-colors active:scale-95"
             title={tCommon("edit")}
           >
-            <Pencil size={16} className="text-zinc-600" />
+            <Pencil size={16} className="text-muted-foreground" />
           </button>
           <button
             onClick={handleDelete}
@@ -491,7 +491,7 @@ export default function ManageItemsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 pb-24">
+    <div className="min-h-screen bg-secondary pb-24">
       <PageHeader title={t("manageItems")} />
 
       <div className="px-4 pt-5 space-y-4">
@@ -505,9 +505,9 @@ export default function ManageItemsPage() {
         {!isLoading && borrowedBooks.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-sm font-semibold text-zinc-700">
+              <h2 className="font-display text-sm font-semibold text-foreground/70">
                 {tCommon("borrowed")}
-                <span className="ml-1.5 text-xs font-normal text-zinc-400">
+                <span className="ml-1.5 text-xs font-normal text-muted-foreground/70">
                   {borrowedBooks.length}
                 </span>
               </h2>
@@ -528,12 +528,12 @@ export default function ManageItemsPage() {
 
         {/* Items Count */}
         <div className="flex items-center justify-between">
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-muted-foreground">
             {isLoading ? (
               tCommon("loading")
             ) : (
               <>
-                <span className="font-medium text-zinc-700">
+                <span className="font-medium text-foreground/70">
                   {availableBooks.length}
                 </span>{" "}
                 {availableBooks.length === 1 ? tCommon("item") : tCommon("items")}
@@ -549,13 +549,13 @@ export default function ManageItemsPage() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="flex gap-4 p-4 bg-white rounded-2xl animate-pulse border border-zinc-100"
+                className="flex gap-4 p-4 bg-background rounded-2xl animate-pulse border border-border"
               >
-                <div className="w-20 h-28 bg-zinc-200 rounded-xl" />
+                <div className="w-20 h-28 bg-muted rounded-xl" />
                 <div className="flex-1 space-y-3">
-                  <div className="h-5 bg-zinc-200 rounded w-3/4" />
-                  <div className="h-4 bg-zinc-200 rounded w-1/2" />
-                  <div className="h-6 bg-zinc-200 rounded w-20 mt-2" />
+                  <div className="h-5 bg-muted rounded w-3/4" />
+                  <div className="h-4 bg-muted rounded w-1/2" />
+                  <div className="h-6 bg-muted rounded w-20 mt-2" />
                 </div>
               </div>
             ))}
@@ -589,7 +589,7 @@ export default function ManageItemsPage() {
       {/* Floating Action Button */}
       <button
         onClick={handleAddNew}
-        className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-zinc-900 text-white shadow-lg hover:bg-zinc-800 active:scale-95 transition-all flex items-center justify-center"
+        className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 active:scale-95 transition-all flex items-center justify-center"
         aria-label="Add new item"
       >
         <Plus size={24} strokeWidth={2.5} />
@@ -613,23 +613,23 @@ export default function ManageItemsPage() {
       <Drawer open={returnDrawerOpen} onOpenChange={setReturnDrawerOpen}>
         <DrawerContent>
           <DrawerHeader className="text-center pt-6 pb-2">
-            <DrawerTitle className="font-display text-lg font-semibold text-zinc-900">
+            <DrawerTitle className="font-display text-lg font-semibold text-foreground">
               {selectedBorrowedBook?.title}
             </DrawerTitle>
           </DrawerHeader>
 
           <div className="px-6 pb-2 space-y-4">
             {/* Borrower */}
-            <div className="flex items-center justify-between py-3 border-b border-zinc-100">
-              <span className="text-sm text-zinc-500">{t("borrower")}</span>
-              <span className="text-sm font-medium text-zinc-900">
+            <div className="flex items-center justify-between py-3 border-b border-border">
+              <span className="text-sm text-muted-foreground">{t("borrower")}</span>
+              <span className="text-sm font-medium text-foreground">
                 {borrowerName ?? tCommon("loading")}
               </span>
             </div>
 
             {/* Remaining Time */}
-            <div className="flex items-center justify-between py-3 border-b border-zinc-100">
-              <span className="text-sm text-zinc-500">{t("remaining")}</span>
+            <div className="flex items-center justify-between py-3 border-b border-border">
+              <span className="text-sm text-muted-foreground">{t("remaining")}</span>
               {selectedBorrowedBook?.borrowedDate ? (
                 (() => {
                   const days = calculateDaysRemaining(selectedBorrowedBook.borrowedDate);
@@ -641,7 +641,7 @@ export default function ManageItemsPage() {
                           ? "text-red-600"
                           : days <= 7
                           ? "text-amber-600"
-                          : "text-zinc-900"
+                          : "text-foreground"
                       )}
                     >
                       <Clock size={14} />
@@ -654,7 +654,7 @@ export default function ManageItemsPage() {
                   );
                 })()
               ) : (
-                <span className="text-sm text-zinc-400">{tCommon("unknown")}</span>
+                <span className="text-sm text-muted-foreground/70">{tCommon("unknown")}</span>
               )}
             </div>
           </div>
@@ -663,7 +663,7 @@ export default function ManageItemsPage() {
             <button
               onClick={handleReturnFromDrawer}
               disabled={isReturningBook}
-              className="flex-1 py-3 rounded-xl font-semibold text-base bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-3 rounded-xl font-semibold text-base bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isReturningBook ? (
                 <>
@@ -677,7 +677,7 @@ export default function ManageItemsPage() {
             <button
               onClick={() => setReturnDrawerOpen(false)}
               disabled={isReturningBook}
-              className="flex-1 py-3 rounded-xl font-semibold text-base bg-zinc-100 text-zinc-700 hover:bg-zinc-200 active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex-1 py-3 rounded-xl font-semibold text-base bg-muted text-foreground/70 hover:bg-muted active:scale-[0.98] transition-all disabled:opacity-50"
             >
               {tCommon("cancel")}
             </button>

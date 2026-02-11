@@ -29,20 +29,20 @@ export function FormInput({
   return (
     <div className={cn("space-y-2", className)}>
       {label && (
-        <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-          {Icon && <Icon size={14} className="text-zinc-400" />}
+        <label className="flex items-center gap-2 text-sm font-medium text-foreground/70 px-1">
+          {Icon && <Icon size={14} className="text-muted-foreground/70" />}
           {label}
           {required && <span className="text-rose-500">*</span>}
         </label>
       )}
-      <div className="bg-zinc-100 rounded-2xl overflow-hidden">
+      <div className="bg-muted rounded-2xl overflow-hidden">
         <input
           type={type}
           name={name}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="w-full px-4 py-4 bg-transparent text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-base"
+          className="w-full px-4 py-4 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-base"
         />
       </div>
     </div>
@@ -75,20 +75,20 @@ export function FormTextarea({
   return (
     <div className={cn("space-y-2", className)}>
       {label && (
-        <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-          {Icon && <Icon size={14} className="text-zinc-400" />}
+        <label className="flex items-center gap-2 text-sm font-medium text-foreground/70 px-1">
+          {Icon && <Icon size={14} className="text-muted-foreground/70" />}
           {label}
           {required && <span className="text-rose-500">*</span>}
         </label>
       )}
-      <div className="bg-zinc-100 rounded-2xl overflow-hidden">
+      <div className="bg-muted rounded-2xl overflow-hidden">
         <textarea
           name={name}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
           rows={rows}
-          className="w-full px-4 py-4 bg-transparent text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-base resize-none"
+          className="w-full px-4 py-4 bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none text-base resize-none"
         />
       </div>
     </div>
@@ -121,29 +121,29 @@ export function DateTimeInput({
   return (
     <div className={cn("space-y-2", className)}>
       {label && (
-        <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 px-1">
-          {Icon && <Icon size={14} className="text-zinc-400" />}
+        <label className="flex items-center gap-2 text-sm font-medium text-foreground/70 px-1">
+          {Icon && <Icon size={14} className="text-muted-foreground/70" />}
           {label}
         </label>
       )}
       <div className="flex gap-3">
-        <div className="flex-1 bg-zinc-100 rounded-2xl overflow-hidden">
+        <div className="flex-1 bg-muted rounded-2xl overflow-hidden">
           <input
             type="date"
             name={dateName}
             value={dateValue}
             onChange={onDateChange}
-            className="w-full px-4 py-4 bg-transparent text-zinc-900 focus:outline-none text-base [color-scheme:light]"
+            className="w-full px-4 py-4 bg-transparent text-foreground focus:outline-none text-base dark:[color-scheme:dark] [color-scheme:light]"
           />
         </div>
-        <div className="w-32 bg-zinc-100 rounded-2xl overflow-hidden flex items-center">
-          <Clock size={16} className="text-zinc-400 ml-4" />
+        <div className="w-32 bg-muted rounded-2xl overflow-hidden flex items-center">
+          <Clock size={16} className="text-muted-foreground/70 ml-4" />
           <input
             type="time"
             name={timeName}
             value={timeValue}
             onChange={onTimeChange}
-            className="w-full px-3 py-4 bg-transparent text-zinc-900 focus:outline-none text-base [color-scheme:light]"
+            className="w-full px-3 py-4 bg-transparent text-foreground focus:outline-none text-base dark:[color-scheme:dark] [color-scheme:light]"
           />
         </div>
       </div>

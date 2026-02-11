@@ -39,7 +39,7 @@ export function ImageUpload({
         type="button"
         onClick={handleClick}
         className={cn(
-          "w-full bg-zinc-100 rounded-2xl flex flex-col items-center justify-center gap-2 overflow-hidden relative group transition-all hover:bg-zinc-200/80",
+          "w-full bg-muted rounded-2xl flex flex-col items-center justify-center gap-2 overflow-hidden relative group transition-all hover:bg-muted/80",
           height,
           className
         )}
@@ -59,8 +59,8 @@ export function ImageUpload({
           </>
         ) : (
           <>
-            <Camera size={28} className="text-zinc-400" />
-            <span className="text-zinc-500 font-medium text-sm">{label}</span>
+            <Camera size={28} className="text-muted-foreground/70" />
+            <span className="text-muted-foreground font-medium text-sm">{label}</span>
           </>
         )}
       </button>
