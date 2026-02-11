@@ -6,22 +6,30 @@ import Image from "next/image";
 import { BookOpen } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { useIsDesktop } from "@/hooks/use-is-desktop";
 import { BottomNav } from "@/components/navigation";
-import { BookCard } from "@/components/books";
+import { BookCard, BookDetailsPanel } from "@/components/books";
 import { PageHeader } from "@/components/ui/page-header";
 import { SearchInput } from "@/components/ui/search-input";
 import { EmptyState } from "@/components/ui/empty-state";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import type { Book } from "@/types/type";
 import { session } from "@/lib/session";
 
 export default function ItemsPage() {
   const router = useRouter();
   const t = useTranslations("books");
+  const isDesktop = useIsDesktop();
   const [books, setBooks] = useState<Book[]>([]);
   const [featuredBookIds, setFeaturedBookIds] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -102,7 +110,11 @@ export default function ItemsPage() {
   }, [books, featuredBookIds]);
 
   const handleViewBook = (bookId: string) => {
-    router.push(`/items/${bookId}`);
+    if (isDesktop) {
+      setSelectedBookId(bookId);
+    } else {
+      router.push(`/items/${bookId}`);
+    }
   };
 
   return (
@@ -227,6 +239,26 @@ export default function ItemsPage() {
       </div>
 
       <BottomNav />
+
+      {/* Desktop: book details slide-in from right */}
+      <Sheet
+        open={!!selectedBookId}
+        onOpenChange={(open) => {
+          if (!open) setSelectedBookId(null);
+        }}
+      >
+        <SheetContent
+          side="right"
+          className="w-full sm:max-w-md lg:max-w-lg p-0 overflow-hidden"
+        >
+          <SheetTitle className="sr-only">
+            {t("viewDetails")}
+          </SheetTitle>
+          {selectedBookId && (
+            <BookDetailsPanel bookId={selectedBookId} />
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
