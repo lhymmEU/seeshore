@@ -45,7 +45,7 @@ seeshore/
 │   │           ├── route.ts          # GET / POST replies on a post
 │   │           └── [id]/route.ts     # PUT / DELETE a single reply
 │   │
-│   ├── manage/                       # Staff dashboard (Owner / Assistant)
+│   ├── manage/                       # Staff dashboard (Owner)
 │   │   ├── layout.tsx                # BottomNav wrapper for management pages
 │   │   ├── page.tsx                  # Dashboard home — store overview
 │   │   ├── bookstore/page.tsx        # Edit store name, banner, description, rules
@@ -181,9 +181,7 @@ seeshore/
 
 | Role | Description | Access |
 |---|---|---|
-| **Guest** | Default upon registration (no invite code) | View welcome page only |
 | **Owner** | Bookstore owner; full management access | All features: manage store, books, events, invite codes, featured books, collaborate |
-| **Assistant** | Staff member promoted by Owner | Manage books & events; no invite code generation |
 | **Member** | Registered via invite code | Browse books, attend events, collaborate, profile, favorites, borrowing |
 
 ### Data Flow
@@ -324,7 +322,6 @@ Then log in via the welcome page with those credentials. You will still need to 
 |---|---|
 | **Owner** | Register via "I'm a store owner" → create a store |
 | **Member** | Get an invite code from an Owner → register via "I'm a member" |
-| **Assistant** | Promote a member from within the store management (future feature) |
 
 ---
 
@@ -343,13 +340,13 @@ Then log in via the welcome page with those credentials. You will still need to 
 | 7 | **Book Details** — View cover, description, author, categories, location, borrow status, and like count | `app/items/[id]/page.tsx`, `components/books/BookDetailsPanel.tsx` | 1. From the items list, click on any book card. 2. View the full detail page with all book information. |
 | 8 | **Favorite / Unfavorite Books** — Toggle a book as a favorite; increments/decrements like count | `data/supabase.ts` (`addBookToFavorites`, `removeBookFromFavorites`, `increment_book_likes`, `decrement_book_likes`) | 1. Open a book detail page as a Member. 2. Click the heart/favorite button. 3. Verify the like count increases. 4. Click again to unfavorite; verify count decreases. |
 | 9 | **Featured "This Week's Books"** — Owner curates up to 10 featured books displayed in a carousel | `app/manage/featured/page.tsx`, `app/items/page.tsx`, `components/ui/carousel.tsx`, `data/supabase.ts` (`updateStore` with `featuredBooks`) | 1. Log in as Owner → navigate to **Manage** → **Featured**. 2. Select books to feature (up to 10) → save. 3. As a Member, go to **Items** → verify the featured carousel at the top. |
-| 10 | **Register a Book** (Staff) — Add a new book with title, ISBN, author, cover image, categories, and location | `app/manage/items/page.tsx`, `components/manage/ItemRegistrationDrawer.tsx`, `data/supabase.ts` (`registerBook`) | 1. Log in as Owner/Assistant → navigate to **Manage** → **Items**. 2. Click the "+" or "Register" button. 3. Fill in book details, upload a cover image → submit. 4. Verify the book appears in the list. |
+| 10 | **Register a Book** (Staff) — Add a new book with title, ISBN, author, cover image, categories, and location | `app/manage/items/page.tsx`, `components/manage/ItemRegistrationDrawer.tsx`, `data/supabase.ts` (`registerBook`) | 1. Log in as Owner → navigate to **Manage** → **Items**. 2. Click the "+" or "Register" button. 3. Fill in book details, upload a cover image → submit. 4. Verify the book appears in the list. |
 | 11 | **Edit / Delete a Book** (Staff) — Modify book details or remove a book entirely | `app/api/books/[id]/route.ts`, `data/supabase.ts` (`updateBook`, `deregisterBook`) | 1. As Owner, go to **Manage** → **Items**. 2. Click on a book → edit details → save. 3. Or click delete → confirm → verify removal. |
-| 12 | **Borrow / Return a Book** (Staff) — Staff processes borrow and return for members; 30-day borrowing period with countdown | `components/manage/BorrowDrawer.tsx`, `data/supabase.ts` (`borrowBook`, `returnBook`) | 1. As Owner/Assistant, go to **Manage** → **Items**. 2. Click on an available book → "Borrow" → select a member → confirm. 3. Verify the book shows as "Borrowed" with a countdown. 4. Click "Return" on a borrowed book → confirm → verify it's available again. |
+| 12 | **Borrow / Return a Book** (Staff) — Staff processes borrow and return for members; 30-day borrowing period with countdown | `components/manage/BorrowDrawer.tsx`, `data/supabase.ts` (`borrowBook`, `returnBook`) | 1. As Owner, go to **Manage** → **Items**. 2. Click on an available book → "Borrow" → select a member → confirm. 3. Verify the book shows as "Borrowed" with a countdown. 4. Click "Return" on a borrowed book → confirm → verify it's available again. |
 | **Events** | | | |
 | 13 | **Browse Events** — View all events with search; featured "closest upcoming event" at top | `app/events/page.tsx`, `components/events/EventCard.tsx` | 1. Log in as any role. 2. Navigate to **Events** via sidebar. 3. See the closest upcoming event highlighted. 4. Use the search bar to filter events. |
 | 14 | **Event Details & Slide-to-Attend** — View event info (cover, dates, hosts, attendees); swipe to attend | `app/events/[id]/page.tsx`, `data/supabase.ts` (`attendEvent`, `leaveEvent`) | 1. Click on an event card to open the detail page. 2. Use the slide-to-attend control to register attendance. 3. View the attendees list — click an attendee to see their member profile. |
-| 15 | **Create an Event** (Staff) — Form with title, cover image, dates, description, location, and host selection; live preview | `app/manage/events/create/page.tsx`, `components/events/EventForm.tsx`, `components/events/EventPreviewEditor.tsx` | 1. As Owner/Assistant, go to **Manage** → **Events** → **Create**. 2. Fill in all fields, upload a cover image. 3. Preview the event on the right pane. 4. Submit → verify it appears in the events list. |
+| 15 | **Create an Event** (Staff) — Form with title, cover image, dates, description, location, and host selection; live preview | `app/manage/events/create/page.tsx`, `components/events/EventForm.tsx`, `components/events/EventPreviewEditor.tsx` | 1. As Owner, go to **Manage** → **Events** → **Create**. 2. Fill in all fields, upload a cover image. 3. Preview the event on the right pane. 4. Submit → verify it appears in the events list. |
 | 16 | **Edit / Delete an Event** (Staff) — Modify event details or remove an event; update status (open/cancelled/etc.) | `app/manage/events/[id]/edit/page.tsx`, `app/manage/events/page.tsx`, `data/supabase.ts` (`editEvent`, `deleteEvent`) | 1. As Owner, go to **Manage** → **Events**. 2. Click edit on an event → modify fields → save. 3. Or change the status to cancelled/finished. 4. Delete an event → confirm. |
 | 17 | **Auto-finish Past Events** — Events with end dates past the deadline (GMT+8) are auto-marked as "finished" | `data/supabase.ts` (`fetchEvents`, `fetchEvent`), `lib/date-utils.ts` (`isEventPastDeadline`) | 1. Create an event with an end date in the past. 2. Browse the events list → verify the event shows as "finished". |
 | **Invitation Codes** | | | |
@@ -358,7 +355,7 @@ Then log in via the welcome page with those credentials. You will still need to 
 | 20 | **Revoke Invite Code** (Owner) — Delete unused invite codes | `app/api/invite-codes/[id]/route.ts` | 1. On the invite codes page, click delete on an unused code → confirm. 2. Verify it disappears from the list. |
 | **Store Management** | | | |
 | 21 | **Edit Store Info** — Update store name, banner image, description, and rules | `app/manage/bookstore/page.tsx`, `data/supabase.ts` (`updateStore`) | 1. As Owner, go to **Manage** → **Bookstore**. 2. Edit the name, upload a new banner, modify description/rules → save. 3. Verify changes reflect on the public-facing pages. |
-| 22 | **Dashboard Overview** — Staff landing page showing store stats | `app/manage/page.tsx` | 1. Log in as Owner/Assistant. 2. You land on the **Manage** dashboard. 3. View store overview information. |
+| 22 | **Dashboard Overview** — Staff landing page showing store stats | `app/manage/page.tsx` | 1. Log in as Owner. 2. You land on the **Manage** dashboard. 3. View store overview information. |
 | **Collaborate (Forum)** | | | |
 | 23 | **Browse Posts** — View community posts with search | `app/collaborate/page.tsx`, `components/collaborate/PostCard.tsx` | 1. Navigate to **Collaborate** via sidebar. 2. Browse the list of posts. 3. Use search to filter by title. |
 | 24 | **Create a Post** — Create a post with title, description, and optional photos | `components/collaborate/CreatePostDrawer.tsx`, `data/supabase.ts` (`createCollaboratePost`) | 1. On the collaborate page, click the "+" button to open the create drawer. 2. Enter a title, description, and optionally upload photos. 3. Submit → verify the post appears in the list. |
@@ -371,7 +368,7 @@ Then log in via the welcome page with those credentials. You will still need to 
 | 30 | **Public Member Profile** — Accessible at `/members/[id]`; shows display-page content if enabled | `app/members/[id]/page.tsx`, `data/supabase.ts` (`fetchUserDisplayConfig`) | 1. Get a member's profile link (shown on event attendee lists, etc.). 2. Open `/members/<user-id>` in a browser. 3. If their display page is enabled, see their bio, selected events, and books. |
 | **Navigation & UI** | | | |
 | 31 | **Responsive Sidebar (Desktop)** — Role-based navigation links; visible on screens ≥ 1024px | `components/navigation/Sidebar.tsx`, `app/layout.tsx` | 1. Open the app in a desktop browser (≥ 1024px wide). 2. See the sidebar with links based on your role (Owner sees "Manage", Member sees "Profile", etc.). |
-| 32 | **Bottom Nav (Mobile)** — Tab bar for staff management pages on mobile | `components/navigation/BottomNav.tsx`, `app/manage/layout.tsx` | 1. Open the app in mobile view (< 1024px). 2. As Owner/Assistant, navigate to any `/manage` page. 3. See the bottom tab bar for switching between management sections. |
+| 32 | **Bottom Nav (Mobile)** — Tab bar for staff management pages on mobile | `components/navigation/BottomNav.tsx`, `app/manage/layout.tsx` | 1. Open the app in mobile view (< 1024px). 2. As Owner, navigate to any `/manage` page. 3. See the bottom tab bar for switching between management sections. |
 | 33 | **Dark / Light Theme** — Toggle between dark and light modes; persisted across sessions | `components/ui/theme-toggle.tsx`, `lib/theme.ts` | 1. Click the theme toggle in the sidebar or navigation. 2. Verify the UI switches between dark and light. 3. Refresh the page — verify the theme persists. |
 | 34 | **Internationalization (i18n)** — Switch between English and Chinese; all UI strings are translated | `components/ui/language-switcher.tsx`, `i18n/config.ts`, `messages/en.json`, `messages/zh.json` | 1. Click the language switcher (EN/ZH). 2. Verify all UI text changes to the selected language. 3. Navigate between pages — verify translations persist. |
 | 35 | **Image Upload** — Upload images to Supabase Storage for avatars, book covers, event covers, and post photos | `components/ui/image-upload.tsx`, `data/supabase.ts` (`uploadImage`) | 1. In any form with an image field (event creation, book registration, profile), click the upload area. 2. Select an image file. 3. Verify it uploads and displays correctly. |
