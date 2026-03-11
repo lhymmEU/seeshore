@@ -207,7 +207,7 @@ seeshore/
 
 ```bash
 git clone <repo-url>
-cd seashore
+cd seeshore
 npm install
 ```
 
